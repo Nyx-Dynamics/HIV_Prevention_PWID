@@ -1,0 +1,331 @@
+[
+  {
+    "scenario": "Current Policy",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 7,
+    "completed_cascade": 51,
+    "incarceration_disrupted": 44,
+    "step_failure_counts": {
+      "awareness": 69992,
+      "willingness": 18074,
+      "healthcare_access": 7767,
+      "disclosure": 2969,
+      "provider_willing": 529,
+      "affordability": 371,
+      "first_injection": 163,
+      "sustained_engagement": 84
+    },
+    "step_probabilities": {
+      "awareness": 0.29999999999999993,
+      "willingness": 0.4000000000000001,
+      "healthcare_access": 0.35,
+      "disclosure": 0.29999999999999993,
+      "provider_willing": 0.5499999999999999,
+      "affordability": 0.44999999999999996,
+      "first_injection": 0.44999999999999996,
+      "sustained_engagement": 0.29999999999999993
+    },
+    "theoretical_cascade_probability": 0.0004209974999999996,
+    "incarceration_survival_probability": 0.16806999999999994,
+    "theoretical_r0_zero_probability": 7.075704982499991e-05,
+    "observed_r0_zero_rate": 7e-05,
+    "observed_cascade_completion_rate": 0.00051,
+    "r0_zero_95ci": [
+      1.8145089320296768e-05,
+      0.00012185491067970321
+    ],
+    "impact": {
+      "n_protected": 244,
+      "percent_protected": 0.006999999999999999,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 69995,
+      "annual_infections_prevented": 4,
+      "five_year_infections_prevented": 24,
+      "annual_cost_averted_millions": 2.4254999999975553,
+      "five_year_cost_averted_billions": 0.012127499999987777
+    }
+  },
+  {
+    "scenario": "Decriminalization Only",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 814,
+    "completed_cascade": 1256,
+    "incarceration_disrupted": 442,
+    "step_failure_counts": {
+      "awareness": 40085,
+      "willingness": 14947,
+      "healthcare_access": 24664,
+      "disclosure": 8144,
+      "provider_willing": 4849,
+      "affordability": 2911,
+      "first_injection": 2026,
+      "sustained_engagement": 1118
+    },
+    "step_probabilities": {
+      "awareness": 0.6,
+      "willingness": 0.75,
+      "healthcare_access": 0.44999999999999996,
+      "disclosure": 0.6,
+      "provider_willing": 0.6,
+      "affordability": 0.6,
+      "first_injection": 0.5499999999999999,
+      "sustained_engagement": 0.5
+    },
+    "theoretical_cascade_probability": 0.012028499999999996,
+    "incarceration_survival_probability": 0.6240321451000002,
+    "theoretical_r0_zero_probability": 0.007506170657335349,
+    "observed_r0_zero_rate": 0.00814,
+    "observed_cascade_completion_rate": 0.01256,
+    "r0_zero_95ci": [
+      0.007583079169714043,
+      0.008696920830285957
+    ],
+    "impact": {
+      "n_protected": 28490,
+      "percent_protected": 0.814,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 69435,
+      "annual_infections_prevented": 564,
+      "five_year_infections_prevented": 2820,
+      "annual_cost_averted_millions": 282.0509999999995,
+      "five_year_cost_averted_billions": 1.4102549999999974
+    }
+  },
+  {
+    "scenario": "Decrim + Bias Training",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 1391,
+    "completed_cascade": 2228,
+    "incarceration_disrupted": 837,
+    "step_failure_counts": {
+      "awareness": 34969,
+      "willingness": 14432,
+      "healthcare_access": 26437,
+      "disclosure": 8455,
+      "provider_willing": 4288,
+      "affordability": 4303,
+      "first_injection": 3055,
+      "sustained_engagement": 1833
+    },
+    "step_probabilities": {
+      "awareness": 0.6499999999999999,
+      "willingness": 0.775,
+      "healthcare_access": 0.475,
+      "disclosure": 0.6499999999999999,
+      "provider_willing": 0.725,
+      "affordability": 0.625,
+      "first_injection": 0.575,
+      "sustained_engagement": 0.5499999999999999
+    },
+    "theoretical_cascade_probability": 0.022287973541259755,
+    "incarceration_survival_probability": 0.6240321451000002,
+    "theoretical_r0_zero_probability": 0.013908411938884372,
+    "observed_r0_zero_rate": 0.01391,
+    "observed_cascade_completion_rate": 0.02228,
+    "r0_zero_95ci": [
+      0.013184098132561708,
+      0.014635901867438293
+    ],
+    "impact": {
+      "n_protected": 48685,
+      "percent_protected": 1.391,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 69036,
+      "annual_infections_prevented": 963,
+      "five_year_infections_prevented": 4819,
+      "annual_cost_averted_millions": 481.9815000000017,
+      "five_year_cost_averted_billions": 2.4099075000000085
+    }
+  },
+  {
+    "scenario": "Decrim + Low-Barrier Access",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 2088,
+    "completed_cascade": 3342,
+    "incarceration_disrupted": 1254,
+    "step_failure_counts": {
+      "awareness": 37150,
+      "willingness": 14833,
+      "healthcare_access": 18342,
+      "disclosure": 11021,
+      "provider_willing": 6144,
+      "affordability": 3658,
+      "first_injection": 3081,
+      "sustained_engagement": 2429
+    },
+    "step_probabilities": {
+      "awareness": 0.63,
+      "willingness": 0.765,
+      "healthcare_access": 0.615,
+      "disclosure": 0.63,
+      "provider_willing": 0.675,
+      "affordability": 0.7050000000000001,
+      "first_injection": 0.655,
+      "sustained_engagement": 0.59
+    },
+    "theoretical_cascade_probability": 0.03434028153008021,
+    "incarceration_survival_probability": 0.6240321451000002,
+    "theoretical_r0_zero_probability": 0.02142943954655387,
+    "observed_r0_zero_rate": 0.02088,
+    "observed_cascade_completion_rate": 0.03342,
+    "r0_zero_95ci": [
+      0.019993784626939026,
+      0.021766215373060973
+    ],
+    "impact": {
+      "n_protected": 73080,
+      "percent_protected": 2.088,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 68553,
+      "annual_infections_prevented": 1446,
+      "five_year_infections_prevented": 7234,
+      "annual_cost_averted_millions": 723.4920000000056,
+      "five_year_cost_averted_billions": 3.6174600000000283
+    }
+  },
+  {
+    "scenario": "SSP-Integrated Delivery",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 13000,
+    "completed_cascade": 20892,
+    "incarceration_disrupted": 7892,
+    "step_failure_counts": {
+      "awareness": 17917,
+      "willingness": 9421,
+      "healthcare_access": 12113,
+      "disclosure": 10750,
+      "provider_willing": 11305,
+      "affordability": 9468,
+      "first_injection": 1274,
+      "sustained_engagement": 6860
+    },
+    "step_probabilities": {
+      "awareness": 0.82,
+      "willingness": 0.885,
+      "healthcare_access": 0.8350000000000001,
+      "disclosure": 0.82,
+      "provider_willing": 0.7749999999999999,
+      "affordability": 0.755,
+      "first_injection": 0.955,
+      "sustained_engagement": 0.7499999999999999
+    },
+    "theoretical_cascade_probability": 0.20824315744785463,
+    "incarceration_survival_probability": 0.6240321451000002,
+    "theoretical_r0_zero_probability": 0.1299504242445818,
+    "observed_r0_zero_rate": 0.13,
+    "observed_cascade_completion_rate": 0.20892,
+    "r0_zero_95ci": [
+      0.1279155697181244,
+      0.1320844302818756
+    ],
+    "impact": {
+      "n_protected": 455000,
+      "percent_protected": 13.0,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 60991,
+      "annual_infections_prevented": 9009,
+      "five_year_infections_prevented": 45045,
+      "annual_cost_averted_millions": 4504.5,
+      "five_year_cost_averted_billions": 22.5225
+    }
+  },
+  {
+    "scenario": "Full Harm Reduction Infrastructure",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 24582,
+    "completed_cascade": 24582,
+    "incarceration_disrupted": 0,
+    "step_failure_counts": {
+      "awareness": 17208,
+      "willingness": 9251,
+      "healthcare_access": 9858,
+      "disclosure": 10747,
+      "provider_willing": 10546,
+      "affordability": 9628,
+      "first_injection": 813,
+      "sustained_engagement": 7367
+    },
+    "step_probabilities": {
+      "awareness": 0.83,
+      "willingness": 0.89,
+      "healthcare_access": 0.865,
+      "disclosure": 0.83,
+      "provider_willing": 0.8,
+      "affordability": 0.775,
+      "first_injection": 0.975,
+      "sustained_engagement": 0.7699999999999999
+    },
+    "theoretical_cascade_probability": 0.24685920681922502,
+    "incarceration_survival_probability": 1.0,
+    "theoretical_r0_zero_probability": 0.24685920681922502,
+    "observed_r0_zero_rate": 0.24582,
+    "observed_cascade_completion_rate": 0.24582,
+    "r0_zero_95ci": [
+      0.24315128507699277,
+      0.24848871492300725
+    ],
+    "impact": {
+      "n_protected": 860370,
+      "percent_protected": 24.582,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 52964,
+      "annual_infections_prevented": 17035,
+      "five_year_infections_prevented": 85176,
+      "annual_cost_averted_millions": 8517.663,
+      "five_year_cost_averted_billions": 42.588315
+    }
+  },
+  {
+    "scenario": "Theoretical Maximum",
+    "n_individuals": 100000,
+    "n_years": 5,
+    "achieved_r0_zero": 31771,
+    "completed_cascade": 31771,
+    "incarceration_disrupted": 0,
+    "step_failure_counts": {
+      "awareness": 15012,
+      "willingness": 8505,
+      "healthcare_access": 7596,
+      "disclosure": 10233,
+      "provider_willing": 8720,
+      "affordability": 9953,
+      "first_injection": 398,
+      "sustained_engagement": 7812
+    },
+    "step_probabilities": {
+      "awareness": 0.85,
+      "willingness": 0.9,
+      "healthcare_access": 0.9,
+      "disclosure": 0.85,
+      "provider_willing": 0.85,
+      "affordability": 0.8,
+      "first_injection": 0.99,
+      "sustained_engagement": 0.7999999999999999
+    },
+    "theoretical_cascade_probability": 0.315178776,
+    "incarceration_survival_probability": 1.0,
+    "theoretical_r0_zero_probability": 0.315178776,
+    "observed_r0_zero_rate": 0.31771,
+    "observed_cascade_completion_rate": 0.31771,
+    "r0_zero_95ci": [
+      0.3148242678585402,
+      0.3205957321414598
+    ],
+    "impact": {
+      "n_protected": 1111985,
+      "percent_protected": 31.771,
+      "annual_infections_baseline": 70000,
+      "annual_infections_with_policy": 47982,
+      "annual_infections_prevented": 22017,
+      "five_year_infections_prevented": 110086,
+      "annual_cost_averted_millions": 11008.6515,
+      "five_year_cost_averted_billions": 55.0432575
+    }
+  }
+]

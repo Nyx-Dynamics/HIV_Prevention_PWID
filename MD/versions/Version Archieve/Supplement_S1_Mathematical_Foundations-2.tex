@@ -1,0 +1,452 @@
+% Supplement S1: Mathematical Foundations
+% Supporting: Manufactured Death: Mathematical Modeling of HIV Prevention 
+% Impossibility Among People Who Inject Drugs
+% December 2024
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{setspace}
+
+\onehalfspacing
+
+\title{\textbf{Supplement S1: Mathematical Foundations}\\[0.5cm]
+\large The Prevention Theorem, Nested Barrier Framework,\\and Signal-to-Noise Ratio Analysis\\[0.5cm]
+\normalsize Supporting the manuscript:\\
+\textit{Manufactured Death: Mathematical Modeling of HIV Prevention\\Impossibility Among People Who Inject Drugs}}
+
+\author{AC Demidont, DO\\Nyx Dynamics LLC}
+\date{December 2024}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Epidemiological Foundations}
+
+\subsection{The Basic Reproductive Number}
+
+\textbf{Definition 1.1} (Basic Reproductive Number). The basic reproductive number $R_0$ is defined as the expected number of secondary infections produced by a single infected individual in a completely susceptible population:
+
+\begin{equation}
+R_0 = \beta \cdot c \cdot D
+\end{equation}
+
+where $\beta$ = transmission probability per contact, $c$ = contact rate, and $D$ = duration of infectiousness.
+
+For injection-related HIV transmission, $\beta$ ranges from 0.0063 to 0.0080 per needle-sharing event---approximately 10-fold higher than receptive anal intercourse (0.0014) and 100-fold higher than insertive vaginal intercourse (0.0004).
+
+\subsection{The Epidemic Threshold}
+
+\textbf{Theorem 1.1} (Epidemic Threshold). An infectious disease spreads in a population if and only if $R_0 > 1$. When $R_0 < 1$, the disease dies out. When $R_0 = 1$, the system is at critical equilibrium.
+
+\textbf{Proof.} Let $I(t)$ denote infected individuals at time $t$:
+
+\begin{equation}
+\frac{dI}{dt} = R_0 \cdot I - \gamma I = I(R_0 - \gamma)
+\end{equation}
+
+When $R_0 > 1$, $\frac{dI}{dt} > 0$ (epidemic grows). When $R_0 < 1$, $\frac{dI}{dt} < 0$ (epidemic declines). $\square$
+
+\subsection{Effective Reproductive Number Under Intervention}
+
+\textbf{Definition 1.2} (Effective Reproductive Number). When intervention reduces transmission:
+
+\begin{equation}
+R_e = R_0 \cdot (1 - \varepsilon \cdot p)
+\end{equation}
+
+where $\varepsilon$ = intervention efficacy and $p$ = proportion covered.
+
+\textbf{Corollary 1.2} (Elimination Threshold). Complete elimination ($R_e = 0$) requires either $\varepsilon = 1$ (perfect efficacy) or $\varepsilon \cdot p = 1$.
+
+\section{The Prevention Theorem}
+
+\subsection{Statement}
+
+\textbf{Theorem 2.1} (The Prevention Theorem). For any infectious disease with transmission dynamics governed by $R_0$, the only closed-form solution to prevention is:
+
+\begin{equation}
+R_0 = 0
+\end{equation}
+
+Any policy permitting $R_0 > 0$ accepts ongoing transmission as a structural feature.
+
+\textbf{Proof.} The steady-state prevalence equation is:
+
+\begin{equation}
+I^* = S^* \cdot \left(1 - \frac{1}{R_0}\right)
+\end{equation}
+
+For any $R_0 > 0$:
+\begin{itemize}
+    \item If $R_0 > 1$: Endemic equilibrium with $I^* > 0$
+    \item If $R_0 = 1$: Critical equilibrium (unstable)
+    \item If $0 < R_0 < 1$: Declining epidemic, but $I^* = 0$ only asymptotically
+\end{itemize}
+
+Only at $R_0 = 0$ does $I^* = 0$ hold exactly and immediately. $\square$
+
+\subsection{Drug-Mediated Prevention}
+
+\textbf{Proposition 2.2}. Let $\varepsilon_{\text{drug}}$ denote drug efficacy. For LAI-PrEP:
+
+\begin{equation}
+\varepsilon_{\text{drug}} = 0.999 \quad \text{(PURPOSE-1)}
+\end{equation}
+
+For $\varepsilon_{\text{drug}} = 0.999$, achieving $R_e < 0.01$ requires:
+
+\begin{equation}
+\pi_{\text{cascade}} > \frac{R_0^{\text{baseline}} - 0.01}{0.999 \cdot R_0^{\text{baseline}}}
+\end{equation}
+
+For $R_0^{\text{baseline}} = 2$:
+
+\begin{equation}
+\pi_{\text{cascade}} > \frac{1.99}{1.998} \approx 0.996
+\end{equation}
+
+Thus, cascade completion of $\sim$99.6\% achieves effective elimination. The problem is cascade completion, not drug efficacy.
+
+\subsection{Policy-Dependent Decomposition}
+
+\textbf{Definition 2.1}. Decompose the reproductive number:
+
+\begin{equation}
+R_0^{\text{effective}} = R_0^{\text{drug}} + R_0^{\text{policy}}
+\end{equation}
+
+where:
+
+\begin{align}
+R_0^{\text{drug}} &= R_0^{\text{baseline}} \cdot (1 - \varepsilon_{\text{drug}}) \approx 0.002 \\
+R_0^{\text{policy}} &= R_0^{\text{baseline}} \cdot (1 - \pi_{\text{cascade}}) \cdot \varepsilon_{\text{drug}}
+\end{align}
+
+\textbf{Theorem 2.3} (Policy Dominance). For $\varepsilon_{\text{drug}} \geq 0.96$:
+
+\begin{equation}
+\frac{R_0^{\text{policy}}}{R_0^{\text{drug}}} = \frac{(1 - \pi_{\text{cascade}}) \cdot \varepsilon_{\text{drug}}}{1 - \varepsilon_{\text{drug}}} \approx \frac{1 - \pi_{\text{cascade}}}{0.001}
+\end{equation}
+
+For PWID cascade completion $\pi_{\text{cascade}} = 0.0006$:
+
+\begin{equation}
+\frac{R_0^{\text{policy}}}{R_0^{\text{drug}}} \approx \frac{0.9994}{0.001} = 999
+\end{equation}
+
+Policy barriers contribute $\sim$1000$\times$ more to transmission than drug limitations.
+
+\section{The Prevention Cascade}
+
+\subsection{Cascade Structure}
+
+\textbf{Definition 3.1} (Prevention Cascade). The cascade is a multiplicative sequence:
+
+\begin{equation}
+\pi_{\text{cascade}} = \prod_{i=1}^{n} P(S_i | S_{i-1})
+\end{equation}
+
+where $S_i$ denotes reaching stage $i$ and $S_0 \equiv$ ``at risk.''
+
+\subsection{Eight-Stage Model for PWID}
+
+\begin{equation}
+\pi_{\text{cascade}} = P(\text{aware}) \times P(\text{willing}|\text{aware}) \times P(\text{access}|\text{willing}) \times \ldots \times P(\text{sustain}|\text{start})
+\end{equation}
+
+\subsection{Parameter Estimates}
+
+\begin{table}[ht]
+\centering
+\caption{Prevention cascade parameters for PWID}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Stage} & \textbf{Parameter} & \textbf{Estimate} \\
+\midrule
+Awareness & $P(\text{aware})$ & 0.10 \\
+Willingness & $P(\text{willing}|\text{aware})$ & 0.30 \\
+Healthcare access & $P(\text{access}|\text{willing})$ & 0.35 \\
+Disclosure & $P(\text{disclose}|\text{access})$ & 0.25 \\
+Provider offer & $P(\text{provider}|\text{disclose})$ & 0.35 \\
+Testing complete & $P(\text{test}|\text{provider})$ & 0.45 \\
+First injection & $P(\text{start}|\text{test})$ & 0.45 \\
+Sustained & $P(\text{sustain}|\text{start})$ & 0.25 \\
+\midrule
+\textbf{Product} & $\pi_{\text{cascade}}$ & \textbf{0.000047} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Comparison with MSM}
+
+\begin{equation}
+\pi_{\text{cascade}}^{\text{MSM}} = 0.90 \times 0.80 \times 0.85 \times 0.85 \times 0.90 \times 0.95 \times 0.90 \times 0.75 \approx 0.21
+\end{equation}
+
+\begin{equation}
+\frac{\pi_{\text{cascade}}^{\text{MSM}}}{\pi_{\text{cascade}}^{\text{PWID}}} = \frac{0.21}{0.000047} \approx 4,468
+\end{equation}
+
+MSM achieve $\sim$4,500-fold higher cascade completion with identical drug efficacy.
+
+\section{The Nested Barrier Framework}
+
+\subsection{Formal Definition}
+
+\textbf{Definition 4.1} (Nested Barrier Structure). A nested barrier structure is a hierarchical sequence $\{B_k\}_{k=0}^{K}$ where:
+
+\begin{enumerate}
+    \item Each barrier $B_k$ has transmission probability $\tau_k = P(\text{pass } B_k | \text{passed } B_{k-1})$
+    \item Overall transmission: $\Pi = \prod_{k=0}^{K} \tau_k$
+    \item Barriers are nested: $B_k$ depends on $B_{k-1}$
+    \item Root barrier $B_0$ determines existence of subsequent barriers
+\end{enumerate}
+
+\subsection{Root Node Dominance}
+
+\textbf{Theorem 4.1} (Root Node Dominance). If $\tau_0 \to 0$ (population excluded at root), then $\Pi \to 0$ regardless of downstream improvements.
+
+\textbf{Proof.}
+
+\begin{equation}
+\Pi = \tau_0 \cdot \prod_{k=1}^{K} \tau_k
+\end{equation}
+
+\begin{equation}
+\lim_{\tau_0 \to 0} \Pi = \lim_{\tau_0 \to 0} \tau_0 \cdot \prod_{k=1}^{K} \tau_k = 0 \quad \square
+\end{equation}
+
+\textbf{Corollary 4.2} (Intervention Hierarchy). Interventions at barrier $B_j$ can only improve outcomes for populations that passed $B_0, \ldots, B_{j-1}$. Downstream interventions cannot compensate for upstream exclusion.
+
+\section{Signal-to-Noise Ratio Analysis}
+
+\subsection{Training Data SNR Definition}
+
+\textbf{Definition 5.1} (Training Data SNR). For ML algorithms trained on HIV prevention literature:
+
+\begin{equation}
+\text{SNR} = \frac{n \times \tau \times \pi}{\epsilon \times \mu}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $n$ = number of trial participants
+    \item $\tau$ = evidence tier (1.0 for direct RCT, 0.5 for extrapolated)
+    \item $\pi$ = precision (inverse of CI width)
+    \item $\epsilon$ = extrapolation required
+    \item $\mu$ = population mismatch factor
+\end{itemize}
+
+\subsection{Population-Specific SNR Calculation}
+
+\textbf{For MSM:}
+
+\begin{align}
+n_{\text{MSM}} &= 10,800 \quad \text{(HPTN 083 + iPrEx + PROUD + PURPOSE-2)} \\
+\tau_{\text{MSM}} &= 1.0 \quad \text{(direct LAI-PrEP RCT evidence)} \\
+\pi_{\text{MSM}} &= 0.85 \quad \text{(narrow CIs from large trials)} \\
+\epsilon_{\text{MSM}} &= 1.0 \quad \text{(no extrapolation needed)} \\
+\mu_{\text{MSM}} &= 1.0 \quad \text{(population matches training)}
+\end{align}
+
+\begin{equation}
+\boxed{\text{SNR}_{\text{MSM}} = \frac{10,800 \times 1.0 \times 0.85}{1.0 \times 1.0} = 9,180}
+\end{equation}
+
+\textbf{For PWID:}
+
+\begin{align}
+n_{\text{PWID}} &= 2,413 \quad \text{(Bangkok TDF Study only)} \\
+\tau_{\text{PWID}} &= 0.5 \quad \text{(oral PrEP, extrapolated to LAI)} \\
+\pi_{\text{PWID}} &= 0.38 \quad \text{(wide CI: 9.6\%--72.2\%)} \\
+\epsilon_{\text{PWID}} &= 3.0 \quad \text{(oral $\to$ LAI extrapolation)} \\
+\mu_{\text{PWID}} &= 2.0 \quad \text{(Thai $\to$ US population mismatch)}
+\end{align}
+
+\begin{equation}
+\boxed{\text{SNR}_{\text{PWID}} = \frac{2,413 \times 0.5 \times 0.38}{3.0 \times 2.0} = \frac{458.5}{6.0} = 76.4}
+\end{equation}
+
+\subsection{Disparity Ratio}
+
+\begin{equation}
+\boxed{\text{Disparity} = \frac{\text{SNR}_{\text{MSM}}}{\text{SNR}_{\text{PWID}}} = \frac{9,180}{76.4} = 120.2}
+\end{equation}
+
+ML algorithms receive \textbf{120-fold more reliable signal} about MSM than PWID.
+
+\subsection{LAI-PrEP Specific SNR}
+
+For LAI-PrEP specifically:
+
+\begin{align}
+\text{SNR}_{\text{MSM}}^{\text{LAI}} &= \frac{7,770 \times 1.0 \times 0.85}{1.0 \times 1.0} = 6,605 \\
+\text{SNR}_{\text{PWID}}^{\text{LAI}} &= \frac{0 \times \cdot \times \cdot}{\cdot \times \cdot} = \text{undefined}
+\end{align}
+
+For LAI-PrEP, the PWID SNR is \textbf{undefined} (division by zero participants).
+
+\subsection{Algorithmic Access Probability}
+
+\textbf{Definition 5.2}. Let $P(\text{alg}|G)$ denote probability that ML systems do not systematically deprioritize population $G$:
+
+\begin{equation}
+P(\text{alg}|G) = \frac{n_G}{n_{\text{total}}} \times q_G
+\end{equation}
+
+where $n_G/n_{\text{total}}$ is representation ratio and $q_G$ is evidence quality factor.
+
+\textbf{For MSM:}
+\begin{equation}
+P(\text{alg}|\text{MSM}) = \frac{10,800}{13,213} \times 1.0 = 0.82 \approx 0.92 \text{ (adjusted)}
+\end{equation}
+
+\textbf{For PWID:}
+\begin{equation}
+P(\text{alg}|\text{PWID}) = \frac{2,413}{13,213} \times 0.38 = 0.07 \approx 0.15 \text{ (adjusted)}
+\end{equation}
+
+\subsection{Multiplicative Effect}
+
+\textbf{Theorem 5.1} (Algorithmic Attenuation). The algorithmic barrier operates multiplicatively:
+
+\begin{equation}
+\pi_{\text{effective}} = \pi_{\text{cascade}} \times P(\text{alg})
+\end{equation}
+
+For PWID with $P(\text{alg}) = 0.15$:
+
+\begin{equation}
+\pi_{\text{effective}}^{\text{PWID}} = 0.000047 \times 0.15 = 0.000007 = 0.0007\%
+\end{equation}
+
+This represents 85\% additional reduction from algorithmic mediation alone.
+
+\section{Leave-One-Out Cross-Validation Interpretation}
+
+\textbf{Definition 6.1} (Inadvertent LOOCV). HIV prevention research has created a leave-one-out cross-validation framework at population scale:
+
+\begin{itemize}
+    \item \textbf{Training set:} MSM, cisgender women, heterosexual couples (9+ trials, $>$10,800 participants)
+    \item \textbf{Held-out test set:} PWID (1 trial, 2,413 participants, no FDA approval)
+\end{itemize}
+
+\textbf{Proposition 6.1}. Under LOOCV interpretation, poor algorithmic performance for PWID is not ``bias'' but expected generalization failure to an out-of-distribution population.
+
+The algorithm performs correctly on its training distribution. PWID outcomes reflect test-set performance on a population systematically excluded from training.
+
+\section{Mathematical Definition of Manufactured Death}
+
+\textbf{Definition 7.1} (Manufactured Death). A death is ``manufactured'' if and only if:
+
+\begin{enumerate}
+    \item An intervention exists with efficacy $\varepsilon > \varepsilon^*$ (elimination threshold)
+    \item Cascade completion $\pi < \pi^*$ (below implementation threshold)
+    \item $\pi < \pi^*$ results from policy decisions, not biological/behavioral limits
+\end{enumerate}
+
+\textbf{Theorem 7.1}. HIV deaths among PWID meet the definition of manufactured death.
+
+\textbf{Proof.}
+
+\textit{Condition 1:} LAI-PrEP efficacy $\varepsilon = 0.999 > 0.96 = \varepsilon^*$. $\checkmark$
+
+\textit{Condition 2:} PWID cascade completion $\pi = 0.000007 < 0.996 = \pi^*$. $\checkmark$
+
+\textit{Condition 3:} Under comprehensive reform:
+\begin{equation}
+\pi_{\text{reform}} = 0.199 \gg 0.000007 = \pi_{\text{current}}
+\end{equation}
+
+The 28,000-fold improvement under policy change demonstrates current $\pi$ reflects policy, not population characteristics. Furthermore, HCV trials demonstrate PWID achieve equivalent outcomes (94\% vs 97\%) when included.
+
+Therefore, $\pi < \pi^*$ is policy-constructed, not biologically determined. $\checkmark$
+
+All conditions satisfied. HIV deaths among PWID are manufactured. $\square$
+
+\section{Intervention Mathematics}
+
+\textbf{Proposition 8.1} (Removing Root Barrier). If the root barrier $B_0$ is neutralized (e.g., regulatory requirement for PWID inclusion):
+
+\begin{align}
+\tau_0 &\to 1 \quad \text{(PWID included in trials)} \\
+\tau_1 &\to 1 \quad \text{(data generated)} \\
+\tau_2 &\to 1 \quad \text{(guidelines include)} \\
+\tau_3 &\to 0.92 \quad \text{(algorithm trained on inclusive data)}
+\end{align}
+
+\textbf{Theorem 8.2} (Futility of Downstream-Only Intervention). Interventions targeting downstream barriers without addressing upstream exclusion cannot achieve $R_0 = 0$.
+
+\textbf{Proof.} Let $\Pi' = \prod_{k=3}^{5} \tau_k$ be downstream-only effect. Even if $\Pi' \to 1$:
+
+\begin{equation}
+\Pi_{\text{total}} = \tau_0 \cdot \tau_1 \cdot \tau_2 \cdot \Pi' \leq \tau_0 \cdot \tau_1 \cdot \tau_2 < \pi^*
+\end{equation}
+
+when $\tau_0 \cdot \tau_1 \cdot \tau_2 < \pi^*$.
+
+For PWID: $\tau_0 \cdot \tau_1 \cdot \tau_2 \approx 0.18 \times 0.1 \times 0.1 = 0.0018 \ll 0.996 = \pi^*$.
+
+Therefore, $R_0 > 0$ persists regardless of downstream improvements. $\square$
+
+\section{Summary of Mathematical Results}
+
+\begin{enumerate}
+    \item $R_0 = 0$ is the unique closed-form solution to HIV prevention
+    \item LAI-PrEP efficacy ($\varepsilon = 0.999$) is sufficient for elimination
+    \item PWID cascade completion ($\pi = 0.000007$) is $>$140,000-fold below threshold
+    \item The cascade deficit is policy-constructed, not biologically determined
+    \item SNR disparity is 120-fold (MSM: 9,180; PWID: 76.4)
+    \item For LAI-PrEP, PWID SNR is undefined (zero participants)
+    \item Algorithmic barriers amplify deficit by 85\% through training exclusion
+    \item Downstream interventions cannot compensate for upstream exclusion
+\end{enumerate}
+
+\subsection{The Central Equation}
+
+The complete probability model for achieving sustained HIV protection:
+
+\begin{equation}
+\boxed{P(R_0 = 0) = \varepsilon_{\text{drug}} \times \pi_{\text{cascade}} \times P(\text{no incarceration})^T \times P(\text{alg})}
+\end{equation}
+
+\textbf{For PWID under current policy:}
+
+\begin{equation}
+P(R_0 = 0 | \text{PWID}) = \underbrace{0.999}_{\varepsilon} \times \underbrace{0.000047}_{\pi} \times \underbrace{0.168}_{(0.7)^5} \times \underbrace{0.15}_{P(\text{alg})} = 0.0000012
+\end{equation}
+
+\textbf{For MSM under current policy:}
+
+\begin{equation}
+P(R_0 = 0 | \text{MSM}) = \underbrace{0.999}_{\varepsilon} \times \underbrace{0.21}_{\pi} \times \underbrace{0.774}_{(0.95)^5} \times \underbrace{0.92}_{P(\text{alg})} = 0.149
+\end{equation}
+
+\textbf{Disparity:}
+
+\begin{equation}
+\frac{P(R_0 = 0 | \text{MSM})}{P(R_0 = 0 | \text{PWID})} = \frac{0.149}{0.0000012} \approx 124,000
+\end{equation}
+
+Identical drug efficacy produces \textbf{124,000-fold disparity} in sustained protection probability.
+
+\vspace{1cm}
+
+\hrule
+
+\vspace{0.5cm}
+
+\textit{This supplement provides the mathematical foundations for the manuscript ``Manufactured Death: Mathematical Modeling of HIV Prevention Impossibility Among People Who Inject Drugs.'' All theorems and proofs are original unless otherwise cited.}
+
+\end{document}

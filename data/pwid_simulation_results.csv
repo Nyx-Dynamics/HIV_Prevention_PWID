@@ -1,0 +1,8 @@
+Scenario,Observed R0=0 Rate,95% CI Lower,95% CI Upper,Cascade Completion,Incarceration Survival,Annual Infections,5-Year Infections,5-Year Cost Averted (Billions)
+Current Policy,0.0001,0.0000,0.0001,0.0005,0.1681,4,24,0.01
+Decriminalization Only,0.0081,0.0076,0.0087,0.0126,0.6240,564,2820,1.41
+Decrim + Bias Training,0.0139,0.0132,0.0146,0.0223,0.6240,963,4819,2.41
+Decrim + Low-Barrier Access,0.0209,0.0200,0.0218,0.0334,0.6240,1446,7234,3.62
+SSP-Integrated Delivery,0.1300,0.1279,0.1321,0.2089,0.6240,9009,45045,22.52
+Full Harm Reduction Infrastructure,0.2458,0.2432,0.2485,0.2458,1.0000,17035,85176,42.59
+Theoretical Maximum,0.3177,0.3148,0.3206,0.3177,1.0000,22017,110086,55.04

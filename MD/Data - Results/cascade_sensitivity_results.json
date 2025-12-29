@@ -1,0 +1,182 @@
+{
+  "timestamp": "2025-12-27T09:54:06.872661",
+  "probabilistic_sensitivity": {
+    "summary": {
+      "cascade_completion": {
+        "mean": 1.84e-05,
+        "std": 5.197537878649851e-05,
+        "p5": 0.0,
+        "p95": 0.0001
+      },
+      "r0_zero_rate": {
+        "mean": 2.9e-06,
+        "std": 1.8482153554172202e-05,
+        "p5": 0.0,
+        "p95": 0.0
+      },
+      "step_probabilities": {
+        "awareness": {
+          "mean": 0.07492693971177179,
+          "std": 0.07307420021498046,
+          "p5": 0.01,
+          "p95": 0.222610194894548
+        },
+        "willingness": {
+          "mean": 0.2896393205741129,
+          "std": 0.08853471387208413,
+          "p5": 0.15002775579998662,
+          "p95": 0.4339643712826343
+        },
+        "healthcare_access": {
+          "mean": 0.3169314381712023,
+          "std": 0.09445344141621356,
+          "p5": 0.16307201852775915,
+          "p95": 0.48083317319798796
+        },
+        "disclosure": {
+          "mean": 0.22608925876414576,
+          "std": 0.09030034604148772,
+          "p5": 0.08109184730145656,
+          "p95": 0.3780149343150066
+        },
+        "provider_willing": {
+          "mean": 0.3325253812021637,
+          "std": 0.09789279390539295,
+          "p5": 0.1764529375094143,
+          "p95": 0.4941031605747443
+        },
+        "hiv_testing_adequate": {
+          "mean": 0.38675806442488453,
+          "std": 0.0864473428552796,
+          "p5": 0.2467294565338065,
+          "p95": 0.5355562400376856
+        },
+        "first_injection": {
+          "mean": 0.39044743070040083,
+          "std": 0.08687467662269639,
+          "p5": 0.24945803155148236,
+          "p95": 0.5290366022120574
+        },
+        "sustained_engagement": {
+          "mean": 0.23853409368847184,
+          "std": 0.09127370139691655,
+          "p5": 0.08708073996837322,
+          "p95": 0.38657595240063236
+        }
+      }
+    },
+    "n_samples": 1000
+  },
+  "barrier_removal": {
+    "baseline": {
+      "r0_zero_rate": 0.0,
+      "cascade_completion": 6e-05,
+      "ci_95": [
+        0.0,
+        0.0
+      ]
+    },
+    "no_criminalization": {
+      "r0_zero_rate": 0.00148,
+      "cascade_completion": 0.00252,
+      "ci_95": [
+        0.0011430384781800748,
+        0.0018169615218199251
+      ]
+    },
+    "no_stigma": {
+      "r0_zero_rate": 2e-05,
+      "cascade_completion": 0.00034,
+      "ci_95": [
+        0.0,
+        5.9199607998039976e-05
+      ]
+    },
+    "low_barrier_access": {
+      "r0_zero_rate": 0.00014,
+      "cascade_completion": 0.00106,
+      "ci_95": [
+        3.629380880198135e-05,
+        0.00024370619119801863
+      ]
+    },
+    "full_inclusion": {
+      "r0_zero_rate": 8e-05,
+      "cascade_completion": 0.00028,
+      "ci_95": [
+        1.6031360627225086e-06,
+        0.0001583968639372775
+      ]
+    },
+    "all_removed": {
+      "r0_zero_rate": 0.19896,
+      "cascade_completion": 0.19896,
+      "ci_95": [
+        0.1954607009658349,
+        0.2024592990341651
+      ]
+    }
+  },
+  "step_importance": {
+    "ranked": [
+      "awareness",
+      "willingness",
+      "healthcare_access",
+      "hiv_testing_adequate",
+      "disclosure",
+      "provider_willing",
+      "first_injection",
+      "sustained_engagement"
+    ],
+    "effects": {
+      "awareness": {
+        "original_probability": 0.09999999999999995,
+        "cascade_if_fixed": 0.0002,
+        "r0_zero_if_fixed": 3.3333333333333335e-05,
+        "improvement": 3.3333333333333335e-05
+      },
+      "willingness": {
+        "original_probability": 0.3000000000000001,
+        "cascade_if_fixed": 6.666666666666667e-05,
+        "r0_zero_if_fixed": 3.3333333333333335e-05,
+        "improvement": 3.3333333333333335e-05
+      },
+      "healthcare_access": {
+        "original_probability": 0.35,
+        "cascade_if_fixed": 0.00013333333333333334,
+        "r0_zero_if_fixed": 3.3333333333333335e-05,
+        "improvement": 3.3333333333333335e-05
+      },
+      "disclosure": {
+        "original_probability": 0.24999999999999997,
+        "cascade_if_fixed": 0.0001,
+        "r0_zero_if_fixed": 0.0,
+        "improvement": 0.0
+      },
+      "provider_willing": {
+        "original_probability": 0.35,
+        "cascade_if_fixed": 6.666666666666667e-05,
+        "r0_zero_if_fixed": 0.0,
+        "improvement": 0.0
+      },
+      "hiv_testing_adequate": {
+        "original_probability": 0.44999999999999996,
+        "cascade_if_fixed": 0.0003,
+        "r0_zero_if_fixed": 3.3333333333333335e-05,
+        "improvement": 3.3333333333333335e-05
+      },
+      "first_injection": {
+        "original_probability": 0.44999999999999996,
+        "cascade_if_fixed": 3.3333333333333335e-05,
+        "r0_zero_if_fixed": 0.0,
+        "improvement": 0.0
+      },
+      "sustained_engagement": {
+        "original_probability": 0.24999999999999994,
+        "cascade_if_fixed": 0.00023333333333333333,
+        "r0_zero_if_fixed": 0.0,
+        "improvement": 0.0
+      }
+    }
+  }
+}
