@@ -158,4 +158,4 @@ ORCID: [0000-0002-9216-8569](https://orcid.org/0000-0002-9216-8569)
 
 - HIV prevention research community for published parameters
 - PWID community advocates for barrier characterization
-- AI tools (Anthropic Claude) used as assistive technology for literature synthesis and code development
+- AI tools (Anthropic Claude 4.5), Jetbrains Junie, Zotero AI, Numpy, Matplotlib, Scipy, OpenAI GPT 5.2 used as assistive technology for literature synthesis, reference management and code refinement.  Author maintainces responsibility for all aspects of project and responsbility for use and software use.
