@@ -1,6 +1,6 @@
 # HIV Prevention Barrier Modeling for PWID
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18116991.svg)]((https://doi.org/10.5281/zenodo.18116991))]
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Code repository for:** Demidont AC. Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study. *The Lancet HIV* (2025). [Manuscript ID: thelancethiv-D-25-00576, Submitted Dec 29, 2025]
