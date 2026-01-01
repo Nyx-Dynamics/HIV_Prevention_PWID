@@ -1,7 +1,13 @@
 # HIV Prevention Barrier Modeling for PWID
+# HIV-Prevention Master Algorithm
 
-[[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18116991.svg)]((https://doi.org/10.5281/zenodo.18116991))]
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18116991.svg)](https://doi.org/10.5281/zenodo.18116991)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+This repository contains computational models for HIV prevention and policy analysis.
+
+This repository reflects a legacy snapshot of the computational models as submitted to *The Lancet HIV* in December 2025.
+
 
 **Code repository for:** Demidont AC. Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study. *The Lancet HIV* (2025). [Manuscript ID: thelancethiv-D-25-00576, Submitted Dec 29, 2025]
 
