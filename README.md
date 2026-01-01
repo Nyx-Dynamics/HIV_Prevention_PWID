@@ -92,20 +92,51 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Run Main Simulation
+### 1. Main Simulation (`architectural_barrier_model.py`)
+Run the core Monte Carlo simulation to evaluate cascade completion across multiple policy scenarios.
 ```bash
-python architectural_barrier_model.py
+python architectural_barrier_model.py --output-dir ./results --n-individuals 100000
+```
+- `--output-dir`: Directory to save `.json` and `.csv` results (default: `.`)
+- `--n-individuals`: Number of individuals to simulate per scenario (default: `100000`)
+- `--n-sa-sims`: Number of stochastic avoidance simulations (default: `10000`)
+
+### 2. Cascade Sensitivity (`cascade_sensitivity_analysis.py`)
+Analyze how parameter uncertainty and barrier removal affect prevention probability.
+```bash
+python cascade_sensitivity_analysis.py --output-dir ./outputs --n-samples 1000
+```
+- `--output-dir`: Directory for figures and results (default: `outputs`)
+- `--n-samples`: Number of Probabilistic Sensitivity Analysis (PSA) samples (default: `1000`)
+
+### 3. Enhanced Stochastic Avoidance (`stochastic_avoidance_enhanced.py`)
+Forecast regional outbreak probabilities and methamphetamine prevalence trajectories.
+```bash
+python stochastic_avoidance_enhanced.py --output-dir ./outputs --n-sims 2000 --n-psa 500
+```
+- `--output-dir`: Directory for figures and results (default: `outputs`)
+- `--n-sims`: Number of simulations for national forecast (default: `2000`)
+- `--n-psa`: Number of PSA samples (default: `500`)
+
+### 4. Publication Figures (`visualize_md_results.py`)
+Generate the primary figures used in the *Lancet HIV* manuscript.
+```bash
+python visualize_md_results.py --input architectural_barrier_results.json --output-dir ./figures
+```
+- `--input`: Path to the simulation results JSON file
+- `--output-dir`: Directory where figures (Fig 1-5) will be saved
+
+### 5. Quick Visualization (`visualize_results.py`)
+Quickly generate a comparison bar chart from simulation results.
+```bash
+python visualize_results.py --input architectural_barrier_results.json --output ./figures/scenario_comparison.png
 ```
 
-### Generate Figures
-```bash
-python visualize_md_results.py
-```
-
-### Outputs
-- `architectural_barrier_results.json` - Full Monte Carlo results
-- `pwid_simulation_results.csv` - Summary statistics
-- `figures/` - Publication-ready PNG files
+## Outputs
+- **`architectural_barrier_results.json/csv`**: Core simulation data and barrier decomposition.
+- **`cascade_sensitivity_results.json/csv`**: PSA summary and step importance rankings.
+- **`stochastic_avoidance_sensitivity_results.json/csv`**: Regional outbreak forecasts and tornado analyses.
+- **`outputs/` or `figures/`**: Publication-quality PNG and PDF figures.
 
 ## Data Sources
 

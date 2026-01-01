@@ -17,6 +17,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 import json
 import csv
+import argparse
+import os
 from datetime import datetime
 
 # Setup logging
@@ -586,24 +588,26 @@ def plot_r0_zero_distribution(psa_results: Dict, save_path: str = None):
 
 def main():
     """Run complete cascade sensitivity analysis."""
+    parser = argparse.ArgumentParser(description="Cascade Barrier Sensitivity Analysis")
+    parser.add_argument("--output-dir", type=str, default="outputs", help="Directory to save output files (default: outputs)")
+    parser.add_argument("--n-samples", type=int, default=1000, help="Number of samples for PSA (default: 1000)")
+    args = parser.parse_args()
+
+    # Create output directory if it doesn't exist
+    os.makedirs(args.output_dir, exist_ok=True)
 
     print("=" * 80)
     print("CASCADE BARRIER SENSITIVITY ANALYSIS")
+    print(f"Output directory: {os.path.abspath(args.output_dir)}")
     print("=" * 80)
     print()
 
-    # Use relative path to the outputs folder in your project
-    output_dir = "outputs"
-
-    # Create output directory if it doesn't exist
-    import os
-    os.makedirs(output_dir, exist_ok=True)
-
+    output_dir = args.output_dir
     analyzer = CascadeSensitivityAnalyzer()
 
     # 1. Probabilistic sensitivity analysis
-    print("1. Running probabilistic sensitivity analysis (1000 samples)...")
-    psa_results = analyzer.run_probabilistic_sensitivity(n_samples=1000)
+    print(f"1. Running probabilistic sensitivity analysis ({args.n_samples} samples)...")
+    psa_results = analyzer.run_probabilistic_sensitivity(n_samples=args.n_samples)
 
     print(f"\n   P(R(0)=0) under parameter uncertainty:")
     print(f"   - Mean: {psa_results['summary']['r0_zero_rate']['mean'] * 100:.4f}%")
@@ -641,7 +645,7 @@ def main():
         "timestamp": datetime.now().isoformat(),
         "probabilistic_sensitivity": {
             "summary": psa_results["summary"],
-            "n_samples": 1000,
+            "n_samples": args.n_samples,
         },
         "barrier_removal": {
             name: {

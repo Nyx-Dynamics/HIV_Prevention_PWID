@@ -1,4 +1,28 @@
-# CHANGELOG: Manufactured Death HIV Prevention Modeling
+# CHANGELOG: Architectural Barrier HIV Prevention Modeling
+
+## Version 1.2.0 (January 1, 2026)
+
+### Major Refactoring and Terminology Shift
+- **Unified Terminology:** Completed the transition from "Manufactured Death" to **"Architectural Barrier Model"** across all scripts, outputs, and documentation.
+  - Renamed `manufactured_death_model.py` to `architectural_barrier_model.py`.
+  - Updated class names (e.g., `ManufacturedDeathModel` → `ArchitecturalBarrierModel`).
+  - Refined sensitive terminology in logs and print statements to align with academic submission standards.
+
+### Enhanced User Control and Data Privacy
+- **Command-Line Interface (CLI) Integration:** Added `argparse` to all primary scripts, allowing users to configure input and output directories without modifying source code.
+  - **`architectural_barrier_model.py`**: Added `--output-dir`, `--n-individuals`, and `--n-sa-sims`.
+  - **`cascade_sensitivity_analysis.py`**: Added `--output-dir` and `--n-samples`.
+  - **`stochastic_avoidance_enhanced.py`**: Added `--output-dir`, `--n-sims`, and `--n-psa`.
+  - **`visualize_md_results.py`**: Added `--input` and `--output-dir`.
+  - **`visualize_results.py`**: Added `--input` and `--output`.
+- **Automatic Directory Creation:** Scripts now automatically create output directories if they do not exist.
+- **Improved Data Privacy:** Configurable output paths enable users to redirect sensitive simulation results to secure/encrypted volumes, isolating them from version control and shared environments.
+
+### Robustness and Compatibility
+- **Visualizer Resilience:** Visualization scripts now handle both legacy (list-based) and modern (nested dictionary) JSON result formats.
+- **Dependency Optimization:** Streamlined `requirements.txt` to focus on core simulation and visualization dependencies (`numpy`, `scipy`, `matplotlib`).
+
+---
 
 ## Version 1.1.0 (December 27, 2024)
 

@@ -37,6 +37,8 @@ from typing import Dict, List, Tuple, Optional, Union
 from enum import Enum
 import json
 import csv
+import os
+import argparse
 from datetime import datetime
 
 # Setup logging
@@ -1067,10 +1069,20 @@ def calculate_msm_cascade_completion() -> Dict:
 
 def main():
     """Run complete analysis and generate outputs."""
+    parser = argparse.ArgumentParser(description="Architectural Barrier Model: HIV Prevention Cascade Modeling for PWID")
+    parser.add_argument("--output-dir", type=str, default=".", help="Directory to save output files (default: current directory)")
+    parser.add_argument("--n-individuals", type=int, default=100000, help="Number of individuals to simulate per scenario (default: 100000)")
+    parser.add_argument("--n-sa-sims", type=int, default=10000, help="Number of stochastic avoidance simulations (default: 10000)")
+    args = parser.parse_args()
+
+    # Create output directory if it doesn't exist
+    if args.output_dir != ".":
+        os.makedirs(args.output_dir, exist_ok=True)
 
     print("=" * 80)
     print("ARCHITECTURAL BARRIER MODEL: HIV PREVENTION CASCADE MODELING")
     print("Monte Carlo Simulation with 3-Layer Barrier Framework")
+    print(f"Output directory: {os.path.abspath(args.output_dir)}")
     print("=" * 80)
     print()
 
@@ -1079,13 +1091,13 @@ def main():
     scenarios = create_policy_scenarios()
 
     # Run simulations
-    print("Running cascade simulations (100,000 individuals per scenario)...")
+    print(f"Running cascade simulations ({args.n_individuals:,} individuals per scenario)...")
     print()
 
     all_results = []
     for scenario in scenarios:
         print(f"  Simulating: {scenario.name}...")
-        results = model.run_simulation(scenario, n_individuals=100000, years=5)
+        results = model.run_simulation(scenario, n_individuals=args.n_individuals, years=5)
         all_results.append(results)
 
     print()
@@ -1153,7 +1165,7 @@ def main():
     print()
 
     sa_model = StochasticAvoidanceModel()
-    sa_results = sa_model.simulate_time_to_outbreak(n_simulations=10000)
+    sa_results = sa_model.simulate_time_to_outbreak(n_simulations=args.n_sa_sims)
 
     if sa_results["median_years_to_outbreak"]:
         print(f"Median years to major outbreak: {sa_results['median_years_to_outbreak']:.1f}")
@@ -1188,8 +1200,8 @@ def main():
         },
     }
 
-    output_path = "architectural_barrier_results.json"
-    csv_path = "architectural_barrier_results.csv"
+    output_path = os.path.join(args.output_dir, "architectural_barrier_results.json")
+    csv_path = os.path.join(args.output_dir, "architectural_barrier_results.csv")
     try:
         with open(output_path, 'w') as f:
             json.dump(output, f, indent=2, default=str, allow_nan=False)

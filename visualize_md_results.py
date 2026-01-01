@@ -46,18 +46,25 @@ import os
 
 # ... existing code ...
 
+import argparse
+
 def load_results(filepath=None):
     """Load model results from JSON."""
     if filepath is None:
-        # Get the directory where this script is located
+        # Try both the new and old default filenames
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        # Look for the results file in the same directory
-        filepath = os.path.join(script_dir, 'manufactured_death_results.json')
+        new_path = os.path.join(script_dir, 'architectural_barrier_results.json')
+        old_path = os.path.join(script_dir, 'manufactured_death_results.json')
+        
+        if os.path.exists(new_path):
+            filepath = new_path
+        else:
+            filepath = old_path
 
     if not os.path.exists(filepath):
         raise FileNotFoundError(
             f"Results file not found at: {filepath}\n"
-            f"Please ensure 'manufactured_death_results.json' exists in the project directory.\n"
+            f"Please ensure 'architectural_barrier_results.json' exists in the project directory.\n"
             f"You may need to run the simulation script first to generate this file."
         )
 
@@ -373,7 +380,7 @@ def fig5_snr_disparity(results, save_path=None):
     return fig
 
 
-def generate_all_figures(output_dir=None):
+def generate_all_figures(output_dir=None, input_file=None):
     """Generate all figures for manuscript."""
 
     if output_dir is None:
@@ -384,10 +391,10 @@ def generate_all_figures(output_dir=None):
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    print("Loading results...")
-    results = load_results()
+    print(f"Loading results from: {input_file if input_file else 'default'}...")
+    results = load_results(input_file)
 
-    print("Generating figures...")
+    print(f"Generating figures in: {output_dir}...")
 
     fig1_cascade_comparison(results, f'{output_dir}/Fig1_CascadeComparison.png')
     fig2_barrier_decomposition(results, f'{output_dir}/Fig2_BarrierDecomposition.png')
@@ -396,8 +403,12 @@ def generate_all_figures(output_dir=None):
     fig5_snr_disparity(results, f'{output_dir}/Fig5_SNR_LOOCV.png')
 
     print("\nAll figures generated successfully!")
-    print(f"Output directory: {output_dir}")
 
 
 if __name__ == "__main__":
-    generate_all_figures()
+    parser = argparse.ArgumentParser(description="Generate all figures for manuscript")
+    parser.add_argument("--input", type=str, help="Input JSON results file")
+    parser.add_argument("--output-dir", type=str, help="Directory to save output figures")
+    args = parser.parse_args()
+    
+    generate_all_figures(output_dir=args.output_dir, input_file=args.input)

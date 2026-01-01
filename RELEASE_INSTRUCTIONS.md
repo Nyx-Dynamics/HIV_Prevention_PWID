@@ -2,13 +2,14 @@
 
 ## Pre-Release Checklist
 
-- [ ] All code tested and runs without errors
-- [ ] Results files regenerated with final code
-- [ ] Visualization script updated to use `architectural_barrier_results.json`
-- [ ] No "manufactured death" terminology in any files
-- [ ] README.md complete
-- [ ] CITATION.cff complete
-- [ ] LICENSE file present
+- [x] All code tested and runs without errors
+- [x] Results files regenerated with final code
+- [x] All scripts updated with configurable CLI arguments (`argparse`)
+- [x] Visualization scripts updated to handle new and legacy JSON formats
+- [x] No "manufactured death" terminology in any production files
+- [x] README.md and CHANGELOG.md complete (Version 1.2.0)
+- [x] CITATION.cff complete
+- [x] LICENSE file present
 
 ---
 
@@ -25,37 +26,20 @@ git checkout main
 git pull origin main
 ```
 
-## Step 2: Add/Update Files
+## Step 2: Clean Up Duplicates and Old Versions
 
-Copy these files to your repository:
-
-```bash
-# Core model (renamed)
-cp architectural_barrier_model.py /path/to/hiv-prevention-master/
-
-# Update visualization script filename reference
-# In visualize_results.py, change:
-#   manufactured_death_results.json → architectural_barrier_results.json
-
-# Results files
-cp architectural_barrier_results.json /path/to/hiv-prevention-master/
-cp architectural_barrier_results.csv /path/to/hiv-prevention-master/
-
-# Documentation
-cp README.md /path/to/hiv-prevention-master/
-cp CITATION.cff /path/to/hiv-prevention-master/
-cp LICENSE /path/to/hiv-prevention-master/
-```
-
-## Step 3: Remove Old Files (if present)
+If you have legacy files or redundant copies, move them to the `archieve/` directory or delete them:
 
 ```bash
-git rm manufactured_death_model.py
-git rm manufactured_death_results.json
-git rm manufactured_death_results.csv
+# Remove redundant downloads (if present)
+rm *_dl.py
+
+# Ensure legacy 'manufactured_death' scripts are archived
+mv manufactured_death_model.py archieve/ 2>/dev/null
+mv manufactured_death_results.json archieve/ 2>/dev/null
 ```
 
-## Step 4: Stage and Commit
+## Step 3: Stage and Commit Changes
 
 ```bash
 # Stage all changes
@@ -65,15 +49,15 @@ git add .
 git status
 
 # Commit with descriptive message
-git commit -m "Refactor: rename to architectural barrier model for Lancet HIV submission
+git commit -m "Version 1.2.0: Terminology shift and CLI enhancement
 
-- Rename ManufacturedDeathModel → ArchitecturalBarrierModel
-- Update all output filenames and terminology
-- Add README, CITATION.cff, LICENSE
-- Preserve all mathematical logic and results"
+- Completed transition to 'Architectural Barrier Model'
+- Added argparse to all scripts for configurable input/output paths
+- Optimized requirements.txt and streamlined dependencies
+- Improved visualization script robustness for JSON formats"
 ```
 
-## Step 5: Push to GitHub
+## Step 4: Push to GitHub
 
 ```bash
 git push origin main
@@ -81,52 +65,42 @@ git push origin main
 
 ---
 
-## Step 6: Create GitHub Release
+## Step 5: Create GitHub Release
 
 ### Via GitHub Web Interface:
 
 1. Go to https://github.com/Nyx-Dynamics/hiv-prevention-master
 2. Click **Releases** → **Draft a new release**
-3. Click **Choose a tag** → type `v1.0.0` → **Create new tag**
-4. **Release title:** `v1.0.0 - Lancet HIV Submission`
+3. Click **Choose a tag** → type `v1.2.0` → **Create new tag**
+4. **Release title:** `v1.2.0 - Terminology Refactor and CLI Update`
 5. **Description:**
 
 ```markdown
-## HIV Prevention Barrier Modeling for PWID
+## Architectural Barrier HIV Prevention Modeling
 
-Initial release accompanying submission to The Lancet HIV.
+Major update implementing the final terminology shift and enhancing user control.
 
-### Key Features
-- Monte Carlo simulation of 8-step HIV prevention cascade
-- Three-layer barrier framework (biology, testing, architectural)
-- Policy scenario analysis across 8 intervention levels
-- Stochastic avoidance failure modeling
-- MSM vs PWID disparity quantification
+### Key Features (v1.2.0)
+- **Unified Terminology:** Shift from "Manufactured Death" to "Architectural Barrier Model".
+- **CLI Integration:** All primary scripts now support `--output-dir` and other configurable parameters.
+- **Improved Privacy:** Ability to redirect sensitive simulation results outside the project folder.
+- **Robust Visualizations:** Figures FigS1-FigS8 and Fig1-Fig5 fully supported with dual PNG/PDF export.
 
-### Files
-- `architectural_barrier_model.py` - Main simulation model
-- `visualize_results.py` - Figure generation
-- `architectural_barrier_results.json` - Full simulation outputs
+### Primary Scripts
+- `architectural_barrier_model.py`: Main Monte Carlo simulation.
+- `cascade_sensitivity_analysis.py`: PSA and step importance analysis.
+- `stochastic_avoidance_enhanced.py`: Regional outbreak forecasting.
+- `visualize_md_results.py`: Manuscript-ready figure generation.
 
 ### Citation
-Demidont AC. Structural barriers drive near-zero population-level effectiveness of HIV prevention among people who inject drugs: A computational modelling study. The Lancet HIV (2025). [Submitted]
+Demidont AC. Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study. The Lancet HIV (2025). [Submitted]
 ```
 
 6. Click **Publish release**
 
 ---
 
-## Step 7: Get Zenodo DOI (Optional but Recommended)
-
-1. Go to https://zenodo.org
-2. Log in with GitHub
-3. Enable the repository for Zenodo archiving
-4. The GitHub release will automatically create a Zenodo DOI
-5. Update README.md badge with actual DOI
-
----
-
-## Step 8: Verify
+## Step 6: Verify Deployment
 
 ```bash
 # Clone fresh copy to verify
@@ -134,10 +108,11 @@ cd /tmp
 git clone https://github.com/Nyx-Dynamics/hiv-prevention-master.git
 cd hiv-prevention-master
 
-# Test that model runs
-python architectural_barrier_model.py
+# Test main simulation with CLI flag
+python architectural_barrier_model.py --output-dir ./test_run --n-individuals 1000
 
-# Verify outputs match expected values
+# Verify figures can be generated
+python visualize_md_results.py --input ./test_run/architectural_barrier_results.json --output-dir ./test_figures
 ```
 
 ---
@@ -146,25 +121,9 @@ python architectural_barrier_model.py
 
 ```bash
 # All-in-one (run from repository root)
-git checkout main
-git pull origin main
 git add .
-git status
-git commit -m "Refactor: rename to architectural barrier model for Lancet HIV submission"
+git commit -m "Release v1.2.0: Terminology refactor and CLI update"
 git push origin main
-git tag -a v1.0.0 -m "Lancet HIV submission release"
-git push origin v1.0.0
+git tag -a v1.2.0 -m "Version 1.2.0 release"
+git push origin v1.2.0
 ```
-
----
-
-## Troubleshooting
-
-**Problem:** Push rejected  
-**Solution:** `git pull --rebase origin main` then push again
-
-**Problem:** Large file error  
-**Solution:** Check for PDFs or data files >100MB, add to .gitignore
-
-**Problem:** Authentication failed  
-**Solution:** Use GitHub CLI (`gh auth login`) or personal access token

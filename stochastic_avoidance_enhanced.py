@@ -22,6 +22,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional
 import json
 import csv
+import os
+import argparse
 from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -1064,28 +1066,32 @@ def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
 
 def main():
     """Run complete enhanced analysis."""
-    
+    parser = argparse.ArgumentParser(description="Enhanced Stochastic Avoidance Model")
+    parser.add_argument("--output-dir", type=str, default="outputs", help="Directory to save output files (default: outputs)")
+    parser.add_argument("--n-sims", type=int, default=2000, help="Number of simulations for national forecast (default: 2000)")
+    parser.add_argument("--n-psa", type=int, default=500, help="Number of PSA samples (default: 500)")
+    args = parser.parse_args()
+
+    # Create output directory if it doesn't exist
+    os.makedirs(args.output_dir, exist_ok=True)
+
     print("=" * 80)
     print("ENHANCED STOCHASTIC AVOIDANCE MODEL")
     print("With Methamphetamine Trajectory and Sensitivity Analyses")
+    print(f"Output directory: {os.path.abspath(args.output_dir)}")
     print("=" * 80)
     print()
 
-    # Use a relative path within the project instead of absolute path
-    import os
-    output_dir = os.path.join(os.getcwd(), "outputs")
-
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = args.output_dir
 
     # 1. Regional meth trajectories
     print("1. Generating regional methamphetamine trajectories...")
     fig1 = plot_regional_meth_trajectories(f"{output_dir}/FigS1_MethTrajectories.png")
 
     # 2. National outbreak forecast
-    print("2. Running national outbreak probability forecast...")
+    print(f"2. Running national outbreak probability forecast ({args.n_sims} simulations)...")
     model = EnhancedStochasticAvoidanceModel(region="national_average")
-    national_results = model.simulate_trajectory(n_simulations=2000)
+    national_results = model.simulate_trajectory(n_simulations=args.n_sims)
     
     print(f"\n   National Summary:")
     print(f"   - P(outbreak within 5 years): {national_results['summary'].get('p_outbreak_5yr', 0)*100:.1f}%")
@@ -1171,9 +1177,9 @@ def main():
     fig4 = plot_scenario_comparison(scenario_results, f"{output_dir}/FigS4_ScenarioComparison.png")
     
     # 6. Probabilistic sensitivity analysis
-    print("\n6. Running probabilistic sensitivity analysis (this may take a few minutes)...")
+    print(f"\n6. Running probabilistic sensitivity analysis ({args.n_psa} samples)...")
     psa_results = analyzer.probabilistic_sensitivity(
-        n_samples=500,  # Reduced for speed
+        n_samples=args.n_psa,
         outcomes=["p_outbreak_5yr", "p_outbreak_10yr", "median_years_to_outbreak"]
     )
     
