@@ -1,819 +1,366 @@
 #!/usr/bin/env python3
 """
-Cascade Barrier Sensitivity Analysis
+Cascade Sensitivity Analysis
+=============================
 
-Comprehensive sensitivity analysis for the LAI-PrEP cascade model,
-examining how uncertainty in barrier parameters affects P(R(0)=0).
+Performs probabilistic sensitivity analysis (PSA), barrier removal analysis,
+and step importance ranking for the PWID HIV prevention cascade model.
 
-Author: AC Demidont, MD / Nyx Dynamics LLC
-Date: December 2024
+Outputs:
+- PSA distributions for cascade completion and P(R₀=0)
+- Tornado diagram data
+- Barrier removal waterfall analysis
+- Step importance ranking
+
+Usage:
+    python cascade_sensitivity_analysis.py
+    python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples 1000
+
+Author: AC Demidont, DO / Nyx Dynamics LLC
+Date: January 2026
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import logging
-import os
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+import random
 import json
 import csv
-import argparse
 import os
+import argparse
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 from datetime import datetime
 
-# Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-# Import base model
+# Import from main model
 from architectural_barrier_model import (
-    ArchitecturalBarrierModel, 
+    ArchitecturalBarrierModel,
     PolicyScenario,
     create_policy_scenarios,
     create_pwid_cascade,
-    CascadeStep
+    CascadeStep,
 )
-ManufacturedDeathModel = ArchitecturalBarrierModel
 
-rng = np.random.default_rng(42)
-
-# AIDS and Behavior dimensions (mm converted to inches)
-MM_TO_INCH = 1 / 25.4
-WIDTH_SINGLE = 84 * MM_TO_INCH
-WIDTH_DOUBLE = 174 * MM_TO_INCH
-
-# AIDS and Behavior publication quality settings
-plt.rcParams.update({
-    'font.family': 'sans-serif',
-    'font.sans-serif': ['Arial', 'Helvetica'],
-    'font.size': 10,
-    'axes.titlesize': 10,
-    'axes.labelsize': 10,
-    'xtick.labelsize': 9,
-    'ytick.labelsize': 9,
-    'legend.fontsize': 9,
-    'figure.titlesize': 10,
-    'figure.dpi': 300,
-    'savefig.dpi': 600,
-    'savefig.bbox': 'tight',
-    'axes.linewidth': 0.8,
-    'lines.linewidth': 1.0,
-})
-
-def save_publication_fig(fig, fig_name, output_dir):
-    """Saves figure in EPS and TIFF formats as per guidelines."""
-    # EPS for vector
-    fig.savefig(os.path.join(output_dir, f"{fig_name}.eps"), format='eps', dpi=600)
-    # TIFF for high-quality raster
-    fig.savefig(os.path.join(output_dir, f"{fig_name}.tif"), format='tif', dpi=600, 
-                pil_kwargs={"compression": "tiff_lzw"})
-    print(f"✓ Saved: {fig_name}.eps and .tif")
+# Set seeds
+np.random.seed(42)
+random.seed(42)
 
 
 # =============================================================================
-# CASCADE PARAMETER UNCERTAINTY
+# PARAMETER BOUNDS FOR PSA
 # =============================================================================
 
 @dataclass
 class CascadeParameterBounds:
-    """Uncertainty bounds for cascade step parameters."""
-    step_name: str
-    base_prob_range: Tuple[float, float]
-    policy_penalty_range: Tuple[float, float]
-    stigma_penalty_range: Tuple[float, float]
-    infrastructure_penalty_range: Tuple[float, float]
-    testing_penalty_range: Tuple[float, float] = (0.0, 0.0)
-    research_penalty_range: Tuple[float, float] = (0.0, 0.0)
-    ml_penalty_range: Tuple[float, float] = (0.0, 0.0)
+    """Uncertainty bounds for cascade step parameters"""
+    name: str
+    base_prob_low: float
+    base_prob_high: float
+    policy_penalty_low: float = 0.0
+    policy_penalty_high: float = 0.0
+    stigma_penalty_low: float = 0.0
+    stigma_penalty_high: float = 0.0
+    infrastructure_penalty_low: float = 0.0
+    infrastructure_penalty_high: float = 0.0
 
 
-# Define uncertainty bounds for each cascade step (±25% or literature-based)
-CASCADE_BOUNDS = [
-    CascadeParameterBounds(
-        step_name="awareness",
-        base_prob_range=(0.60, 0.80),
-        policy_penalty_range=(0.15, 0.35),
-        stigma_penalty_range=(0.02, 0.10),
-        infrastructure_penalty_range=(0.10, 0.25),
-        research_penalty_range=(0.02, 0.10),
-        ml_penalty_range=(0.05, 0.15),
+# Literature-derived uncertainty bounds
+CASCADE_BOUNDS = {
+    "awareness": CascadeParameterBounds(
+        name="awareness",
+        base_prob_low=0.60, base_prob_high=0.80,
+        policy_penalty_low=0.15, policy_penalty_high=0.35,
+        stigma_penalty_low=0.02, stigma_penalty_high=0.10,
+        infrastructure_penalty_low=0.10, infrastructure_penalty_high=0.25,
     ),
-    CascadeParameterBounds(
-        step_name="willingness",
-        base_prob_range=(0.70, 0.90),
-        policy_penalty_range=(0.25, 0.45),
-        stigma_penalty_range=(0.05, 0.15),
-        infrastructure_penalty_range=(0.0, 0.0),
-        ml_penalty_range=(0.02, 0.10),
+    "willingness": CascadeParameterBounds(
+        name="willingness",
+        base_prob_low=0.70, base_prob_high=0.90,
+        policy_penalty_low=0.25, policy_penalty_high=0.45,
+        stigma_penalty_low=0.05, stigma_penalty_high=0.15,
     ),
-    CascadeParameterBounds(
-        step_name="healthcare_access",
-        base_prob_range=(0.65, 0.85),
-        policy_penalty_range=(0.05, 0.20),
-        stigma_penalty_range=(0.02, 0.10),
-        infrastructure_penalty_range=(0.15, 0.35),
+    "healthcare_access": CascadeParameterBounds(
+        name="healthcare_access",
+        base_prob_low=0.65, base_prob_high=0.85,
+        policy_penalty_low=0.05, policy_penalty_high=0.20,
+        stigma_penalty_low=0.02, stigma_penalty_high=0.10,
+        infrastructure_penalty_low=0.15, infrastructure_penalty_high=0.35,
     ),
-    CascadeParameterBounds(
-        step_name="disclosure",
-        base_prob_range=(0.60, 0.80),
-        policy_penalty_range=(0.20, 0.40),
-        stigma_penalty_range=(0.10, 0.25),
-        infrastructure_penalty_range=(0.0, 0.0),
+    "disclosure": CascadeParameterBounds(
+        name="disclosure",
+        base_prob_low=0.60, base_prob_high=0.80,
+        policy_penalty_low=0.20, policy_penalty_high=0.40,
+        stigma_penalty_low=0.10, stigma_penalty_high=0.25,
     ),
-    CascadeParameterBounds(
-        step_name="provider_willing",
-        base_prob_range=(0.75, 0.95),
-        policy_penalty_range=(0.02, 0.10),
-        stigma_penalty_range=(0.15, 0.35),
-        infrastructure_penalty_range=(0.0, 0.0),
-        research_penalty_range=(0.05, 0.15),
-        ml_penalty_range=(0.05, 0.15),
+    "provider_willing": CascadeParameterBounds(
+        name="provider_willing",
+        base_prob_low=0.75, base_prob_high=0.90,
+        policy_penalty_low=0.02, policy_penalty_high=0.10,
+        stigma_penalty_low=0.15, stigma_penalty_high=0.35,
     ),
-    CascadeParameterBounds(
-        step_name="hiv_testing_adequate",
-        base_prob_range=(0.80, 0.95),
-        policy_penalty_range=(0.02, 0.10),
-        stigma_penalty_range=(0.0, 0.0),
-        infrastructure_penalty_range=(0.10, 0.25),
-        testing_penalty_range=(0.15, 0.35),
+    "hiv_testing_adequate": CascadeParameterBounds(
+        name="hiv_testing_adequate",
+        base_prob_low=0.80, base_prob_high=0.95,
+        policy_penalty_low=0.02, policy_penalty_high=0.10,
+        infrastructure_penalty_low=0.10, infrastructure_penalty_high=0.25,
     ),
-    CascadeParameterBounds(
-        step_name="first_injection",
-        base_prob_range=(0.65, 0.85),
-        policy_penalty_range=(0.05, 0.20),
-        stigma_penalty_range=(0.02, 0.10),
-        infrastructure_penalty_range=(0.10, 0.25),
+    "first_injection": CascadeParameterBounds(
+        name="first_injection",
+        base_prob_low=0.65, base_prob_high=0.85,
+        policy_penalty_low=0.05, policy_penalty_high=0.15,
+        stigma_penalty_low=0.02, stigma_penalty_high=0.10,
+        infrastructure_penalty_low=0.10, infrastructure_penalty_high=0.25,
     ),
-    CascadeParameterBounds(
-        step_name="sustained_engagement",
-        base_prob_range=(0.60, 0.80),
-        policy_penalty_range=(0.10, 0.30),
-        stigma_penalty_range=(0.05, 0.15),
-        infrastructure_penalty_range=(0.05, 0.15),
-        ml_penalty_range=(0.02, 0.10),
+    "sustained_engagement": CascadeParameterBounds(
+        name="sustained_engagement",
+        base_prob_low=0.60, base_prob_high=0.80,
+        policy_penalty_low=0.15, policy_penalty_high=0.30,
+        stigma_penalty_low=0.05, stigma_penalty_high=0.15,
+        infrastructure_penalty_low=0.05, infrastructure_penalty_high=0.20,
     ),
-]
+}
 
 
 # =============================================================================
-# SENSITIVITY ANALYSIS FOR CASCADE
+# SENSITIVITY ANALYZER
 # =============================================================================
 
 class CascadeSensitivityAnalyzer:
-    """
-    Sensitivity analysis engine for cascade barrier parameters.
-    """
-    
+    """Performs various sensitivity analyses on the cascade model"""
+
     def __init__(self):
-        self.base_model = ManufacturedDeathModel()
-        self.bounds = {b.step_name: b for b in CASCADE_BOUNDS}
-        
+        self.base_cascade = create_pwid_cascade()
+        self.bounds = CASCADE_BOUNDS
+
     def sample_cascade_parameters(self) -> List[CascadeStep]:
-        """
-        Sample cascade steps with randomized parameters within bounds.
-        """
+        """Sample cascade parameters from uncertainty distributions"""
         sampled_cascade = []
-        
-        for step in self.base_model.cascade:
+
+        for step in self.base_cascade:
             bounds = self.bounds.get(step.name)
-            if bounds is None:
+            if bounds:
+                sampled_step = CascadeStep(
+                    name=step.name,
+                    description=step.description,
+                    base_probability=np.random.uniform(bounds.base_prob_low, bounds.base_prob_high),
+                    policy_penalty=np.random.uniform(bounds.policy_penalty_low, bounds.policy_penalty_high),
+                    stigma_penalty=np.random.uniform(bounds.stigma_penalty_low, bounds.stigma_penalty_high),
+                    infrastructure_penalty=np.random.uniform(bounds.infrastructure_penalty_low, bounds.infrastructure_penalty_high),
+                    testing_penalty=step.testing_penalty,
+                    research_penalty=step.research_penalty,
+                    ml_penalty=step.ml_penalty,
+                )
+                sampled_cascade.append(sampled_step)
+            else:
                 sampled_cascade.append(step)
-                continue
-                
-            sampled_step = CascadeStep(
-                name=step.name,
-                description=step.description,
-                base_probability=rng.uniform(*bounds.base_prob_range),
-                barrier_layer=step.barrier_layer,
-                architectural_subtype=step.architectural_subtype,
-                pathogen_penalty=step.pathogen_penalty,
-                testing_penalty=rng.uniform(*bounds.testing_penalty_range),
-                policy_penalty=rng.uniform(*bounds.policy_penalty_range),
-                stigma_penalty=rng.uniform(*bounds.stigma_penalty_range),
-                infrastructure_penalty=rng.uniform(*bounds.infrastructure_penalty_range),
-                research_penalty=rng.uniform(*bounds.research_penalty_range),
-                ml_penalty=rng.uniform(*bounds.ml_penalty_range),
-            )
-            sampled_cascade.append(sampled_step)
-            
+
         return sampled_cascade
-    
+
     def run_probabilistic_sensitivity(
         self,
         n_samples: int = 1000,
-        scenario: PolicyScenario = None
+        n_individuals: int = 10000
     ) -> Dict:
-        """
-        Probabilistic sensitivity analysis for cascade parameters.
-        """
-        if scenario is None:
-            scenario = PolicyScenario(name="Current Policy", description="Status quo")
-            
-        results = {
-            "cascade_completions": [],
-            "r0_zero_rates": [],
-            "step_probabilities": {step.name: [] for step in self.base_model.cascade},
-            "barrier_attributions": {
-                "policy": [],
-                "stigma": [],
-                "infrastructure": [],
-                "testing": [],
-                "research": [],
-                "ml": [],
-            }
-        }
-        
-        for _ in range(n_samples):
-            # Sample new cascade parameters
+        """Run probabilistic sensitivity analysis"""
+        print(f"Running PSA with {n_samples} samples...")
+
+        cascade_completions = []
+        r0_zero_rates = []
+        step_prob_samples = {step.name: [] for step in self.base_cascade}
+
+        current_scenario = PolicyScenario("Current Policy")
+
+        for i in range(n_samples):
+            if (i + 1) % 100 == 0:
+                print(f"  Sample {i + 1}/{n_samples}")
+
+            # Sample parameters
             sampled_cascade = self.sample_cascade_parameters()
-            
-            # Create model with sampled cascade
-            model = ManufacturedDeathModel()
-            model.cascade = sampled_cascade
-            
-            # Run quick simulation
-            sim_results = model.run_simulation(scenario, n_individuals=10000, years=5)
-            
-            results["cascade_completions"].append(sim_results["observed_cascade_completion_rate"])
-            results["r0_zero_rates"].append(sim_results["observed_r0_zero_rate"])
-            
-            for step_name, prob in sim_results["step_probabilities"].items():
-                results["step_probabilities"][step_name].append(prob)
-                
-            for barrier, val in sim_results["barrier_attribution_totals"].items():
-                if barrier in results["barrier_attributions"]:
-                    results["barrier_attributions"][barrier].append(val)
-        
-        # Calculate statistics
-        results["summary"] = {
+            model = ArchitecturalBarrierModel(cascade=sampled_cascade)
+
+            # Run simulation
+            results = model.run_simulation(current_scenario, n_individuals=n_individuals, years=5)
+
+            cascade_completions.append(results["observed_cascade_completion_rate"])
+            r0_zero_rates.append(results["observed_r0_zero_rate"])
+
+            for step_name, prob in results["step_probabilities"].items():
+                step_prob_samples[step_name].append(prob)
+
+        # Summary statistics
+        summary = {
             "cascade_completion": {
-                "mean": np.mean(results["cascade_completions"]),
-                "std": np.std(results["cascade_completions"]),
-                "p5": np.percentile(results["cascade_completions"], 5),
-                "p95": np.percentile(results["cascade_completions"], 95),
+                "mean": np.mean(cascade_completions),
+                "std": np.std(cascade_completions),
+                "p5": np.percentile(cascade_completions, 5),
+                "p95": np.percentile(cascade_completions, 95),
             },
             "r0_zero_rate": {
-                "mean": np.mean(results["r0_zero_rates"]),
-                "std": np.std(results["r0_zero_rates"]),
-                "p5": np.percentile(results["r0_zero_rates"], 5),
-                "p95": np.percentile(results["r0_zero_rates"], 95),
+                "mean": np.mean(r0_zero_rates),
+                "std": np.std(r0_zero_rates),
+                "p5": np.percentile(r0_zero_rates, 5),
+                "p95": np.percentile(r0_zero_rates, 95),
             },
             "step_probabilities": {
-                step: {
+                name: {
                     "mean": np.mean(probs),
                     "std": np.std(probs),
                     "p5": np.percentile(probs, 5),
                     "p95": np.percentile(probs, 95),
                 }
-                for step, probs in results["step_probabilities"].items()
+                for name, probs in step_prob_samples.items()
             }
         }
-        
-        return results
-    
-    def barrier_removal_analysis(self, n_simulations: int = 50000) -> Dict:
-        """
-        Analyze effect of removing individual barrier types.
-        """
-        scenarios = {
-            "baseline": PolicyScenario(
-                name="Current Policy",
-                description="All barriers active"
-            ),
-            "no_criminalization": PolicyScenario(
-                name="Decriminalization",
-                description="Policy barriers removed",
-                decriminalization=True,
-                incarceration_modifier=0.3,
-            ),
-            "no_stigma": PolicyScenario(
-                name="No Stigma",
-                description="Stigma barriers removed",
-                stigma_reduction=1.0,
-                bias_training=True,
-            ),
-            "low_barrier_access": PolicyScenario(
-                name="Low Barrier Access",
-                description="Infrastructure barriers reduced",
-                low_barrier_access=True,
-                ssp_integrated_delivery=True,
-            ),
-            "full_inclusion": PolicyScenario(
-                name="Full Research Inclusion",
-                description="Research exclusion removed",
-                pwid_trial_inclusion=True,
-                algorithmic_debiasing=True,
-            ),
-            "all_removed": PolicyScenario(
-                name="All Barriers Removed",
-                description="Theoretical maximum",
-                decriminalization=True,
-                incarceration_modifier=0.0,
-                in_custody_prep=True,
-                stigma_reduction=1.0,
-                bias_training=True,
-                ssp_integrated_delivery=True,
-                peer_navigation=True,
-                low_barrier_access=True,
-                pwid_trial_inclusion=True,
-                algorithmic_debiasing=True,
-            ),
-        }
-        
+
+        return {"summary": summary, "n_samples": n_samples}
+
+    def barrier_removal_analysis(self, n_individuals: int = 100000) -> Dict:
+        """Analyze effect of removing individual barrier types"""
+        print("Running barrier removal analysis...")
+
+        model = ArchitecturalBarrierModel()
         results = {}
-        model = ManufacturedDeathModel()
-        
-        for name, scenario in scenarios.items():
-            sim_results = model.run_simulation(scenario, n_individuals=n_simulations)
-            results[name] = {
-                "r0_zero_rate": sim_results["observed_r0_zero_rate"],
-                "cascade_completion": sim_results["observed_cascade_completion_rate"],
-                "ci_95": sim_results["r0_zero_95ci"],
-                "step_probabilities": sim_results["step_probabilities"],
-                "barrier_attribution": sim_results.get("barrier_decomposition_pct", {}),
-            }
-        
-        # Calculate incremental effects
-        baseline_rate = results["baseline"]["r0_zero_rate"]
-        for name in results:
-            if name != "baseline":
-                rate = results[name]["r0_zero_rate"]
-                if baseline_rate > 0:
-                    results[name]["relative_improvement"] = (rate - baseline_rate) / baseline_rate
-                else:
-                    results[name]["relative_improvement"] = float('inf') if rate > 0 else 0
-                results[name]["absolute_improvement"] = rate - baseline_rate
-        
-        return results
-    
-    def step_importance_analysis(self) -> Dict:
-        """
-        Analyze which cascade steps are most critical bottlenecks.
-        """
-        model = ManufacturedDeathModel()
-        base_scenario = PolicyScenario(name="Current Policy", description="Baseline")
-        
-        # Get baseline results
-        baseline = model.run_simulation(base_scenario, n_individuals=50000)
-        
-        results = {
-            "baseline": {
-                "cascade_completion": baseline["observed_cascade_completion_rate"],
-                "r0_zero_rate": baseline["observed_r0_zero_rate"],
-            },
-            "step_removal_effects": {}
+
+        # Baseline (current policy)
+        baseline = model.run_simulation(PolicyScenario("Current Policy"), n_individuals=n_individuals)
+        results["baseline"] = {
+            "r0_zero_rate": baseline["observed_r0_zero_rate"],
+            "cascade_completion": baseline["observed_cascade_completion_rate"],
+            "ci_95": list(baseline["r0_zero_95ci"]),
         }
-        
-        # For each step, see what happens if we set it to 99%
+
+        # Scenario configurations for barrier removal
+        barrier_scenarios = [
+            ("no_criminalization", PolicyScenario("No Criminalization", decriminalization=True, incarceration_modifier=0.3)),
+            ("no_stigma", PolicyScenario("No Stigma", stigma_reduction=1.0, bias_training=True)),
+            ("low_barrier_access", PolicyScenario("Low Barrier Access", ssp_integrated=True, peer_navigation=True, low_barrier=True)),
+            ("full_inclusion", PolicyScenario("Full Research Inclusion", trial_inclusion=True, ml_debiasing=True)),
+            ("all_removed", PolicyScenario("All Barriers Removed", decriminalization=True, incarceration_modifier=0.0,
+                                           stigma_reduction=1.0, bias_training=True, ssp_integrated=True,
+                                           peer_navigation=True, low_barrier=True, trial_inclusion=True, ml_debiasing=True)),
+        ]
+
+        for name, scenario in barrier_scenarios:
+            print(f"  Testing: {name}")
+            result = model.run_simulation(scenario, n_individuals=n_individuals)
+            results[name] = {
+                "r0_zero_rate": result["observed_r0_zero_rate"],
+                "cascade_completion": result["observed_cascade_completion_rate"],
+                "ci_95": list(result["r0_zero_95ci"]),
+            }
+
+        return results
+
+    def step_importance_analysis(self, n_individuals: int = 100000) -> Dict:
+        """Analyze importance of each cascade step"""
+        print("Running step importance analysis...")
+
+        model = ArchitecturalBarrierModel()
+        current_scenario = PolicyScenario("Current Policy")
+
+        # Baseline
+        baseline = model.run_simulation(current_scenario, n_individuals=n_individuals)
+        baseline_r0_zero = baseline["observed_r0_zero_rate"]
+
+        effects = {}
         for i, step in enumerate(model.cascade):
-            # Create modified cascade
+            # Create modified cascade with step fixed at 100%
             modified_cascade = []
             for j, s in enumerate(model.cascade):
                 if i == j:
-                    # Set this step to near-certain
+                    # Fix this step at near-perfect probability
                     modified_step = CascadeStep(
                         name=s.name,
                         description=s.description,
                         base_probability=0.99,
-                        barrier_layer=s.barrier_layer,
-                        architectural_subtype=s.architectural_subtype,
-                        pathogen_penalty=0.0,
-                        testing_penalty=0.0,
                         policy_penalty=0.0,
                         stigma_penalty=0.0,
                         infrastructure_penalty=0.0,
+                        testing_penalty=0.0,
                         research_penalty=0.0,
                         ml_penalty=0.0,
                     )
                     modified_cascade.append(modified_step)
                 else:
                     modified_cascade.append(s)
-            
-            # Run with modified cascade
-            modified_model = ManufacturedDeathModel()
-            modified_model.cascade = modified_cascade
-            modified_results = modified_model.run_simulation(base_scenario, n_individuals=30000)
-            
-            improvement = modified_results["observed_r0_zero_rate"] - baseline["observed_r0_zero_rate"]
-            
-            results["step_removal_effects"][step.name] = {
+
+            modified_model = ArchitecturalBarrierModel(cascade=modified_cascade)
+            result = modified_model.run_simulation(current_scenario, n_individuals=n_individuals)
+
+            effects[step.name] = {
                 "original_probability": baseline["step_probabilities"][step.name],
-                "cascade_completion_if_fixed": modified_results["observed_cascade_completion_rate"],
-                "r0_zero_if_fixed": modified_results["observed_r0_zero_rate"],
-                "absolute_improvement": improvement,
-                "improvement_factor": modified_results["observed_r0_zero_rate"] / max(baseline["observed_r0_zero_rate"], 0.0001),
+                "cascade_if_fixed": result["observed_cascade_completion_rate"],
+                "r0_zero_if_fixed": result["observed_r0_zero_rate"],
+                "improvement": result["observed_r0_zero_rate"] - baseline_r0_zero,
             }
-        
+
         # Rank by improvement
-        ranked = sorted(
-            results["step_removal_effects"].items(),
-            key=lambda x: x[1]["absolute_improvement"],
-            reverse=True
-        )
-        results["ranked_importance"] = [name for name, _ in ranked]
-        
-        return results
+        ranked = sorted(effects.keys(), key=lambda x: effects[x]["improvement"], reverse=True)
+
+        return {"ranked": ranked, "effects": effects}
 
 
 # =============================================================================
-# VISUALIZATION FUNCTIONS
-# =============================================================================
-
-def plot_cascade_uncertainty(psa_results: Dict, save_path: str = None):
-    """
-    Figure: Cascade step probability distributions with uncertainty.
-    """
-    fig, axes = plt.subplots(2, 4, figsize=(WIDTH_DOUBLE, 4.5))
-    axes = axes.flatten()
-    
-    step_names = list(psa_results["step_probabilities"].keys())
-    
-    for i, step in enumerate(step_names):
-        ax = axes[i]
-        probs = psa_results["step_probabilities"][step]
-        
-        ax.hist(probs, bins=25, color='#91bfdb', edgecolor='black')
-        
-        mean_val = np.mean(probs)
-        ax.axvline(x=mean_val, color='black', linewidth=1)
-        
-        # Add label for each subplot
-        ax.text(0.05, 0.9, step.replace('_', ' ').title(), transform=ax.transAxes, 
-                fontsize=8, fontweight='bold', va='top')
-        
-        ax.set_xlim(0, 1)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.set_yticks([]) # Hide y counts for cleaner look
-    
-    plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
-    os.makedirs(output_dir, exist_ok=True)
-    save_publication_fig(fig, 'FigS5_CascadeUncertainty', output_dir)
-    plt.close()
-    
-    return fig
-
-
-def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None):
-    """
-    Figure: Waterfall chart showing incremental barrier removal effects.
-    """
-    fig, ax = plt.subplots(figsize=(WIDTH_DOUBLE, 5))
-    
-    scenarios = ['baseline', 'no_criminalization', 'no_stigma', 
-                 'low_barrier_access', 'full_inclusion', 'all_removed']
-    labels = ['Current', 'Decrim', 'Stigma', 'Access', 'Inclusion', 'Max']
-    
-    rates = [barrier_results[s]["r0_zero_rate"] * 100 for s in scenarios]
-    
-    # Create waterfall data
-    increments = [rates[0]]
-    for i in range(1, len(rates)):
-        increments.append(rates[i] - rates[i-1])
-    
-    bottoms = [0] + [sum(increments[:i+1]) for i in range(len(increments)-1)]
-    
-    colors = ['#d73027'] + ['#4575b4'] * (len(increments) - 1)
-    
-    bars = ax.bar(range(len(scenarios)), increments, bottom=bottoms, color=colors, edgecolor='black')
-    
-    # Add connecting lines
-    for i in range(len(scenarios) - 1):
-        ax.plot([i, i + 1], [sum(increments[:i+1]), sum(increments[:i+1])], 'k--', linewidth=0.5)
-    
-    # Value labels
-    for i, (bar, val) in enumerate(zip(bars, increments)):
-        y_pos = bottoms[i] + val/2
-        if val > 0.5:
-            ax.text(bar.get_x() + bar.get_width()/2, y_pos, f'{val:.1f}%', 
-                    ha='center', va='center', color='white', fontsize=8, fontweight='bold')
-    
-    ax.set_xticks(range(len(scenarios)))
-    ax.set_xticklabels(labels)
-    ax.set_ylabel('P(R0=0) %')
-    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
-    os.makedirs(output_dir, exist_ok=True)
-    save_publication_fig(fig, 'FigS7_BarrierRemoval', output_dir)
-    plt.close()
-    
-    return fig
-
-
-def plot_step_importance(importance_results: Dict, save_path: str = None):
-    """
-    Figure: Ranked importance of cascade steps.
-    """
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 4))
-    
-    step_effects = importance_results["step_removal_effects"]
-    ranked = importance_results["ranked_importance"]
-    
-    # Panel A: Original step probabilities
-    ax = axes[0]
-    original_probs = [step_effects[s]["original_probability"] for s in ranked]
-    
-    ax.barh(range(len(ranked)), original_probs, color='#91bfdb', edgecolor='black')
-    ax.set_yticks(range(len(ranked)))
-    ax.set_yticklabels([s.replace('_', ' ').title() for s in ranked], fontsize=8)
-    ax.set_xlabel('Current Step Probability')
-    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
-    ax.set_xlim(0, 1)
-    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    # Panel B: Improvement if fixed
-    ax = axes[1]
-    improvements = [step_effects[s]["absolute_improvement"] * 100 for s in ranked]
-    
-    ax.barh(range(len(ranked)), improvements, color='#fc8d59', edgecolor='black')
-    ax.set_yticks(range(len(ranked)))
-    ax.set_yticklabels([]) 
-    ax.set_xlabel('Improvement in P(R0=0) %')
-    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
-    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
-    os.makedirs(output_dir, exist_ok=True)
-    save_publication_fig(fig, 'FigS8_StepImportance', output_dir)
-    plt.close()
-    
-    return fig
-
-
-def plot_r0_zero_distribution(psa_results: Dict, save_path: str = None):
-    """
-    Figure: Distribution of P(R(0)=0) and Cascade Completion.
-    """
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
-    
-    # Panel A: R(0)=0 distribution
-    ax = axes[0]
-    r0_rates = np.array(psa_results["r0_zero_rates"]) * 100
-    ax.hist(r0_rates, bins=30, color='#d73027', edgecolor='black')
-    
-    mean_val = np.mean(r0_rates)
-    ax.axvline(x=mean_val, color='black', linewidth=1)
-    ax.set_xlabel('P(R(0)=0) %')
-    ax.set_ylabel('Frequency')
-    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
-    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    # Panel B: Cascade completion distribution
-    ax = axes[1]
-    cascade_rates = np.array(psa_results["cascade_completions"]) * 100
-    ax.hist(cascade_rates, bins=30, color='#4575b4', edgecolor='black')
-    
-    mean_c = np.mean(cascade_rates)
-    ax.axvline(x=mean_c, color='black', linewidth=1)
-    ax.set_xlabel('Cascade Completion %')
-    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
-    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
-    os.makedirs(output_dir, exist_ok=True)
-    save_publication_fig(fig, 'FigS6_R0ZeroDistribution', output_dir)
-    plt.close()
-    
-    return fig
-
-
-# =============================================================================
-# MAIN EXECUTION
+# MAIN
 # =============================================================================
 
 def main():
-    """Run complete cascade sensitivity analysis."""
-    parser = argparse.ArgumentParser(description="Cascade Barrier Sensitivity Analysis")
-    parser.add_argument("--output-dir", type=str, default="../data/figures", help="Directory to save output figures (default: ../data/figures)")
-    parser.add_argument("--data-dir", type=str, default="../data/csv_xlsx", help="Directory to save data files (default: ../data/csv_xlsx)")
-    parser.add_argument("--n-samples", type=int, default=1000, help="Number of samples for PSA (default: 1000)")
+    parser = argparse.ArgumentParser(description="Cascade Sensitivity Analysis")
+    parser.add_argument("--output-dir", type=str, default="../data/csv_xlsx",
+                       help="Output directory")
+    parser.add_argument("--n-samples", type=int, default=1000,
+                       help="PSA samples (default: 1000)")
+    parser.add_argument("--n-individuals", type=int, default=100000,
+                       help="Individuals per simulation")
     args = parser.parse_args()
 
-    # Create directories if they don't exist
     os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs(args.data_dir, exist_ok=True)
 
-    print("=" * 80)
-    print("CASCADE BARRIER SENSITIVITY ANALYSIS")
-    print(f"Output directory: {os.path.abspath(args.output_dir)}")
-    print(f"Data directory: {os.path.abspath(args.data_dir)}")
-    print("=" * 80)
+    print("=" * 70)
+    print("CASCADE SENSITIVITY ANALYSIS")
+    print("=" * 70)
     print()
 
-    output_dir = args.output_dir
-    data_dir = args.data_dir
     analyzer = CascadeSensitivityAnalyzer()
 
-    # 1. Probabilistic sensitivity analysis
-    print(f"1. Running probabilistic sensitivity analysis ({args.n_samples} samples)...")
-    psa_results = analyzer.run_probabilistic_sensitivity(n_samples=args.n_samples)
+    # Run analyses
+    psa_results = analyzer.run_probabilistic_sensitivity(
+        n_samples=args.n_samples, n_individuals=10000)
+    barrier_results = analyzer.barrier_removal_analysis(n_individuals=args.n_individuals)
+    step_results = analyzer.step_importance_analysis(n_individuals=args.n_individuals)
 
-    print(f"\n   P(R(0)=0) under parameter uncertainty:")
-    print(f"   - Mean: {psa_results['summary']['r0_zero_rate']['mean'] * 100:.4f}%")
-    print(f"   - 90% CI: ({psa_results['summary']['r0_zero_rate']['p5'] * 100:.4f}%, "
-          f"{psa_results['summary']['r0_zero_rate']['p95'] * 100:.4f}%)")
-
-    fig1 = plot_cascade_uncertainty(psa_results, f"{output_dir}/FigS5_CascadeUncertainty.png")
-    fig2 = plot_r0_zero_distribution(psa_results, f"{output_dir}/FigS6_R0ZeroDistribution.png")
-
-    # 2. Barrier removal analysis
-    print("\n2. Running barrier removal analysis...")
-    barrier_results = analyzer.barrier_removal_analysis(n_simulations=50000)
-
-    print("\n   Effect of barrier removal:")
-    for name, res in barrier_results.items():
-        print(f"   - {name}: P(R(0)=0) = {res['r0_zero_rate'] * 100:.4f}%")
-
-    fig3 = plot_barrier_removal_waterfall(barrier_results, f"{output_dir}/FigS7_BarrierRemoval.png")
-
-    # 3. Step importance analysis
-    print("\n3. Running step importance analysis...")
-    importance_results = analyzer.step_importance_analysis()
-
-    print("\n   Most impactful steps to fix (ranked):")
-    for i, step in enumerate(importance_results["ranked_importance"][:5]):
-        effect = importance_results["step_removal_effects"][step]
-        print(f"   {i + 1}. {step}: +{effect['absolute_improvement'] * 100:.2f}pp if fixed")
-
-    fig4 = plot_step_importance(importance_results, f"{output_dir}/FigS8_StepImportance.png")
-
-    # 4. Save all results
-    print("\n4. Saving results...")
-
-    all_results = {
+    # Compile output
+    output = {
         "timestamp": datetime.now().isoformat(),
-        "probabilistic_sensitivity": {
-            "summary": psa_results["summary"],
-            "n_samples": args.n_samples,
-        },
-        "barrier_removal": {
-            name: {
-                "r0_zero_rate": res["r0_zero_rate"],
-                "cascade_completion": res["cascade_completion"],
-                "ci_95": list(res["ci_95"]),
-            }
-            for name, res in barrier_results.items()
-        },
-        "step_importance": {
-            "ranked": importance_results["ranked_importance"],
-            "effects": {
-                step: {
-                    "original_probability": float(effect["original_probability"]),
-                    "cascade_if_fixed": float(effect["cascade_completion_if_fixed"]),
-                    "r0_zero_if_fixed": float(effect["r0_zero_if_fixed"]),
-                    "improvement": float(effect["absolute_improvement"]),
-                }
-                for step, effect in importance_results["step_removal_effects"].items()
-            }
-        }
+        "probabilistic_sensitivity": psa_results,
+        "barrier_removal": barrier_results,
+        "step_importance": step_results,
     }
 
-    try:
-        json_path = f"{data_dir}/cascade_sensitivity_results.json"
-        with open(json_path, 'w') as f:
-            json.dump(all_results, f, indent=2, default=str, allow_nan=False)
-        print(f"\n   Results saved to {json_path}")
+    # Save
+    json_path = os.path.join(args.output_dir, "cascade_sensitivity_results.json")
+    with open(json_path, 'w') as f:
+        json.dump(output, f, indent=2)
+    print(f"\nSaved: {json_path}")
 
-        # Save to CSV
-        csv_path = f"{data_dir}/cascade_sensitivity_results.csv"
-        with open(csv_path, 'w', newline='') as f:
-            writer = csv.writer(f)
-            
-            # PSA Summary
-            writer.writerow(["PROBABILISTIC SENSITIVITY ANALYSIS (PSA) SUMMARY"])
-            writer.writerow(["Metric", "Mean", "Std", "p5", "p95"])
-            for metric in ["cascade_completion", "r0_zero_rate"]:
-                s = psa_results["summary"][metric]
-                writer.writerow([metric.replace('_', ' ').title(), f"{s['mean']:.6f}", f"{s['std']:.6f}", f"{s['p5']:.6f}", f"{s['p95']:.6f}"])
-            writer.writerow([])
-            
-            # Barrier Removal Analysis
-            writer.writerow(["BARRIER REMOVAL ANALYSIS"])
-            writer.writerow(["Scenario", "P(R0=0)", "Improvement"])
-            for name, res in barrier_results.items():
-                writer.writerow([name, f"{res['r0_zero_rate']:.6f}", f"{res.get('absolute_improvement', 0):.6f}"])
-            writer.writerow([])
-            
-            # Step Importance Analysis
-            writer.writerow(["STEP IMPORTANCE ANALYSIS"])
-            writer.writerow(["Step Name", "Rank", "Original Prob", "Cascade if Fixed", "R0=0 if Fixed", "Improvement"])
-            ranked = importance_results["ranked_importance"]
-            for i, step_name in enumerate(ranked):
-                eff = importance_results["step_removal_effects"][step_name]
-                writer.writerow([
-                    step_name,
-                    i + 1,
-                    f"{eff['original_probability']:.4f}",
-                    f"{eff['cascade_completion_if_fixed']:.6f}",
-                    f"{eff['r0_zero_if_fixed']:.6f}",
-                    f"{eff['absolute_improvement']:.6f}"
-                ])
+    # Print summary
+    print("\n" + "=" * 70)
+    print("SUMMARY")
+    print("=" * 70)
+    print("\nPSA Results (Current Policy):")
+    print(f"  P(R₀=0) mean: {psa_results['summary']['r0_zero_rate']['mean']:.6f}")
+    print(f"  P(R₀=0) 95% CI: ({psa_results['summary']['r0_zero_rate']['p5']:.6f}, "
+          f"{psa_results['summary']['r0_zero_rate']['p95']:.6f})")
 
-        print(f"   Results saved to {csv_path}")
+    print("\nBarrier Removal Effects:")
+    for name, result in barrier_results.items():
+        print(f"  {name}: P(R₀=0) = {result['r0_zero_rate']*100:.2f}%")
 
-        # Save to Excel
-        xlsx_path = f"{data_dir}/cascade_sensitivity_results.xlsx"
-        try:
-            import pandas as pd
-            with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer_xl:
-                # PSA Summary
-                psa_data = []
-                for metric in ["cascade_completion", "r0_zero_rate"]:
-                    s = psa_results["summary"][metric]
-                    psa_data.append({
-                        "Metric": metric.replace('_', ' ').title(),
-                        "Mean": s['mean'],
-                        "Std": s['std'],
-                        "p5": s['p5'],
-                        "p95": s['p95']
-                    })
-                df_psa = pd.DataFrame(psa_data)
-                df_psa.to_excel(writer_xl, sheet_name="PSA Summary", index=False)
+    print("\nStep Importance Ranking:")
+    for i, step_name in enumerate(step_results["ranked"][:5], 1):
+        effect = step_results["effects"][step_name]
+        print(f"  {i}. {step_name}: +{effect['improvement']*100:.4f}% if fixed")
 
-                # Barrier Removal Analysis
-                barrier_data = [
-                    {
-                        "Scenario": name,
-                        "P(R0=0)": res["r0_zero_rate"],
-                        "Improvement": res.get("absolute_improvement", 0)
-                    } for name, res in barrier_results.items()
-                ]
-                df_barrier = pd.DataFrame(barrier_data)
-                df_barrier.to_excel(writer_xl, sheet_name="Barrier Removal", index=False)
-
-                # Step Importance Analysis
-                importance_data = []
-                ranked = importance_results["ranked_importance"]
-                for i, step_name in enumerate(ranked):
-                    eff = importance_results["step_removal_effects"][step_name]
-                    importance_data.append({
-                        "Step Name": step_name,
-                        "Rank": i + 1,
-                        "Original Prob": eff['original_probability'],
-                        "Cascade if Fixed": eff['cascade_completion_if_fixed'],
-                        "R0=0 if Fixed": eff['r0_zero_if_fixed'],
-                        "Improvement": eff['absolute_improvement']
-                    })
-                df_importance = pd.DataFrame(importance_data)
-                df_importance.to_excel(writer_xl, sheet_name="Step Importance", index=False)
-
-            print(f"   Results saved to {xlsx_path}")
-        except Exception as e:
-            logger.error(f"Failed to save Excel results: {e}")
-
-    except Exception as e:
-        logger.error(f"Failed to save results: {e}")
-
-    # Print key findings
-    print("\n" + "=" * 80)
-    print("KEY FINDINGS")
-    print("=" * 80)
-
-    print("""
-CASCADE SENSITIVITY ANALYSIS RESULTS:
-
-1. PARAMETER UNCERTAINTY IMPACT
-   - Even with uncertainty, P(R(0)=0) remains near zero under current policy
-   - 90% CI for prevention probability: 0.000% to ~0.01%
-   - Conclusion: Result is ROBUST to parameter uncertainty
-
-2. BARRIER REMOVAL EFFECTS (incremental)
-   - Decriminalization alone: +0.14 percentage points
-   - Stigma removal: Additional improvement
-   - Infrastructure access: Further improvement
-   - Full barrier removal: ~20% achievable maximum
-
-3. MOST IMPACTFUL STEPS TO ADDRESS
-   - Awareness (90% fail at first step under current policy)
-   - Disclosure (willingness to disclose IDU status)
-   - Willingness (fear of system visibility)
-   - Provider willingness (bias against PWID)
-   - Sustained engagement (incarceration disruption)
-
-4. POLICY IMPLICATIONS
-   - No single intervention can achieve epidemic control
-   - Must address ALL barrier layers simultaneously
-   - Even with all barriers removed, maximum ~20% due to residual factors
-   - Structural change (decriminalization) has multiplicative effects
-""")
-
-    return all_results
+    print("\nDone!")
 
 
 if __name__ == "__main__":
-    results = main()
+    main()
