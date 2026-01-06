@@ -1,0 +1,24 @@
+PROBABILISTIC SENSITIVITY ANALYSIS (PSA) SUMMARY
+Metric,Mean,Std,p5,p95
+Cascade Completion,0.000010,0.000030,0.000000,0.000055
+R0 Zero Rate,0.000000,0.000000,0.000000,0.000000
+
+BARRIER REMOVAL ANALYSIS
+Scenario,P(R0=0),Improvement
+baseline,0.000000,0.000000
+no_criminalization,0.001840,0.001840
+no_stigma,0.000040,0.000040
+low_barrier_access,0.000140,0.000140
+full_inclusion,0.000000,0.000000
+all_removed,0.197140,0.197140
+
+STEP IMPORTANCE ANALYSIS
+Step Name,Rank,Original Prob,Cascade if Fixed,R0=0 if Fixed,Improvement
+awareness,1,0.1000,0.000533,0.000200,0.000180
+healthcare_access,2,0.3500,0.000067,0.000033,0.000013
+disclosure,3,0.2500,0.000167,0.000033,0.000013
+willingness,4,0.3000,0.000133,0.000000,-0.000020
+provider_willing,5,0.3500,0.000033,0.000000,-0.000020
+hiv_testing_adequate,6,0.4500,0.000133,0.000000,-0.000020
+first_injection,7,0.4500,0.000100,0.000000,-0.000020
+sustained_engagement,8,0.2500,0.000200,0.000000,-0.000020
