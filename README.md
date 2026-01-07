@@ -1,13 +1,8 @@
-# PWID HIV Prevention Cascade Analysis
 
-Simulation code and data for: Demidont AC. *Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs.* AIDS and Behavior (submitted 1/2026).
-
-## Overview
-
-This repository contains Monte Carlo simulation code that models barriers to long-acting injectable pre-exposure prophylaxis (LAI-PrEP) access among people who inject drugs (PWID). The analysis quantifies structural, policy, and healthcare barriers using a multi-step prevention cascade framework, and predicts outbreak risk through stochastic avoidance failure modeling.
+## Respository Overview
+This repository contains the code, simulation outputs, and supplementary analyses supporting the manuscript *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. The study examines why people who inject drugs (PWID) continue to experience high HIV incidence despite the availability of highly efficacious biomedical prevention tools. Building on a feasibility-based definition of prevention, the analyses demonstrate how strict biological timing constraints on post-exposure prophylaxis interact with structural barriers to care, network dynamics, and incarceration to place reactive prevention strategies outside the feasible biological domain. The materials provided here support the computational modeling, sensitivity analyses, and scenario evaluations described in the manuscript and are intended to enable transparency and reproducibility of the reported findings.
 
 ## Author
-
 **AC Demidont, DO**
 Independent Researcher
 Nyx Dynamics LLC
@@ -39,7 +34,7 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 | `stochastic_avoidance_enhanced.py` | Models outbreak probability over 5-10 year horizons |
 | `generate_figures.py` | Generates all manuscript figures (Figs 1-5) |
 
-## Reproducing Results
+## Reproducibility:
 
 ### Prerequisites
 
@@ -128,7 +123,7 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 
 This code accompanies the manuscript:
 
-> Demidont AC. Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *AIDS and Behavior* (submitted 1/2026).
+> Demidont AC. *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. AIDS and Behavior (submitted 1/2026).
 
 ### Figures
 
@@ -146,7 +141,8 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 You are free to:
 - Use, copy, modify, and distribute this code
-- Use for commercial or non-commercial purposes
+- Use for non-commercial purposes
+- Use for commercial purposes requires author permission
 - Include in derivative works
 
 With the requirement to include the original copyright notice.
@@ -158,8 +154,7 @@ If you use this code or data, please cite:
 ```bibtex
 @article{demidont2026pwid,
   author = {Demidont, AC},
-  title = {Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk
-           in {HIV} Prevention for People Who Inject Drugs},
+  title = {Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs},
   journal = {AIDS and Behavior},
   year = {2026},
   publisher = {Springer}
@@ -169,9 +164,9 @@ If you use this code or data, please cite:
 For the code repository:
 
 ```bibtex
-@software{demidont2025pwid_code,
+@software{demidont2026pwid_code,
   author = {Demidont, AC},
-  title = {{HIV Prevention PWID}: Cascade Simulation Code},
+  title = {Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs Source Code},
   year = {2026},
   url = {https://github.com/Nyx-Dynamics/HIV_Prevention_PWID}
 }
