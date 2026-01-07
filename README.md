@@ -113,7 +113,7 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 | `structural_barrier_results.*` | Three-layer barrier decomposition |
 
 ### Key Results
-Summary statistics below reflect simulated outcomes under specified structural scenarios and are provided for transparency.
+Summary statistics below reflect simulated outcomes under specified structural scenarios and are provided for transparency; they are not intended as population forecasts.
 | Metric | Value | 95% CI |
 |--------|-------|--------|
 | PWID cascade completion (current policy) | 0.003% | (0.000%, 0.006%) |
@@ -143,8 +143,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 You are free to:
 - Use, copy, modify, and distribute this code
-- Use for non-commercial purposes
-- Use for commercial purposes requires author permission
+- This project is licensed under the MIT License. You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the terms of the license.
 - Include in derivative works
 
 With the requirement to include the original copyright notice.
