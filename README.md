@@ -1,5 +1,5 @@
 
-## Respository Overview
+## Repository Overview
 This repository contains the code, simulation outputs, and supplementary analyses supporting the manuscript *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. The study examines why people who inject drugs (PWID) continue to experience high HIV incidence despite the availability of highly efficacious biomedical prevention tools. Building on a feasibility-based definition of prevention, the analyses demonstrate how strict biological timing constraints on post-exposure prophylaxis interact with structural barriers to care, network dynamics, and incarceration to place reactive prevention strategies outside the feasible biological domain. The materials provided here support the computational modeling, sensitivity analyses, and scenario evaluations described in the manuscript and are intended to enable transparency and reproducibility of the reported findings.
 
 ## Author
@@ -12,9 +12,9 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 
 ```
 ├── SRC/                                    # Source code
-│   ├── architectural_barrier_model.py      # Main cascade simulation (n=100,000)
+│   ├── architectural_barrier_model.py      # Cascade simulation framework (Monte Carlo)
 │   ├── cascade_sensitivity_analysis.py     # Probabilistic sensitivity analysis
-│   ├── stochastic_avoidance_enhanced.py    # Outbreak risk prediction model
+│   ├── stochastic_avoidance_enhanced.py    # Models outbreak probability under stochastic avoidance over 5-10 year horizons 
 │   └── generate_figures.py                 # Publication figure generator
 ├── data/
 │   ├── csv_xlsx/                           # Model outputs (JSON, CSV, XLSX)
@@ -35,6 +35,7 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 | `generate_figures.py` | Generates all manuscript figures (Figs 1-5) |
 
 ## Reproducibility:
+The commands below reproduce the analyses reported in the manuscript and Supplementary Materials.
 
 ### Prerequisites
 
@@ -91,6 +92,7 @@ pip install -r requirements.txt
 ```
 
 ## Data Provenance
+No individual-level or identifiable data are used in this repository.
 
 ### Model Parameters
 
@@ -111,7 +113,7 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 | `structural_barrier_results.*` | Three-layer barrier decomposition |
 
 ### Key Results
-
+Summary statistics below reflect simulated outcomes under specified structural scenarios and are provided for transparency.
 | Metric | Value | 95% CI |
 |--------|-------|--------|
 | PWID cascade completion (current policy) | 0.003% | (0.000%, 0.006%) |
