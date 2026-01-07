@@ -1,0 +1,36 @@
+NATIONAL FORECAST SUMMARY
+Metric,Value
+n_simulations,100
+n_outbreaks,98
+outbreak_rate,0.98
+median_years_to_outbreak,2.0
+mean_years_to_outbreak,3.836734693877551
+std_years,3.911505471306622
+p10_years,0.0
+p25_years,1.0
+p75_years,5.75
+p90_years,10.0
+p_outbreak_5yr,0.7448979591836735
+p_outbreak_10yr,0.9081632653061225
+
+REGIONAL COMPARISON
+Region,N Simulations,N Outbreaks,Outbreak Rate,Median Years,P(5yr Outbreak)
+appalachia,1000,986,0.9860,2.00,0.7809
+pacific_northwest,1000,992,0.9920,2.00,0.8750
+northeast_urban,1000,990,0.9900,2.00,0.7768
+national_average,1000,968,0.9680,3.00,0.7355
+
+SCENARIO COMPARISON
+Scenario,P(5yr Outbreak),Median Years to Outbreak,SSP Coverage,OAT Coverage
+Current Policy,0.7287,3.00,0.21,0.08
+SSP Expansion (50%),0.6788,3.00,0.5,0.08
+OAT Expansion (40%),0.6649,4.00,0.21,0.4
+Combined SSP+OAT,0.6332,4.00,0.5,0.4
+Decriminalization Effect,0.6392,4.00,0.4,0.3
+Full Harm Reduction,0.5425,5.00,0.8,0.6
+
+PROBABILISTIC SENSITIVITY ANALYSIS (PSA)
+Outcome,Mean,90% CI Lower (p5),90% CI Upper (p95)
+p_outbreak_5yr,0.7355,0.6596,0.8120
+p_outbreak_10yr,0.9311,0.8984,0.9754
+median_years_to_outbreak,2.6000,2.0000,3.5500

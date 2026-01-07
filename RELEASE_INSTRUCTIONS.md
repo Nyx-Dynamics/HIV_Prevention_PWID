@@ -92,8 +92,6 @@ Major update implementing the final terminology shift and enhancing user control
 - `stochastic_avoidance_enhanced.py`: Regional outbreak forecasting.
 - `visualize_md_results.py`: Manuscript-ready figure generation.
 
-### Citation
-Demidont AC. Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study. The Lancet HIV (2025). [Submitted]
 ```
 
 6. Click **Publish release**

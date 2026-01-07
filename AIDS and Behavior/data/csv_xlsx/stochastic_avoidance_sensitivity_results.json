@@ -1,0 +1,563 @@
+{
+  "timestamp": "2026-01-06T14:39:19.029728",
+  "national_forecast": {
+    "summary": {
+      "n_simulations": 100,
+      "n_outbreaks": 98,
+      "outbreak_rate": 0.98,
+      "median_years_to_outbreak": 2.0,
+      "mean_years_to_outbreak": 3.836734693877551,
+      "std_years": 3.911505471306622,
+      "p10_years": 0.0,
+      "p25_years": 1.0,
+      "p75_years": 5.75,
+      "p90_years": 10.0,
+      "p_outbreak_5yr": 0.7448979591836735,
+      "p_outbreak_10yr": 0.9081632653061225
+    },
+    "trajectory_stats": {
+      "meth_prevalence": {
+        "mean": [
+          0.1711321933427418,
+          0.17641484616046457,
+          0.18188493428809432,
+          0.1875497259649746,
+          0.19341678755397665,
+          0.19949399623214006,
+          0.2057895532357485,
+          0.21231199768453077,
+          0.2190702210107949,
+          0.22607348202046385,
+          0.2333314226142064,
+          0.24085408419813256,
+          0.24865192481485146,
+          0.2567358370270951,
+          0.2651171665875564,
+          0.27380773193013164,
+          0.28281984451934167
+        ],
+        "p5": [
+          0.1532604777694579,
+          0.15504075154299418,
+          0.15684170500066938,
+          0.1586635783582419,
+          0.16050661462182586,
+          0.162371059620304,
+          0.16425716203811716,
+          0.16616517344843457,
+          0.1680953483467093,
+          0.17004794418462407,
+          0.17202322140443058,
+          0.17402144347368823,
+          0.17604287692040638,
+          0.17808779136859457,
+          0.1801564595742258,
+          0.1822491574616178,
+          0.18436616416023638
+        ],
+        "p95": [
+          0.19005268316454402,
+          0.19927997834091224,
+          0.20895527031505826,
+          0.21910030989993332,
+          0.22973790393826882,
+          0.24089196657418321,
+          0.25258757301409124,
+          0.2648510158977758,
+          0.277709864406348,
+          0.2911930262399762,
+          0.30533081260471356,
+          0.32015500635452127,
+          0.3356989334416755,
+          0.35199753783618437,
+          0.3690874600826404,
+          0.38700711967111,
+          0.40579680140723834
+        ]
+      },
+      "network_density": {
+        "mean": [
+          0.6739337665644853,
+          0.6819189917732266,
+          0.6901873479831383,
+          0.6987497889060557,
+          0.7076177161377782,
+          0.7168029981580013,
+          0.7263179901574058,
+          0.7358877148186255,
+          0.7454312899019793,
+          0.7552599658006633,
+          0.7652676715259505,
+          0.7753909057049507,
+          0.7851637189200236,
+          0.7945625933182133,
+          0.8040700272046188,
+          0.8138176847413078,
+          0.8232378571197202
+        ],
+        "p5": [
+          0.5349553440828854,
+          0.540368299689346,
+          0.5460884175806333,
+          0.5543416331615748,
+          0.5631746783176891,
+          0.5723738247438321,
+          0.5775086542759759,
+          0.5817594795345682,
+          0.5876462391510661,
+          0.591413266101708,
+          0.597169277076057,
+          0.6042897832237777,
+          0.6116340535617677,
+          0.6192108430175413,
+          0.6270130507424045,
+          0.6331550009996061,
+          0.6381562355976156
+        ],
+        "p95": [
+          0.8107443593993101,
+          0.8244587681665294,
+          0.8386978692319418,
+          0.8534817485174235,
+          0.8688312613621582,
+          0.8860920468778931,
+          0.9051614375100576,
+          0.9248074969380622,
+          0.9452672600368401,
+          0.9665744610440689,
+          0.9887642338499061,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "cumulative_outbreak_prob": {
+        "mean": [
+          0.18397672695955705,
+          0.3351492598938958,
+          0.45918273559432266,
+          0.5607935958585452,
+          0.6439041652379252,
+          0.7117725903029204,
+          0.767102007035032,
+          0.8121230140202836,
+          0.8486862782325278,
+          0.878332280704892,
+          0.9023279736433626,
+          0.9217159391166667,
+          0.9373493766570133,
+          0.9499312449920815,
+          0.9600419663176284,
+          0.9681553626283411,
+          0.9746543561310947
+        ],
+        "p5": [
+          0.15687930039224324,
+          0.2899428180245091,
+          0.4027318610673205,
+          0.49823255478386613,
+          0.579000325337248,
+          0.6472303263285772,
+          0.7048012147864703,
+          0.7533194308264622,
+          0.794157445563322,
+          0.8284867801929183,
+          0.8576737422761138,
+          0.8825701476803468,
+          0.9027227369810465,
+          0.9192363440577888,
+          0.9330178665463149,
+          0.944508667235571,
+          0.954096139125591
+        ],
+        "p95": [
+          0.21463496336663362,
+          0.3854885686091206,
+          0.5210312259751672,
+          0.6281805285611899,
+          0.7125711759477827,
+          0.7796892055683776,
+          0.8324110314042821,
+          0.8732170950183673,
+          0.9041147868109898,
+          0.9274986907560371,
+          0.9451796913238009,
+          0.958548666200009,
+          0.9690627810421995,
+          0.9769468009901162,
+          0.9828216237865374,
+          0.9871992914879576,
+          0.9904613502712047
+        ]
+      }
+    },
+    "years": [
+      2024,
+      2025,
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+      2031,
+      2032,
+      2033,
+      2034,
+      2035,
+      2036,
+      2037,
+      2038,
+      2039,
+      2040
+    ]
+  },
+  "regional_comparison": {
+    "appalachia": {
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 986,
+        "outbreak_rate": 0.986,
+        "median_years_to_outbreak": 2.0,
+        "mean_years_to_outbreak": 3.3782961460446246,
+        "std_years": 3.408600198306021,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 5.0,
+        "p90_years": 8.0,
+        "p_outbreak_5yr": 0.7809330628803245,
+        "p_outbreak_10yr": 0.9513184584178499
+      },
+      "profile": {
+        "baseline_meth": 0.25,
+        "growth_rate": 0.04,
+        "pwid_population": 150000
+      }
+    },
+    "pacific_northwest": {
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 992,
+        "outbreak_rate": 0.992,
+        "median_years_to_outbreak": 2.0,
+        "mean_years_to_outbreak": 2.4233870967741935,
+        "std_years": 2.709782424040712,
+        "p10_years": 0.0,
+        "p25_years": 0.0,
+        "p75_years": 4.0,
+        "p90_years": 6.0,
+        "p_outbreak_5yr": 0.875,
+        "p_outbreak_10yr": 0.9788306451612904
+      },
+      "profile": {
+        "baseline_meth": 0.35,
+        "growth_rate": 0.03,
+        "pwid_population": 120000
+      }
+    },
+    "northeast_urban": {
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 990,
+        "outbreak_rate": 0.99,
+        "median_years_to_outbreak": 2.0,
+        "mean_years_to_outbreak": 3.3525252525252527,
+        "std_years": 3.516191794286938,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 5.0,
+        "p90_years": 8.100000000000023,
+        "p_outbreak_5yr": 0.7767676767676768,
+        "p_outbreak_10yr": 0.9363636363636364
+      },
+      "profile": {
+        "baseline_meth": 0.12,
+        "growth_rate": 0.05,
+        "pwid_population": 400000
+      }
+    },
+    "national_average": {
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 968,
+        "outbreak_rate": 0.968,
+        "median_years_to_outbreak": 3.0,
+        "mean_years_to_outbreak": 3.7107438016528924,
+        "std_years": 3.5397693731872057,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 6.0,
+        "p90_years": 9.0,
+        "p_outbreak_5yr": 0.7355371900826446,
+        "p_outbreak_10yr": 0.9390495867768595
+      },
+      "profile": {
+        "baseline_meth": 0.143,
+        "growth_rate": 0.025,
+        "pwid_population": 3500000
+      }
+    }
+  },
+  "tornado_analysis": {
+    "baseline_outcome": 0.7242083758937692,
+    "outcome_metric": "p_outbreak_5yr",
+    "parameters": [
+      {
+        "parameter": "meth_annual_growth_rate",
+        "parameter_label": "Meth prevalence annual growth rate",
+        "low_value": 0.01,
+        "high_value": 0.05,
+        "baseline_value": 0.025,
+        "outcome_at_low": 0.6584362139917695,
+        "outcome_at_high": 0.7741273100616016,
+        "outcome_range": 0.11569109606983208,
+        "direction": "positive"
+      },
+      {
+        "parameter": "baseline_network_density",
+        "parameter_label": "Baseline PWID network density",
+        "low_value": 0.08,
+        "high_value": 0.25,
+        "baseline_value": 0.15,
+        "outcome_at_low": 0.6680761099365751,
+        "outcome_at_high": 0.7626774847870182,
+        "outcome_range": 0.09460137485044318,
+        "direction": "positive"
+      },
+      {
+        "parameter": "meth_network_multiplier",
+        "parameter_label": "Meth effect on network density",
+        "low_value": 1.5,
+        "high_value": 4.0,
+        "baseline_value": 2.5,
+        "outcome_at_low": 0.6958333333333333,
+        "outcome_at_high": 0.7870182555780934,
+        "outcome_range": 0.09118492224476005,
+        "direction": "positive"
+      },
+      {
+        "parameter": "ssp_coverage",
+        "parameter_label": "SSP coverage in vulnerable counties",
+        "low_value": 0.15,
+        "high_value": 0.3,
+        "baseline_value": 0.21,
+        "outcome_at_low": 0.7453416149068323,
+        "outcome_at_high": 0.6833333333333333,
+        "outcome_range": 0.06200828157349891,
+        "direction": "negative"
+      },
+      {
+        "parameter": "critical_network_threshold",
+        "parameter_label": "Critical network threshold for outbreak",
+        "low_value": 0.25,
+        "high_value": 0.45,
+        "baseline_value": 0.35,
+        "outcome_at_low": 0.7098765432098766,
+        "outcome_at_high": 0.6850715746421268,
+        "outcome_range": 0.02480496856774983,
+        "direction": "negative"
+      },
+      {
+        "parameter": "incarceration_annual_rate",
+        "parameter_label": "Annual incarceration rate PWID",
+        "low_value": 0.2,
+        "high_value": 0.45,
+        "baseline_value": 0.3,
+        "outcome_at_low": 0.7255717255717256,
+        "outcome_at_high": 0.7111111111111111,
+        "outcome_range": 0.014460614460614418,
+        "direction": "negative"
+      },
+      {
+        "parameter": "oat_coverage",
+        "parameter_label": "OAT coverage global",
+        "low_value": 0.04,
+        "high_value": 0.15,
+        "baseline_value": 0.08,
+        "outcome_at_low": 0.7213114754098361,
+        "outcome_at_high": 0.7134020618556701,
+        "outcome_range": 0.007909413554165967,
+        "direction": "negative"
+      },
+      {
+        "parameter": "housing_instability_rate",
+        "parameter_label": "PWID homelessness rate",
+        "low_value": 0.55,
+        "high_value": 0.8,
+        "baseline_value": 0.685,
+        "outcome_at_low": 0.7142857142857143,
+        "outcome_at_high": 0.71900826446281,
+        "outcome_range": 0.0047225501770956635,
+        "direction": "positive"
+      },
+      {
+        "parameter": "baseline_outbreak_prob",
+        "parameter_label": "Baseline annual outbreak probability",
+        "low_value": 0.01,
+        "high_value": 0.08,
+        "baseline_value": 0.03,
+        "outcome_at_low": 0.7209775967413442,
+        "outcome_at_high": 0.718052738336714,
+        "outcome_range": 0.002924858404630193,
+        "direction": "negative"
+      }
+    ]
+  },
+  "scenario_comparison": {
+    "Current Policy": {
+      "parameters": {
+        "ssp_coverage": 0.21,
+        "oat_coverage": 0.08
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 973,
+        "outbreak_rate": 0.973,
+        "median_years_to_outbreak": 3.0,
+        "mean_years_to_outbreak": 3.961973278520041,
+        "std_years": 3.883132550960649,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 6.0,
+        "p90_years": 10.0,
+        "p_outbreak_5yr": 0.7286742034943474,
+        "p_outbreak_10yr": 0.9116135662898253
+      }
+    },
+    "SSP Expansion (50%)": {
+      "parameters": {
+        "ssp_coverage": 0.5,
+        "oat_coverage": 0.08
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 937,
+        "outbreak_rate": 0.937,
+        "median_years_to_outbreak": 3.0,
+        "mean_years_to_outbreak": 4.4108858057630735,
+        "std_years": 3.9837997667315124,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 7.0,
+        "p90_years": 10.0,
+        "p_outbreak_5yr": 0.6787620064034151,
+        "p_outbreak_10yr": 0.9114194236926361
+      }
+    },
+    "OAT Expansion (40%)": {
+      "parameters": {
+        "ssp_coverage": 0.21,
+        "oat_coverage": 0.4
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 955,
+        "outbreak_rate": 0.955,
+        "median_years_to_outbreak": 4.0,
+        "mean_years_to_outbreak": 4.614659685863875,
+        "std_years": 4.083961064113066,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 7.0,
+        "p90_years": 11.0,
+        "p_outbreak_5yr": 0.6649214659685864,
+        "p_outbreak_10yr": 0.8837696335078534
+      }
+    },
+    "Combined SSP+OAT": {
+      "parameters": {
+        "ssp_coverage": 0.5,
+        "oat_coverage": 0.4
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 935,
+        "outbreak_rate": 0.935,
+        "median_years_to_outbreak": 4.0,
+        "mean_years_to_outbreak": 4.853475935828877,
+        "std_years": 4.2326621757873255,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 8.0,
+        "p90_years": 11.0,
+        "p_outbreak_5yr": 0.6331550802139038,
+        "p_outbreak_10yr": 0.8652406417112299
+      }
+    },
+    "Decriminalization Effect": {
+      "parameters": {
+        "ssp_coverage": 0.4,
+        "oat_coverage": 0.3,
+        "incarceration_annual_rate": 0.1,
+        "housing_instability_rate": 0.5
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 923,
+        "outbreak_rate": 0.923,
+        "median_years_to_outbreak": 4.0,
+        "mean_years_to_outbreak": 4.944745395449621,
+        "std_years": 4.309301338144484,
+        "p10_years": 0.0,
+        "p25_years": 1.0,
+        "p75_years": 8.0,
+        "p90_years": 12.0,
+        "p_outbreak_5yr": 0.6392199349945829,
+        "p_outbreak_10yr": 0.856988082340195
+      }
+    },
+    "Full Harm Reduction": {
+      "parameters": {
+        "ssp_coverage": 0.8,
+        "oat_coverage": 0.6,
+        "incarceration_annual_rate": 0.05,
+        "housing_instability_rate": 0.3
+      },
+      "summary": {
+        "n_simulations": 1000,
+        "n_outbreaks": 824,
+        "outbreak_rate": 0.824,
+        "median_years_to_outbreak": 5.0,
+        "mean_years_to_outbreak": 5.75,
+        "std_years": 4.598767775017965,
+        "p10_years": 0.30000000000001137,
+        "p25_years": 2.0,
+        "p75_years": 9.0,
+        "p90_years": 13.0,
+        "p_outbreak_5yr": 0.5424757281553398,
+        "p_outbreak_10yr": 0.808252427184466
+      }
+    }
+  },
+  "probabilistic_sensitivity": {
+    "p_outbreak_5yr": {
+      "mean": 0.7355197524528831,
+      "std": 0.05286556131899865,
+      "p5": 0.6595804988662132,
+      "p25": 0.6975,
+      "median": 0.7450065132435953,
+      "p75": 0.7593939393939394,
+      "p95": 0.8119999999999999
+    },
+    "p_outbreak_10yr": {
+      "mean": 0.9311347035268008,
+      "std": 0.027723794904189556,
+      "p5": 0.8984230055658627,
+      "p25": 0.9086224489795919,
+      "median": 0.9296464646464646,
+      "p75": 0.9471212121212121,
+      "p95": 0.9753510638297872
+    },
+    "median_years_to_outbreak": {
+      "mean": 2.6,
+      "std": 0.66332495807108,
+      "p5": 2.0,
+      "p25": 2.0,
+      "median": 2.5,
+      "p75": 3.0,
+      "p95": 3.549999999999999
+    }
+  }
+}

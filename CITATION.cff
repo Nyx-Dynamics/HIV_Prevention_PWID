@@ -9,7 +9,7 @@ authors:
     orcid: "https://orcid.org/0000-0002-9216-8569"
     affiliation: "Nyx Dynamics LLC"
     email: "acdemidont@nyxdynamics.org"
-repository-code: "https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm"
+repository-code: "https://github.com/Nyx-Dynamics/HIV_Prevention_PWID"
 license: MIT
 type: software
 keywords:
@@ -24,19 +24,9 @@ keywords:
   - structural barriers
   - epidemiology
 abstract: >-
-  Computational Monte Carlo simulation modeling structural barriers 
-  to HIV prevention among people who inject drugs (PWID). Demonstrates 
-  how policy, stigma, and infrastructure barriers compound across an 
-  8-step prevention cascade to produce near-zero population-level 
-  effectiveness (~0.003%) despite highly efficacious pharmacological 
+  Computational Monte Carlo simulation modeling structural barriers
+  to HIV prevention among people who inject drugs (PWID). Demonstrates
+  how policy, stigma, and infrastructure barriers compound across an
+  8-step prevention cascade to produce near-zero population-level
+  effectiveness (~0.003%) despite highly efficacious pharmacological
   interventions (>99% efficacy).
-references:
-  - type: article
-    title: "Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study"
-    authors:
-      - family-names: "Demidont"
-        given-names: "AC"
-    journal: "The Lancet HIV"
-    year: 2025
-    notes: "Manuscript ID: thelancethiv-D-25-00576"
-    status: submitted

@@ -41,8 +41,8 @@
   - `cascade_sensitivity_results.csv`: PSA and bottleneck rankings.
 - **JSON Standardization:** Standardized JSON serialization to be RFC 8259 compliant (replaced `Infinity` with numeric proxies/nulls) and implemented `allow_nan=False` to ensure data integrity.
 
-#### 3. Visualization for Publication (Lancet HIV Standards)
-- **Unified Visualization Suite:** Overhauled `visualize_md_results.py` and supplementary plotting functions to meet *The Lancet HIV* submission requirements.
+#### 3. Visualization for Publication
+- **Unified Visualization Suite:** Overhauled `visualize_md_results.py` and supplementary plotting functions to meet academic journal submission requirements.
   - **Dimensions:** Precise single-column (75mm) and double-column (154mm) layouts.
   - **Typography:** Standardized Arial 8-12pt font hierarchy.
   - **Rigor:** Replaced pie charts with bar charts; added bold panel identifiers (A, B, C...); removed non-essential chart spines.
@@ -59,7 +59,7 @@
 
 ### Overview
 
-Major release implementing comprehensive Monte Carlo simulation framework for HIV prevention barrier modeling in people who inject drugs (PWID). This release includes two primary models supporting the "Manufactured Death" manuscript hypotheses for Lancet HIV submission.
+Major release implementing comprehensive Monte Carlo simulation framework for HIV prevention barrier modeling in people who inject drugs (PWID). This release includes two primary models supporting the structural barrier analysis hypotheses.
 
 ---
 
@@ -168,10 +168,10 @@ Major release implementing comprehensive Monte Carlo simulation framework for HI
 ---
 
 #### `visualize_md_results.py` (14.1 KB)
-**Purpose:** Publication-quality figure generation for Lancet HIV submission.
+**Purpose:** Publication-quality figure generation.
 
 **Design Decisions:**
-- Lancet column widths: single=75mm, double=154mm
+- Journal column widths: single=75mm, double=154mm
 - DPI: 300 (publication standard)
 - Color palette: Colorblind-safe (PWID=#B22222, MSM=#2E8B57)
 - Font: DejaVu Sans (Arial fallback)

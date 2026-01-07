@@ -6,8 +6,6 @@
 
 Computational models for HIV prevention barrier analysis and policy simulation among people who inject drugs (PWID).
 
-**Code repository for:** Demidont AC. *Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study.* The Lancet HIV (2025). [Manuscript ID: thelancethiv-D-25-00576]
-
 ## Overview
 
 This repository contains Monte Carlo simulation models demonstrating how policy, stigma, and infrastructure barriers compound across an 8-step prevention cascade to produce near-zero population-level effectiveness despite highly efficacious pharmacological interventions. The model quantifies the "manufactured death" phenomenon where structural barriers, not biology or individual choice, determine prevention outcomes.
@@ -268,34 +266,16 @@ All model parameters are derived from peer-reviewed literature:
 
 ## Citation
 
-If you use this code or data in your research, please cite the following paper:
-
-> Demidont AC. Structural barriers drive near-zero population-level effectiveness of Long Acting Injectable HIV prevention (LAI-PrEP) among people who inject drugs: A Computational Modeling Study. *The Lancet HIV* (2025). Manuscript ID: thelancethiv-D-25-00576
-
-**BibTeX:**
-
-```bibtex
-@article{demidont2025structural,
-  title={Structural barriers drive near-zero population-level effectiveness
-         of Long Acting Injectable HIV prevention (LAI-PrEP) among people
-         who inject drugs: A Computational Modeling Study},
-  author={Demidont, AC},
-  journal={The Lancet HIV},
-  year={2025},
-  note={Manuscript ID: thelancethiv-D-25-00576}
-}
-```
-
-**Software Citation (Zenodo):**
+If you use this code or data in your research, please cite:
 
 ```bibtex
 @software{demidont2025hivprevention,
   author={Demidont, AC},
-  title={HIV Prevention Master Algorithm: Structural Barrier Modeling},
+  title={HIV Prevention Master Algorithm: Structural Barrier Modeling for PWID},
   year={2025},
   publisher={Zenodo},
   doi={10.5281/zenodo.18116991},
-  url={https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm}
+  url={https://github.com/Nyx-Dynamics/HIV_Prevention_PWID}
 }
 ```
 

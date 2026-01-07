@@ -1,0 +1,140 @@
+{
+  "project": {
+    "name": "AIDS and Behavior - PWID HIV Prevention Cascade Analysis",
+    "author": "AC Demidont, DO / Nyx Dynamics LLC",
+    "version": "1.0.0",
+    "date": "2026-01-06",
+    "github": "https://github.com/Nyx-Dynamics/HIV_Prevention_PWID"
+  },
+  "simulation": {
+    "n_individuals": 100000,
+    "n_stochastic_sims": 10000,
+    "years": 5,
+    "random_seed": 42
+  },
+  "literature_params": {
+    "global_pwid_population": 15600000,
+    "global_pwid_hiv_prevalence": 0.178,
+    "us_pwid_population": 3500000,
+    "meth_hr_hiv_seroconversion": 1.46,
+    "meth_persistent_aor": 7.11,
+    "meth_opioid_couse_2012": 0.043,
+    "meth_opioid_couse_2018": 0.143,
+    "criminalization_negative_effect_rate": 0.80,
+    "incarceration_hiv_rr": 1.81,
+    "pwid_stigma_experienced": 0.88,
+    "pwid_stigma_affecting_care": 0.78,
+    "rural_pwid_stigma": 0.62,
+    "unstable_housing_hiv_arr": 1.39,
+    "pwid_homelessness_rate": 0.685,
+    "pwid_prep_uptake": 0.015,
+    "global_pwid_art_coverage": 0.04,
+    "who_required_syringes_per_pwid": 200,
+    "actual_syringes_per_pwid": 22,
+    "who_required_oat_coverage": 0.40,
+    "actual_oat_coverage": 0.08,
+    "cab_la_insti_resistance_rate": 0.63,
+    "cab_la_detection_delay_median_days": 98,
+    "vulnerable_us_counties": 220,
+    "vulnerable_counties_with_ssp": 0.21,
+    "scott_county_cases": 215,
+    "massachusetts_cases": 180,
+    "cabell_county_cases": 82,
+    "kanawha_county_cases": 85,
+    "baseline_annual_outbreak_prob": 0.03,
+    "covid_disruption_outbreak_prob": 0.25,
+    "high_risk_outbreak_prob": 0.33
+  },
+  "cascade_steps": {
+    "pwid": {
+      "awareness": {
+        "base_probability": 0.70,
+        "policy_penalty": 0.25,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.15,
+        "research_penalty": 0.05,
+        "ml_penalty": 0.10
+      },
+      "willingness": {
+        "base_probability": 0.80,
+        "policy_penalty": 0.35,
+        "stigma_penalty": 0.10,
+        "ml_penalty": 0.05
+      },
+      "healthcare_access": {
+        "base_probability": 0.75,
+        "policy_penalty": 0.10,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.25
+      },
+      "disclosure": {
+        "base_probability": 0.70,
+        "policy_penalty": 0.30,
+        "stigma_penalty": 0.15
+      },
+      "provider_willing": {
+        "base_probability": 0.85,
+        "policy_penalty": 0.05,
+        "stigma_penalty": 0.25,
+        "research_penalty": 0.10,
+        "ml_penalty": 0.10
+      },
+      "hiv_testing_adequate": {
+        "base_probability": 0.90,
+        "policy_penalty": 0.05,
+        "infrastructure_penalty": 0.15,
+        "testing_penalty": 0.25
+      },
+      "first_injection": {
+        "base_probability": 0.75,
+        "policy_penalty": 0.10,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.15
+      },
+      "sustained_engagement": {
+        "base_probability": 0.70,
+        "policy_penalty": 0.20,
+        "stigma_penalty": 0.10,
+        "infrastructure_penalty": 0.10,
+        "ml_penalty": 0.05
+      }
+    },
+    "msm": {
+      "awareness": 0.90,
+      "willingness": 0.85,
+      "healthcare_access": 0.80,
+      "disclosure": 0.75,
+      "provider_willing": 0.90,
+      "hiv_testing_adequate": 0.85,
+      "first_injection": 0.80,
+      "sustained_engagement": 0.75
+    }
+  },
+  "incarceration": {
+    "annual_rate_pwid": 0.30,
+    "annual_rate_msm": 0.05
+  },
+  "stochastic_avoidance": {
+    "baseline_network_density": 0.15,
+    "meth_network_multiplier": 2.5,
+    "critical_threshold": 0.35,
+    "baseline_outbreak_prob": 0.03,
+    "housing_instability": 0.685,
+    "ssp_coverage": 0.21,
+    "oat_coverage": 0.08,
+    "meth_prevalence_baseline": 0.143,
+    "meth_growth_rate": 0.025
+  },
+  "snr": {
+    "msm": 9180,
+    "pwid": 76.4,
+    "disparity_fold": 120
+  },
+  "figure_settings": {
+    "dpi": 300,
+    "single_col_mm": 84,
+    "double_col_mm": 174,
+    "font_family": "Arial",
+    "font_size": 9
+  }
+}
