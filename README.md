@@ -1,6 +1,6 @@
 # PWID HIV Prevention Cascade Analysis
 
-Simulation code and data for: Demidont AC. *Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs.* AIDS and Behavior (2025).
+Simulation code and data for: Demidont AC. *Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs.* AIDS and Behavior (submitted 1/2026).
 
 ## Overview
 
@@ -9,6 +9,7 @@ This repository contains Monte Carlo simulation code that models barriers to lon
 ## Author
 
 **AC Demidont, DO**
+Independent Researcher
 Nyx Dynamics LLC
 GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 
@@ -127,7 +128,7 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 
 This code accompanies the manuscript:
 
-> Demidont AC. Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *AIDS and Behavior* (2025).
+> Demidont AC. Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *AIDS and Behavior* (submitted 1/2026).
 
 ### Figures
 
@@ -155,12 +156,12 @@ With the requirement to include the original copyright notice.
 If you use this code or data, please cite:
 
 ```bibtex
-@article{demidont2025pwid,
+@article{demidont2026pwid,
   author = {Demidont, AC},
   title = {Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk
            in {HIV} Prevention for People Who Inject Drugs},
   journal = {AIDS and Behavior},
-  year = {2025},
+  year = {2026},
   publisher = {Springer}
 }
 ```
@@ -171,7 +172,7 @@ For the code repository:
 @software{demidont2025pwid_code,
   author = {Demidont, AC},
   title = {{HIV Prevention PWID}: Cascade Simulation Code},
-  year = {2025},
+  year = {2026},
   url = {https://github.com/Nyx-Dynamics/HIV_Prevention_PWID}
 }
 ```
