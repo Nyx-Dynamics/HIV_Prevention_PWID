@@ -1,127 +1,177 @@
 # PWID HIV Prevention Cascade Analysis
 
-Code repository for: Demidont AC. *Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs.* AIDS and Behavior (2025).
+Simulation code and data for: Demidont AC. *Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs.* AIDS and Behavior (2025).
 
-## Repository Structure
+## Overview
 
-```
-├── SRC/
-│   ├── architectural_barrier_model.py    # Main cascade simulation model
-│   ├── cascade_sensitivity_analysis.py   # PSA and sensitivity analyses
-│   ├── stochastic_avoidance_enhanced.py  # Outbreak prediction model
-│   └── generate_figures.py               # Publication figure generator
-├── data/
-│   ├── csv_xlsx/                         # Model outputs (JSON, CSV, XLSX)
-│   └── figures/                          # Generated figures (TIFF, PNG, EPS)
-└── config/
-    └── parameters.json                   # Model configuration
-```
-
-## Usage
-
-### 1. Run Main Simulation
-
-```bash
-cd SRC
-python architectural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
-```
-
-### 2. Run Sensitivity Analysis
-
-```bash
-python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples 1000
-```
-
-### 3. Generate Figures
-
-```bash
-python generate_figures.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
-```
-
-## Key Findings
-
-### Cascade Completion by Policy Scenario
-
-| Scenario | P(R₀=0) | 95% CI |
-|----------|---------|--------|
-| Current Policy | 0.003% | (0.000%, 0.006%) |
-| Decriminalization Only | 0.20% | (0.17%, 0.23%) |
-| Decrim + Stigma Reduction | 0.45% | (0.41%, 0.50%) |
-| SSP-Integrated Delivery | 5.00% | (4.87%, 5.14%) |
-| Full Harm Reduction | 9.55% | (9.37%, 9.73%) |
-| Full HR + PURPOSE-4 Data | 11.87% | (11.67%, 12.07%) |
-| Full HR + ML Debiasing | 18.57% | (18.33%, 18.81%) |
-| Theoretical Maximum | 19.74% | (19.49%, 19.98%) |
-| **MSM (Comparison)** | **16.30%** | — |
-
-**Disparity: 5,434-fold** (MSM vs PWID under identical pharmacology)
-
-### Three-Layer Barrier Decomposition
-
-| Layer | Contribution |
-|-------|-------------|
-| Pathogen Biology | 0.0% |
-| HIV Testing | 6.9% |
-| **Architectural** | **93.1%** |
-
-### Architectural Barrier Subtypes
-
-| Subtype | Contribution |
-|---------|-------------|
-| Policy (Criminalization) | 38.4% |
-| Infrastructure (MSM-centric) | 21.9% |
-| Stigma (Healthcare) | 20.6% |
-| Machine Learning (Algorithmic) | 8.2% |
-| Research Exclusion | 4.1% |
-
-### Stochastic Avoidance Failure Prediction
-
-| Metric | Value |
-|--------|-------|
-| P(outbreak within 5 years) | 63.3% |
-| P(outbreak within 10 years) | 87.5% |
-| Median years to outbreak | 4.0 |
-
-## Figures
-
-### Main Manuscript (5 figures)
-
-1. **Fig 1**: LAI-PrEP Cascade Comparison (MSM vs PWID)
-2. **Fig 2**: Three-Layer Barrier Decomposition
-3. **Fig 3**: Policy Scenario Analysis
-4. **Fig 4**: Stochastic Avoidance Failure Prediction
-5. **Fig 5**: Signal-to-Noise Ratio / LOOCV Framework
-
-### Online Resource S2 (Supplementary Figures)
-
-- **Fig S1**: Methamphetamine Prevalence Trajectories
-- **Fig S2**: Tornado Diagram (Parameter Sensitivity)
-- **Fig S3**: Policy Scenario Extended Comparison
-- **Fig S4**: Cascade Uncertainty (PSA Distribution)
-- **Fig S5**: Barrier Removal Waterfall
-- **Fig S6**: Step Importance Analysis
-
-## Requirements
-
-```
-numpy>=1.20.0
-scipy>=1.7.0
-matplotlib>=3.5.0
-pandas>=1.3.0
-openpyxl>=3.0.0
-```
-
-## Citation
-
-Demidont AC. Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk
-in HIV Prevention for People Who Inject Drugs. *AIDS and Behavior* (2025).
+This repository contains Monte Carlo simulation code that models barriers to long-acting injectable pre-exposure prophylaxis (LAI-PrEP) access among people who inject drugs (PWID). The analysis quantifies structural, policy, and healthcare barriers using a multi-step prevention cascade framework, and predicts outbreak risk through stochastic avoidance failure modeling.
 
 ## Author
 
-AC Demidont, DO
+**AC Demidont, DO**
 Nyx Dynamics LLC
-https://github.com/Nyx-Dynamics/HIV_Prevention_PWID
+GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
+
+## Repository Contents
+
+```
+├── SRC/                                    # Source code
+│   ├── architectural_barrier_model.py      # Main cascade simulation (n=100,000)
+│   ├── cascade_sensitivity_analysis.py     # Probabilistic sensitivity analysis
+│   ├── stochastic_avoidance_enhanced.py    # Outbreak risk prediction model
+│   └── generate_figures.py                 # Publication figure generator
+├── data/
+│   ├── csv_xlsx/                           # Model outputs (JSON, CSV, XLSX)
+│   └── figures/                            # Generated figures (TIFF, PNG, EPS)
+├── config/
+│   └── parameters.json                     # Model configuration and literature values
+├── LICENSE                                 # MIT License
+└── requirements.txt                        # Python dependencies
+```
+
+### Key Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `architectural_barrier_model.py` | Simulates 100,000 individuals through 8-step prevention cascade |
+| `cascade_sensitivity_analysis.py` | Runs 1,000-sample probabilistic sensitivity analysis |
+| `stochastic_avoidance_enhanced.py` | Models outbreak probability over 5-10 year horizons |
+| `generate_figures.py` | Generates all manuscript figures (Figs 1-5) |
+
+## Reproducing Results
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Virtual environment (recommended)
+
+### Step-by-Step Instructions
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Nyx-Dynamics/HIV_Prevention_PWID.git
+cd HIV_Prevention_PWID
+
+# 2. Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run main simulation (generates cascade results)
+cd SRC
+python architectural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
+
+# 5. Run sensitivity analysis
+python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples 1000
+
+# 6. Run stochastic outbreak model
+python stochastic_avoidance_enhanced.py --output-dir ../data/csv_xlsx
+
+# 7. Generate publication figures
+python generate_figures.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
+```
+
+### Expected Runtime
+
+- Main simulation: ~2-5 minutes (100,000 individuals)
+- Sensitivity analysis: ~5-10 minutes (1,000 samples)
+- Figure generation: ~1 minute
+
+## Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| numpy | >=1.20.0 | Numerical computation |
+| scipy | >=1.7.0 | Statistical functions |
+| matplotlib | >=3.5.0 | Figure generation |
+| pandas | >=1.3.0 | Data manipulation |
+| openpyxl | >=3.0.0 | Excel export |
+
+Install all dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Data Provenance
+
+### Model Parameters
+
+All epidemiological parameters in `config/parameters.json` are derived from peer-reviewed literature. Key sources include:
+
+- **PWID population estimates**: UNODC World Drug Report 2023
+- **HIV prevalence**: Degenhardt et al. (2017), Lancet HIV
+- **Cascade probabilities**: Derived from empirical studies cited in manuscript
+- **Outbreak parameters**: Based on Scott County (2015), Massachusetts (2018-2019), and Kanawha County (2019) outbreak data
+
+### Output Files
+
+| File | Description |
+|------|-------------|
+| `architectural_barrier_results.*` | Cascade completion rates by scenario |
+| `cascade_sensitivity_results.*` | Parameter sensitivity rankings |
+| `stochastic_avoidance_sensitivity_results.*` | Outbreak probability distributions |
+| `structural_barrier_results.*` | Three-layer barrier decomposition |
+
+### Key Results
+
+| Metric | Value | 95% CI |
+|--------|-------|--------|
+| PWID cascade completion (current policy) | 0.003% | (0.000%, 0.006%) |
+| MSM cascade completion (comparison) | 16.30% | — |
+| Disparity ratio | 5,434-fold | — |
+| P(outbreak within 5 years) | 63.3% | (60.1%, 66.5%) |
+
+## Manuscript
+
+This code accompanies the manuscript:
+
+> Demidont AC. Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *AIDS and Behavior* (2025).
+
+### Figures
+
+| Figure | File | Description |
+|--------|------|-------------|
+| Fig 1 | `Fig1_CascadeComparison.*` | LAI-PrEP cascade comparison (MSM vs PWID) |
+| Fig 2 | `Fig2_BarrierDecomposition.*` | Three-layer barrier decomposition |
+| Fig 3 | `Fig3_PolicyScenarios.*` | Policy scenario analysis |
+| Fig 4 | `Fig4_StochasticAvoidance.*` | Stochastic avoidance failure prediction |
+| Fig 5 | `Fig5_SNR_LOOCV.*` | Signal-to-noise ratio / LOOCV framework |
 
 ## License
 
-MIT License
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+You are free to:
+- Use, copy, modify, and distribute this code
+- Use for commercial or non-commercial purposes
+- Include in derivative works
+
+With the requirement to include the original copyright notice.
+
+## Citation
+
+If you use this code or data, please cite:
+
+```bibtex
+@article{demidont2025pwid,
+  author = {Demidont, AC},
+  title = {Structural Barriers, Stochastic Avoidance Failure, and Outbreak Risk
+           in {HIV} Prevention for People Who Inject Drugs},
+  journal = {AIDS and Behavior},
+  year = {2025},
+  publisher = {Springer}
+}
+```
+
+For the code repository:
+
+```bibtex
+@software{demidont2025pwid_code,
+  author = {Demidont, AC},
+  title = {{HIV Prevention PWID}: Cascade Simulation Code},
+  year = {2025},
+  url = {https://github.com/Nyx-Dynamics/HIV_Prevention_PWID}
+}
+```
