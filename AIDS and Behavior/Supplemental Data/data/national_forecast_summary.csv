@@ -1,0 +1,13 @@
+Metric,Value
+n_simulations,2000.0
+n_outbreaks,1943.0
+outbreak_rate,0.9715
+median_years_to_outbreak,3.0
+mean_years_to_outbreak,3.7920741121976325
+std_years,3.709746932931708
+p10_years,0.0
+p25_years,1.0
+p75_years,6.0
+p90_years,9.0
+p_outbreak_5yr,0.7380339680905815
+p_outbreak_10yr,0.9274318064848173
