@@ -74,7 +74,7 @@ yerr_lower = p_values - ci_lower
 yerr_upper = ci_upper - p_values
 
 # Bars
-bars = ax.bar(x_pos, p_values, color=colors_gradient, alpha=0.8,
+bars = ax.bar(x_pos, p_values, color=colors_gradient,
               edgecolor='black', linewidth=0.5)
 
 # Error bars
@@ -94,14 +94,14 @@ ax.set_title('PWID LAI-PrEP Success Rate by Policy Scenario\n(with 95% Confidenc
 ax.set_xticks(x_pos)
 ax.set_xticklabels(scenarios, rotation=45, ha='right', fontsize=7)
 ax.set_ylim(0, max(p_values) * 1.25)
-ax.grid(axis='y', alpha=0.2, linewidth=0.3)
+ax.grid(axis='y', color='lightgray', linewidth=0.3)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 
 # Reference line
 current_val = p_values[0]
 ax.axhline(y=current_val, color=COLORS['red'], linestyle='--',
-           linewidth=1, label=f'Current Policy: {current_val:.2f}%', alpha=0.7)
+           linewidth=1, label=f'Current Policy: {current_val:.2f}%')
 ax.legend(loc='upper left', fontsize=7, frameon=False)
 
 plt.tight_layout()
@@ -125,7 +125,7 @@ cost_savings = np.array([r['impact']['five_year_cost_averted_billions'] for r in
 
 # Panel A: People Protected
 ax1 = fig.add_subplot(gs[0, 0])
-bars1 = ax1.bar(x_pos, n_protected, color=COLORS['blue'], alpha=0.75, edgecolor='black', linewidth=0.5)
+bars1 = ax1.bar(x_pos, n_protected, color=COLORS['blue'], edgecolor='black', linewidth=0.5)
 for bar, val in zip(bars1, n_protected):
     if val > 0.1:
         ax1.text(bar.get_x() + bar.get_width() / 2., bar.get_height(),
@@ -134,13 +134,13 @@ ax1.set_ylabel('Millions of PWID', fontsize=7)
 ax1.set_title('A. People Achieving Sustained Protection', fontsize=8, fontweight='bold', loc='left')
 ax1.set_xticks(x_pos)
 ax1.set_xticklabels(scenarios, rotation=45, ha='right', fontsize=6)
-ax1.grid(axis='y', alpha=0.2)
+ax1.grid(axis='y', color='lightgray', linewidth=0.3)
 ax1.spines['top'].set_visible(False)
 ax1.spines['right'].set_visible(False)
 
 # Panel B: Annual Infections Prevented
 ax2 = fig.add_subplot(gs[0, 1])
-bars2 = ax2.bar(x_pos, annual_prevented, color=COLORS['green'], alpha=0.75, edgecolor='black', linewidth=0.5)
+bars2 = ax2.bar(x_pos, annual_prevented, color=COLORS['green'], edgecolor='black', linewidth=0.5)
 for bar, val in zip(bars2, annual_prevented):
     if val > 0.5:
         ax2.text(bar.get_x() + bar.get_width() / 2., bar.get_height(),
@@ -149,13 +149,13 @@ ax2.set_ylabel('Thousands of Infections', fontsize=7)
 ax2.set_title('B. Annual HIV Infections Prevented', fontsize=8, fontweight='bold', loc='left')
 ax2.set_xticks(x_pos)
 ax2.set_xticklabels(scenarios, rotation=45, ha='right', fontsize=6)
-ax2.grid(axis='y', alpha=0.2)
+ax2.grid(axis='y', color='lightgray', linewidth=0.3)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
 
 # Panel C: 5-Year Cumulative
 ax3 = fig.add_subplot(gs[1, 0])
-bars3 = ax3.bar(x_pos, five_year_prevented, color=COLORS['orange'], alpha=0.75, edgecolor='black', linewidth=0.5)
+bars3 = ax3.bar(x_pos, five_year_prevented, color=COLORS['orange'], edgecolor='black', linewidth=0.5)
 for bar, val in zip(bars3, five_year_prevented):
     if val > 2:
         ax3.text(bar.get_x() + bar.get_width() / 2., bar.get_height(),
@@ -164,13 +164,13 @@ ax3.set_ylabel('Thousands of Infections', fontsize=7)
 ax3.set_title('C. 5-Year Cumulative Infections Prevented', fontsize=8, fontweight='bold', loc='left')
 ax3.set_xticks(x_pos)
 ax3.set_xticklabels(scenarios, rotation=45, ha='right', fontsize=6)
-ax3.grid(axis='y', alpha=0.2)
+ax3.grid(axis='y', color='lightgray', linewidth=0.3)
 ax3.spines['top'].set_visible(False)
 ax3.spines['right'].set_visible(False)
 
 # Panel D: Cost Savings
 ax4 = fig.add_subplot(gs[1, 1])
-bars4 = ax4.bar(x_pos, cost_savings, color=COLORS['purple'], alpha=0.75, edgecolor='black', linewidth=0.5)
+bars4 = ax4.bar(x_pos, cost_savings, color=COLORS['purple'], edgecolor='black', linewidth=0.5)
 for bar, val in zip(bars4, cost_savings):
     if val > 0.5:
         ax4.text(bar.get_x() + bar.get_width() / 2., bar.get_height(),
@@ -179,7 +179,7 @@ ax4.set_ylabel('Billions of Dollars ($)', fontsize=7)
 ax4.set_title('D. 5-Year Healthcare Cost Savings', fontsize=8, fontweight='bold', loc='left')
 ax4.set_xticks(x_pos)
 ax4.set_xticklabels(scenarios, rotation=45, ha='right', fontsize=6)
-ax4.grid(axis='y', alpha=0.2)
+ax4.grid(axis='y', color='lightgray', linewidth=0.3)
 ax4.spines['top'].set_visible(False)
 ax4.spines['right'].set_visible(False)
 
@@ -218,7 +218,7 @@ for idx, r in enumerate(results):
     colors = [COLORS['red'] if c < 10 else COLORS['orange'] if c < 30 else
     COLORS['yellow'] if c < 50 else COLORS['green'] for c in cumulative]
 
-    bars = ax.bar(range(len(steps)), cumulative, color=colors, alpha=0.75,
+    bars = ax.bar(range(len(steps)), cumulative, color=colors,
                   edgecolor='black', linewidth=0.5)
 
     # Value labels
@@ -231,8 +231,8 @@ for idx, r in enumerate(results):
     ax.set_ylim(0, 100)
     ax.set_xticks(range(len(steps)))
     ax.set_xticklabels([s[:4] for s in steps], rotation=45, ha='right', fontsize=6)
-    ax.axhline(y=50, color='gray', linestyle='--', linewidth=0.5, alpha=0.5)
-    ax.grid(axis='y', alpha=0.2)
+    ax.axhline(y=50, color='gray', linestyle='--', linewidth=0.5)
+    ax.grid(axis='y', color='lightgray', linewidth=0.3)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 

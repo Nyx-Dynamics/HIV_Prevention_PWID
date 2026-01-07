@@ -14,19 +14,20 @@ import matplotlib.pyplot as plt
 import logging
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import json
 import csv
+import pandas as pd
 from datetime import datetime
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Import base model
+# Import base model (structural_barrier_model, formerly manufactured_death_model)
 try:
-    from manufactured_death_model import (
-        ManufacturedDeathModel, 
+    from structural_barrier_model import (
+        ManufacturedDeathModel,
         PolicyScenario,
         create_policy_scenarios,
         create_pwid_cascade,
@@ -35,8 +36,8 @@ try:
 except ImportError:
     import sys
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from manufactured_death_model import (
-        ManufacturedDeathModel, 
+    from structural_barrier_model import (
+        ManufacturedDeathModel,
         PolicyScenario,
         create_policy_scenarios,
         create_pwid_cascade,
@@ -192,77 +193,83 @@ class CascadeSensitivityAnalyzer:
     def run_probabilistic_sensitivity(
         self,
         n_samples: int = 1000,
-        scenario: PolicyScenario = None
-    ) -> Dict:
+        scenario: Optional[PolicyScenario] = None
+    ) -> Dict[str, Any]:
         """
         Probabilistic sensitivity analysis for cascade parameters.
         """
         if scenario is None:
             scenario = PolicyScenario(name="Current Policy", description="Status quo")
-            
-        results = {
-            "cascade_completions": [],
-            "r0_zero_rates": [],
-            "step_probabilities": {step.name: [] for step in self.base_model.cascade},
-            "barrier_attributions": {
-                "policy": [],
-                "stigma": [],
-                "infrastructure": [],
-                "testing": [],
-                "research": [],
-                "ml": [],
-            }
+
+        cascade_completions: List[float] = []
+        r0_zero_rates: List[float] = []
+        step_probabilities: Dict[str, List[float]] = {step.name: [] for step in self.base_model.cascade}
+        barrier_attributions: Dict[str, List[float]] = {
+            "policy": [],
+            "stigma": [],
+            "infrastructure": [],
+            "testing": [],
+            "research": [],
+            "ml": [],
         }
         
         for _ in range(n_samples):
             # Sample new cascade parameters
             sampled_cascade = self.sample_cascade_parameters()
-            
+
             # Create model with sampled cascade
             model = ManufacturedDeathModel()
             model.cascade = sampled_cascade
-            
+
             # Run quick simulation
             sim_results = model.run_simulation(scenario, n_individuals=10000, years=5)
-            
-            results["cascade_completions"].append(sim_results["observed_cascade_completion_rate"])
-            results["r0_zero_rates"].append(sim_results["observed_r0_zero_rate"])
-            
+
+            cascade_completions.append(sim_results["observed_cascade_completion_rate"])
+            r0_zero_rates.append(sim_results["observed_r0_zero_rate"])
+
             for step_name, prob in sim_results["step_probabilities"].items():
-                results["step_probabilities"][step_name].append(prob)
-                
+                step_probabilities[step_name].append(prob)
+
             for barrier, val in sim_results["barrier_attribution_totals"].items():
-                if barrier in results["barrier_attributions"]:
-                    results["barrier_attributions"][barrier].append(val)
-        
+                if barrier in barrier_attributions:
+                    barrier_attributions[barrier].append(val)
+
         # Calculate statistics
+        cascade_arr = np.array(cascade_completions)
+        r0_arr = np.array(r0_zero_rates)
+        results: Dict[str, Any] = {
+            "cascade_completions": cascade_completions,
+            "r0_zero_rates": r0_zero_rates,
+            "step_probabilities": step_probabilities,
+            "barrier_attributions": barrier_attributions,
+        }
         results["summary"] = {
             "cascade_completion": {
-                "mean": np.mean(results["cascade_completions"]),
-                "std": np.std(results["cascade_completions"]),
-                "p5": np.percentile(results["cascade_completions"], 5),
-                "p95": np.percentile(results["cascade_completions"], 95),
+                "mean": float(np.mean(cascade_arr)),
+                "std": float(np.std(cascade_arr)),
+                "p5": float(np.percentile(cascade_arr, 5)),
+                "p95": float(np.percentile(cascade_arr, 95)),
             },
             "r0_zero_rate": {
-                "mean": np.mean(results["r0_zero_rates"]),
-                "std": np.std(results["r0_zero_rates"]),
-                "p5": np.percentile(results["r0_zero_rates"], 5),
-                "p95": np.percentile(results["r0_zero_rates"], 95),
+                "mean": float(np.mean(r0_arr)),
+                "std": float(np.std(r0_arr)),
+                "p5": float(np.percentile(r0_arr, 5)),
+                "p95": float(np.percentile(r0_arr, 95)),
             },
             "step_probabilities": {
                 step: {
-                    "mean": np.mean(probs),
-                    "std": np.std(probs),
-                    "p5": np.percentile(probs, 5),
-                    "p95": np.percentile(probs, 95),
+                    "mean": float(np.mean(probs)),
+                    "std": float(np.std(probs)),
+                    "p5": float(np.percentile(probs, 5)),
+                    "p95": float(np.percentile(probs, 95)),
                 }
-                for step, probs in results["step_probabilities"].items()
+                for step, probs in step_probabilities.items()
             }
         }
         
         return results
     
-    def barrier_removal_analysis(self, n_simulations: int = 50000) -> Dict:
+    def barrier_removal_analysis(self, n_simulations: int = 50000) -> Dict[str, Any]:
         """
         Analyze effect of removing individual barrier types.
         """
@@ -281,7 +288,7 @@ class CascadeSensitivityAnalyzer:
                 name="No Stigma",
                 description="Stigma barriers removed",
                 stigma_reduction=1.0,
-                bias_training=True,
+                provider_stigma_training=True,
             ),
             "low_barrier_access": PolicyScenario(
                 name="Low Barrier Access",
@@ -302,7 +309,7 @@ class CascadeSensitivityAnalyzer:
                 incarceration_modifier=0.0,
                 in_custody_prep=True,
                 stigma_reduction=1.0,
-                bias_training=True,
+                provider_stigma_training=True,
                 ssp_integrated_delivery=True,
                 peer_navigation=True,
                 low_barrier_access=True,
@@ -337,7 +344,7 @@ class CascadeSensitivityAnalyzer:
         
         return results
     
-    def step_importance_analysis(self) -> Dict:
+    def step_importance_analysis(self) -> Dict[str, Any]:
         """
         Analyze which cascade steps are most critical bottlenecks.
         """
@@ -347,7 +354,7 @@ class CascadeSensitivityAnalyzer:
         # Get baseline results
         baseline = model.run_simulation(base_scenario, n_individuals=50000)
         
-        results = {
+        results: Dict[str, Any] = {
             "baseline": {
                 "cascade_completion": baseline["observed_cascade_completion_rate"],
                 "r0_zero_rate": baseline["observed_r0_zero_rate"],
@@ -410,7 +417,7 @@ class CascadeSensitivityAnalyzer:
 # VISUALIZATION FUNCTIONS
 # =============================================================================
 
-def plot_cascade_uncertainty(psa_results: Dict, save_path: str = None):
+def plot_cascade_uncertainty(psa_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Cascade step probability distributions with uncertainty.
     """
@@ -444,7 +451,7 @@ def plot_cascade_uncertainty(psa_results: Dict, save_path: str = None):
     return fig
 
 
-def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None):
+def plot_barrier_removal_waterfall(barrier_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Waterfall chart showing incremental barrier removal effects.
     """
@@ -495,7 +502,7 @@ def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None)
     return fig
 
 
-def plot_step_importance(importance_results: Dict, save_path: str = None):
+def plot_step_importance(importance_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Ranked importance of cascade steps.
     """
@@ -539,7 +546,7 @@ def plot_step_importance(importance_results: Dict, save_path: str = None):
     return fig
 
 
-def plot_r0_zero_distribution(psa_results: Dict, save_path: str = None):
+def plot_r0_zero_distribution(psa_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Distribution of P(R(0)=0) and Cascade Completion.
     """
@@ -707,6 +714,56 @@ def main():
                 ])
 
         print(f"   Results saved to {csv_path}")
+
+        # Save to Excel
+        xlsx_path = f"{output_dir}/cascade_sensitivity_results.xlsx"
+        try:
+            with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
+                # PSA Summary
+                psa_data = []
+                for metric in ["cascade_completion", "r0_zero_rate"]:
+                    s = psa_results["summary"][metric]
+                    psa_data.append({
+                        "Metric": metric.replace('_', ' ').title(),
+                        "Mean": s['mean'],
+                        "Std": s['std'],
+                        "p5": s['p5'],
+                        "p95": s['p95']
+                    })
+                df_psa = pd.DataFrame(psa_data)
+                df_psa.to_excel(writer, sheet_name="PSA Summary", index=False)
+
+                # Barrier Removal Analysis
+                barrier_data = [
+                    {
+                        "Scenario": name,
+                        "P(R0=0)": res["r0_zero_rate"],
+                        "Improvement": res.get("absolute_improvement", 0)
+                    } for name, res in barrier_results.items()
+                ]
+                df_barrier = pd.DataFrame(barrier_data)
+                df_barrier.to_excel(writer, sheet_name="Barrier Removal", index=False)
+
+                # Step Importance Analysis
+                importance_data = []
+                ranked = importance_results["ranked_importance"]
+                for i, step_name in enumerate(ranked):
+                    eff = importance_results["step_removal_effects"][step_name]
+                    importance_data.append({
+                        "Step Name": step_name,
+                        "Rank": i + 1,
+                        "Original Prob": eff['original_probability'],
+                        "Cascade if Fixed": eff['cascade_completion_if_fixed'],
+                        "R0=0 if Fixed": eff['r0_zero_if_fixed'],
+                        "Improvement": eff['absolute_improvement']
+                    })
+                df_importance = pd.DataFrame(importance_data)
+                df_importance.to_excel(writer, sheet_name="Step Importance", index=False)
+
+            print(f"   Results saved to {xlsx_path}")
+        except Exception as e:
+            logger.error(f"Failed to save Excel results: {e}")
+
     except Exception as e:
         logger.error(f"Failed to save results: {e}")
 

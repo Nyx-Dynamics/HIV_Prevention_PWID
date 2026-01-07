@@ -345,8 +345,8 @@ Major release implementing comprehensive Monte Carlo simulation framework for HI
 If using this code, please cite:
 
 ```
-Demidont AC. Manufactured Death: HIV Prevention Barrier Modeling for PWID.
-Nyx Dynamics LLC, December 2024. https://github.com/Nyx-Dynamics/hiv-prevention-master
+Demidont AC. HIV Prevention Barrier Modeling for PWID.
+Nyx Dynamics LLC, December 2024. https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm
 ```
 
 ---

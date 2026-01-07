@@ -35,20 +35,37 @@ logger = logging.getLogger(__name__)
 # Set seeds for reproducibility
 rng = np.random.default_rng(42)
 
-# Publication quality settings
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams['font.size'] = 8
-plt.rcParams['axes.titlesize'] = 10
-plt.rcParams['axes.labelsize'] = 9
-plt.rcParams['legend.fontsize'] = 8
-plt.rcParams['xtick.labelsize'] = 8
-plt.rcParams['ytick.labelsize'] = 8
-plt.rcParams['axes.linewidth'] = 0.8
-plt.rcParams['figure.dpi'] = 300
+# AIDS and Behavior dimensions (mm converted to inches)
+MM_TO_INCH = 1 / 25.4
+WIDTH_SINGLE = 84 * MM_TO_INCH
+WIDTH_DOUBLE = 174 * MM_TO_INCH
 
-# Lancet dimensions
-SINGLE_COL = 75 / 25.4  # 2.95 inches
-DOUBLE_COL = 154 / 25.4  # 6.06 inches
+# AIDS and Behavior publication quality settings
+plt.rcParams.update({
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica'],
+    'font.size': 10,
+    'axes.titlesize': 10,
+    'axes.labelsize': 10,
+    'xtick.labelsize': 9,
+    'ytick.labelsize': 9,
+    'legend.fontsize': 9,
+    'figure.titlesize': 10,
+    'figure.dpi': 300,
+    'savefig.dpi': 600,
+    'savefig.bbox': 'tight',
+    'axes.linewidth': 0.8,
+    'lines.linewidth': 1.0,
+})
+
+def save_publication_fig(fig, fig_name, output_dir):
+    """Saves figure in EPS and TIFF formats as per guidelines."""
+    # EPS for vector
+    fig.savefig(os.path.join(output_dir, f"{fig_name}.eps"), format='eps', dpi=600)
+    # TIFF for high-quality raster
+    fig.savefig(os.path.join(output_dir, f"{fig_name}.tif"), format='tif', dpi=600, 
+                pil_kwargs={"compression": "tiff_lzw"})
+    print(f"✓ Saved: {fig_name}.eps and .tif")
 
 
 # =============================================================================
@@ -828,7 +845,7 @@ def plot_regional_meth_trajectories(save_path: str = None):
     """
     Figure: Regional methamphetamine prevalence trajectories.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE_COL, 3.5))
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
     
     # Panel A: All regions
     ax = axes[0]
@@ -839,7 +856,7 @@ def plot_regional_meth_trajectories(save_path: str = None):
         if region != "national_average":
             trajectory = profile.trajectory(2018, 2040)
             ax.plot(trajectory["years"], trajectory["prevalences"],
-                   label=profile.region, linewidth=1.2, alpha=0.8)
+                   label=profile.region, linewidth=1.2)
     
     # Add national average as dashed
     nat_trajectory = REGIONAL_PROFILES["national_average"].trajectory(2018, 2040)
@@ -848,10 +865,11 @@ def plot_regional_meth_trajectories(save_path: str = None):
     
     ax.set_xlabel("Year")
     ax.set_ylabel("Meth-Opioid Co-Use Prevalence")
-    ax.set_title("A", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.legend(loc='upper left', fontsize=7, frameon=False)
     ax.set_xlim(2018, 2040)
     ax.set_ylim(0, 0.6)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
@@ -865,7 +883,7 @@ def plot_regional_meth_trajectories(save_path: str = None):
     p5_density = results["trajectory_stats"]["network_density"]["p5"]
     p95_density = results["trajectory_stats"]["network_density"]["p95"]
     
-    ax.fill_between(years, p5_density, p95_density, alpha=0.2, color='crimson')
+    ax.fill_between(years, p5_density, p95_density, color='crimson', hatch='///', alpha=1.0, facecolor='white', edgecolor='crimson')
     ax.plot(years, mean_density, color='darkred', linewidth=1.5, label='Network density')
     
     threshold = KEY_PARAMETERS["critical_network_threshold"].point_estimate
@@ -874,19 +892,19 @@ def plot_regional_meth_trajectories(save_path: str = None):
     
     ax.set_xlabel("Year")
     ax.set_ylabel("Effective Network Density")
-    ax.set_title("B", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.legend(loc='upper left', frameon=False, fontsize=7)
     ax.set_xlim(2024, 2040)
     ax.set_ylim(0, 1.0)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS1_MethTrajectories', output_dir)
+    plt.close()
     
     return fig
 
@@ -895,7 +913,7 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     """
     Figure: Outbreak probability forecast with uncertainty.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE_COL, 3.5))
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
     
     years = results["years"]
     
@@ -906,12 +924,12 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     p5_prob = results["trajectory_stats"]["cumulative_outbreak_prob"]["p5"]
     p95_prob = results["trajectory_stats"]["cumulative_outbreak_prob"]["p95"]
     
-    ax.fill_between(years, p5_prob, p95_prob, alpha=0.2, color='crimson')
+    ax.fill_between(years, p5_prob, p95_prob, color='crimson', hatch='\\\\\\', alpha=1.0, facecolor='white', edgecolor='crimson')
     ax.plot(years, mean_prob, 'darkred', linewidth=1.5)
     
     # Add reference lines
-    ax.axhline(y=0.5, color='gray', linestyle=':', alpha=0.5)
-    ax.axhline(y=0.9, color='gray', linestyle='--', alpha=0.5)
+    ax.axhline(y=0.5, color='gray', linestyle=':')
+    ax.axhline(y=0.9, color='gray', linestyle='--')
     
     # Find years when thresholds crossed
     mean_array = np.array(mean_prob)
@@ -919,13 +937,14 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     
     if year_50:
         ax.annotate(f'50% by {year_50}', xy=(year_50, 0.5), xytext=(year_50+1, 0.4),
-                   fontsize=7, arrowprops=dict(arrowstyle='->', color='black', lw=0.5))
+                   fontsize=8, arrowprops=dict(arrowstyle='->', color='black', lw=0.5))
     
     ax.set_xlabel("Year")
     ax.set_ylabel("Cumulative P(Major Outbreak)")
-    ax.set_title("A", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.set_xlim(2024, 2040)
     ax.set_ylim(0, 1.0)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
@@ -935,27 +954,27 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     valid_years = [y - 2024 for y in results["outbreak_years"] if y is not None]
     
     if valid_years:
-        ax.hist(valid_years, bins=range(0, 18), color='crimson', alpha=0.5,
+        ax.hist(valid_years, bins=range(0, 18), color='crimson', 
                edgecolor='darkred', density=True)
         
         median = np.median(valid_years)
         ax.axvline(x=median, color='black', linestyle='--', linewidth=1)
         ax.text(median + 0.5, ax.get_ylim()[1]*0.8, f'Median:\n{median:.1f} yr', 
-                fontsize=8, fontweight='bold')
+                fontsize=9, fontweight='bold')
     
     ax.set_xlabel("Years from 2024")
     ax.set_ylabel("Probability Density")
-    ax.set_title("B", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.set_xlim(0, 16)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS2_OutbreakForecast', output_dir)
+    plt.close()
     
     return fig
 
@@ -964,7 +983,7 @@ def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
     """
     Figure: Tornado diagram for sensitivity analysis.
     """
-    fig, ax = plt.subplots(figsize=(DOUBLE_COL, 5))
+    fig, ax = plt.subplots(figsize=(WIDTH_DOUBLE, 5))
     
     params = tornado_results["parameters"][:10]  # Top 10 most influential
     baseline = tornado_results["baseline_outcome"]
@@ -984,7 +1003,7 @@ def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
     ax.set_yticks(y_positions)
     ax.set_yticklabels([p["parameter_label"] for p in params])
     ax.set_xlabel(f'{tornado_results["outcome_metric"]} (Baseline = {baseline:.2%})')
-    ax.set_title('Tornado Diagram: Parameter Sensitivity', fontweight='bold')
+    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
@@ -992,14 +1011,13 @@ def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
     from matplotlib.lines import Line2D
     legend_elements = [Line2D([0], [0], color='#91bfdb', lw=4, label='Lower parameter value'),
                       Line2D([0], [0], color='#fc8d59', lw=4, label='Higher parameter value')]
-    ax.legend(handles=legend_elements, loc='lower right', frameon=False, fontsize=8)
+    ax.legend(handles=legend_elements, loc='lower right', frameon=False, fontsize=9)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS3_TornadoDiagram', output_dir)
+    plt.close()
     
     return fig
 
@@ -1008,7 +1026,7 @@ def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
     """
     Figure: Scenario comparison for policy interventions.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE_COL, 3.5))
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
     
     scenarios = list(scenario_results.keys())
     
@@ -1027,9 +1045,10 @@ def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
     
     bars = ax.barh(range(len(s_sorted)), p_sorted, color=colors)
     ax.set_yticks(range(len(s_sorted)))
-    ax.set_yticklabels(s_sorted, fontsize=7)
+    ax.set_yticklabels(s_sorted, fontsize=8)
     ax.set_xlabel("P(Outbreak within 5 years) %")
-    ax.set_title("A", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
+    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
@@ -1045,17 +1064,17 @@ def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
     ax.set_yticks(range(len(s_sorted)))
     ax.set_yticklabels([]) # Hide y labels on right panel
     ax.set_xlabel("Median Years to Outbreak")
-    ax.set_title("B", loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.set_xlim(0, 20)
+    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS4_ScenarioComparison', output_dir)
+    plt.close()
     
     return fig
 

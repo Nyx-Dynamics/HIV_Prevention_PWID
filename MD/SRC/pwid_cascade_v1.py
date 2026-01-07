@@ -59,7 +59,7 @@ from dataclasses import dataclass
 #
 # With dataclass, you just declare the fields and Python does the rest.
 
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 # Type hints don't change how Python runs—they're documentation that helps
 # you (and tools like mypy) catch bugs. 
 #
@@ -335,10 +335,10 @@ POLICY_SCENARIOS = [
     ),
     
     PolicyScenario(
-        name="Decrim + Bias Training",
-        description="Decriminalization plus healthcare bias reduction initiatives",
+        name="Decrim + Stigma Reduction",
+        description="Decriminalization plus provider stigma reduction training",
         criminalization_removed=True,
-        bias_reduced=0.5,  # Training reduces bias by 50%
+        bias_reduced=0.5,  # Training reduces stigma by 50%
         structural_barriers_reduced=0.0,
         incarceration_rate_modifier=0.3,
         in_custody_prep_available=False,
@@ -513,7 +513,7 @@ def calculate_incarceration_disruption(
 # MONTE CARLO SIMULATION
 # =============================================================================
 
-def simulate_individual(scenario: PolicyScenario, n_years: int = 5) -> Dict:
+def simulate_individual(scenario: PolicyScenario, n_years: int = 5) -> Dict[str, Any]:
     """
     Simulate a single PWID's journey through the PrEP cascade.
     
@@ -555,7 +555,7 @@ def simulate_individual(scenario: PolicyScenario, n_years: int = 5) -> Dict:
     """
     
     # Initialize result tracking
-    results = {
+    results: Dict[str, Any] = {
         "completed_cascade": True,  # Assume success until proven otherwise
         "failed_step": None,
         "incarceration_disrupted": False,
@@ -604,7 +604,7 @@ def run_simulation(
     scenario: PolicyScenario,
     n_individuals: int = 100000,
     n_years: int = 5
-) -> Dict:
+) -> Dict[str, Any]:
     """
     Run full Monte Carlo simulation for a policy scenario.
     
@@ -637,7 +637,7 @@ def run_simulation(
     """
     
     # Initialize results dictionary
-    results = {
+    results: Dict[str, Any] = {
         "scenario": scenario.name,
         "n_individuals": n_individuals,
         "n_years": n_years,

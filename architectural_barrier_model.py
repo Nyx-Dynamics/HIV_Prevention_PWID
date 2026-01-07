@@ -264,7 +264,7 @@ class PolicyScenario:
 
     # Stigma interventions
     stigma_reduction: float = 0.0  # 0-1
-    bias_training: bool = False
+    provider_stigma_training: bool = False  # Healthcare provider anti-stigma training
 
     # Infrastructure improvements
     ssp_integrated_delivery: bool = False
@@ -482,7 +482,7 @@ class ArchitecturalBarrierModel:
         # Layer 3b: Stigma barriers
         if step.stigma_penalty > 0:
             stigma_impact = step.stigma_penalty * (1 - scenario.stigma_reduction)
-            if scenario.bias_training:
+            if scenario.provider_stigma_training:
                 stigma_impact *= 0.7
             prob -= stigma_impact
             decomposition['stigma'] = stigma_impact
@@ -943,11 +943,11 @@ def create_policy_scenarios() -> List[PolicyScenario]:
 
         PolicyScenario(
             name="Decrim + Stigma Reduction",
-            description="Decriminalization plus healthcare bias training",
+            description="Decriminalization plus provider stigma reduction training",
             decriminalization=True,
             incarceration_modifier=0.3,
             stigma_reduction=0.5,
-            bias_training=True,
+            provider_stigma_training=True,
         ),
 
         PolicyScenario(
@@ -968,7 +968,7 @@ def create_policy_scenarios() -> List[PolicyScenario]:
             incarceration_modifier=0.2,
             in_custody_prep=True,
             stigma_reduction=0.8,
-            bias_training=True,
+            provider_stigma_training=True,
             ssp_integrated_delivery=True,
             peer_navigation=True,
             low_barrier_access=True,
@@ -981,7 +981,7 @@ def create_policy_scenarios() -> List[PolicyScenario]:
             incarceration_modifier=0.2,
             in_custody_prep=True,
             stigma_reduction=0.8,
-            bias_training=True,
+            provider_stigma_training=True,
             ssp_integrated_delivery=True,
             peer_navigation=True,
             low_barrier_access=True,
@@ -995,7 +995,7 @@ def create_policy_scenarios() -> List[PolicyScenario]:
             incarceration_modifier=0.2,
             in_custody_prep=True,
             stigma_reduction=0.9,
-            bias_training=True,
+            provider_stigma_training=True,
             ssp_integrated_delivery=True,
             peer_navigation=True,
             low_barrier_access=True,
@@ -1010,7 +1010,7 @@ def create_policy_scenarios() -> List[PolicyScenario]:
             incarceration_modifier=0.0,
             in_custody_prep=True,
             stigma_reduction=1.0,
-            bias_training=True,
+            provider_stigma_training=True,
             ssp_integrated_delivery=True,
             peer_navigation=True,
             low_barrier_access=True,

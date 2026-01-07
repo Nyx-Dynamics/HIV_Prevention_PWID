@@ -19,9 +19,10 @@ import logging
 from scipy.stats import beta, norm, lognorm
 from scipy.special import expit
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import json
 import csv
+import pandas as pd
 from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -341,7 +342,7 @@ class EnhancedStochasticAvoidanceModel:
     def __init__(
         self,
         region: str = "national_average",
-        params: Dict[str, ParameterWithUncertainty] = None
+        params: Optional[Dict[str, ParameterWithUncertainty]] = None
     ):
         self.region = region
         self.profile = REGIONAL_PROFILES.get(region, REGIONAL_PROFILES["national_average"])
@@ -350,9 +351,9 @@ class EnhancedStochasticAvoidanceModel:
     def calculate_network_density(
         self,
         year: int,
-        meth_prevalence: float = None,
-        housing_instability: float = None,
-        incarceration_rate: float = None
+        meth_prevalence: Optional[float] = None,
+        housing_instability: Optional[float] = None,
+        incarceration_rate: Optional[float] = None
     ) -> float:
         """
         Calculate effective network density incorporating multiple factors.
@@ -396,9 +397,9 @@ class EnhancedStochasticAvoidanceModel:
     def calculate_outbreak_probability(
         self,
         network_density: float,
-        ssp_coverage: float = None,
-        oat_coverage: float = None,
-        hiv_prevalence: float = None
+        ssp_coverage: Optional[float] = None,
+        oat_coverage: Optional[float] = None,
+        hiv_prevalence: Optional[float] = None
     ) -> float:
         """
         Calculate annual probability of major outbreak.
@@ -448,7 +449,7 @@ class EnhancedStochasticAvoidanceModel:
         end_year: int = 2040,
         n_simulations: int = 1000,
         include_uncertainty: bool = True
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         """
         Simulate outbreak trajectories with uncertainty using vectorized operations.
         """
@@ -523,38 +524,32 @@ class EnhancedStochasticAvoidanceModel:
         has_outbreak = np.any(outbreak_mask, axis=1)
         first_outbreak_idx = np.argmax(outbreak_mask, axis=1)
         
-        outbreak_years = []
+        outbreak_years: List[Optional[int]] = []
         for sim in range(n_simulations):
             if has_outbreak[sim]:
                 outbreak_years.append(int(years_array[first_outbreak_idx[sim]]))
             else:
                 outbreak_years.append(None)
-        
-        trajectories = {
+
+        trajectories: Dict[str, Any] = {
             "meth_prevalence": meth_prev,
             "network_density": density,
             "outbreak_probability": p_outbreak_matrix,
             "cumulative_outbreak_prob": cumulative_outbreak_prob,
         }
-        
+
         # Calculate summary statistics
-        valid_outbreak_years = [y for y in outbreak_years if y is not None]
-        
-        results = {
-            "region": self.region,
-            "years": years,
-            "trajectories": trajectories,
-            "outbreak_years": outbreak_years,
-            "summary": {
-                "n_simulations": n_simulations,
-                "n_outbreaks": len(valid_outbreak_years),
-                "outbreak_rate": len(valid_outbreak_years) / n_simulations,
-            }
+        valid_outbreak_years: List[int] = [y for y in outbreak_years if y is not None]
+
+        summary_dict: Dict[str, Any] = {
+            "n_simulations": n_simulations,
+            "n_outbreaks": len(valid_outbreak_years),
+            "outbreak_rate": len(valid_outbreak_years) / n_simulations,
         }
-        
+
         if valid_outbreak_years:
             outbreak_times = np.array([y - start_year for y in valid_outbreak_years])
-            results["summary"].update({
+            summary_dict.update({
                 "median_years_to_outbreak": float(np.median(outbreak_times)),
                 "mean_years_to_outbreak": float(np.mean(outbreak_times)),
                 "std_years": float(np.std(outbreak_times)),
@@ -565,7 +560,15 @@ class EnhancedStochasticAvoidanceModel:
                 "p_outbreak_5yr": float(np.mean(outbreak_times <= 5)),
                 "p_outbreak_10yr": float(np.mean(outbreak_times <= 10)),
             })
-        
+
+        results: Dict[str, Any] = {
+            "region": self.region,
+            "years": years,
+            "trajectories": trajectories,
+            "outbreak_years": outbreak_years,
+            "summary": summary_dict,
+        }
+
         # Calculate trajectory statistics
         results["trajectory_stats"] = {
             "meth_prevalence": {
@@ -597,7 +600,7 @@ class SensitivityAnalyzer:
     Comprehensive sensitivity analysis for the manufactured death models.
     """
     
-    def __init__(self, base_model: EnhancedStochasticAvoidanceModel = None):
+    def __init__(self, base_model: Optional[EnhancedStochasticAvoidanceModel] = None):
         self.base_model = base_model or EnhancedStochasticAvoidanceModel()
         self.params = KEY_PARAMETERS
         
@@ -606,7 +609,7 @@ class SensitivityAnalyzer:
         param_name: str,
         n_points: int = 20,
         outcome: str = "p_outbreak_5yr"
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         """
         One-way sensitivity analysis for a single parameter.
         """
@@ -646,8 +649,8 @@ class SensitivityAnalyzer:
     def tornado_analysis(
         self,
         outcome: str = "p_outbreak_5yr",
-        params_to_analyze: List[str] = None
-    ) -> Dict:
+        params_to_analyze: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """
         Tornado diagram analysis showing parameter importance.
         """
@@ -715,8 +718,8 @@ class SensitivityAnalyzer:
     def probabilistic_sensitivity(
         self,
         n_samples: int = 2000,
-        outcomes: List[str] = None
-    ) -> Dict:
+        outcomes: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """
         Probabilistic sensitivity analysis (Monte Carlo).
         """
@@ -730,7 +733,7 @@ class SensitivityAnalyzer:
         }
         
         # Run simulations for each sample
-        results = {outcome: [] for outcome in outcomes}
+        results: Dict[str, List[Any]] = {outcome: [] for outcome in outcomes}
         
         for i in range(n_samples):
             # Create parameter set for this sample
@@ -783,7 +786,7 @@ class SensitivityAnalyzer:
     def scenario_comparison(
         self,
         scenarios: Dict[str, Dict[str, float]]
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         """
         Compare specific policy/intervention scenarios.
         """
@@ -822,7 +825,7 @@ class SensitivityAnalyzer:
 # VISUALIZATION FUNCTIONS
 # =============================================================================
 
-def plot_regional_meth_trajectories(save_path: str = None):
+def plot_regional_meth_trajectories(save_path: Optional[str] = None):
     """
     Figure: Regional methamphetamine prevalence trajectories.
     """
@@ -889,7 +892,7 @@ def plot_regional_meth_trajectories(save_path: str = None):
     return fig
 
 
-def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
+def plot_outbreak_probability_forecast(results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Outbreak probability forecast with uncertainty.
     """
@@ -958,7 +961,7 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     return fig
 
 
-def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
+def plot_tornado_diagram(tornado_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Tornado diagram for sensitivity analysis.
     """
@@ -1002,7 +1005,7 @@ def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
     return fig
 
 
-def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
+def plot_scenario_comparison(scenario_results: Dict[str, Any], save_path: Optional[str] = None):
     """
     Figure: Scenario comparison for policy interventions.
     """
@@ -1274,6 +1277,64 @@ def main():
                 ])
 
         print(f"   Results saved to {csv_path}")
+
+        # Save to Excel
+        xlsx_path = f"{output_dir}/stochastic_avoidance_sensitivity_results.xlsx"
+        try:
+            with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
+                # National Forecast Summary
+                df_national = pd.DataFrame([
+                    {"Metric": k, "Value": v}
+                    for k, v in national_results["summary"].items()
+                ])
+                df_national.to_excel(writer, sheet_name="National Forecast", index=False)
+
+                # Regional Comparison
+                regional_data = []
+                for region, res in regional_results.items():
+                    s = res["summary"]
+                    regional_data.append({
+                        "Region": region,
+                        "N Simulations": s.get("n_simulations"),
+                        "N Outbreaks": s.get("n_outbreaks"),
+                        "Outbreak Rate": s.get("outbreak_rate", 0),
+                        "Median Years": s.get("median_years_to_outbreak", 0),
+                        "P(5yr Outbreak)": s.get("p_outbreak_5yr", 0)
+                    })
+                df_regional = pd.DataFrame(regional_data)
+                df_regional.to_excel(writer, sheet_name="Regional Comparison", index=False)
+
+                # Scenario Comparison
+                scenario_data = []
+                for name, res in scenario_results.items():
+                    s = res["summary"]
+                    p = res["parameters"]
+                    scenario_data.append({
+                        "Scenario": name,
+                        "P(5yr Outbreak)": s.get("p_outbreak_5yr", 0),
+                        "Median Years to Outbreak": s.get("median_years_to_outbreak", 0),
+                        "SSP Coverage": p.get("ssp_coverage", "N/A"),
+                        "OAT Coverage": p.get("oat_coverage", "N/A")
+                    })
+                df_scenario = pd.DataFrame(scenario_data)
+                df_scenario.to_excel(writer, sheet_name="Scenario Comparison", index=False)
+
+                # Probabilistic Sensitivity Analysis
+                psa_data = []
+                for outcome, stats in psa_results["summary"].items():
+                    psa_data.append({
+                        "Outcome": outcome,
+                        "Mean": stats['mean'],
+                        "90% CI Lower (p5)": stats['p5'],
+                        "90% CI Upper (p95)": stats['p95']
+                    })
+                df_psa = pd.DataFrame(psa_data)
+                df_psa.to_excel(writer, sheet_name="PSA Results", index=False)
+
+            print(f"   Results saved to {xlsx_path}")
+        except Exception as e:
+            logger.error(f"Failed to save Excel results: {e}")
+
     except Exception as e:
         logger.error(f"Failed to save results: {e}")
     

@@ -26,41 +26,48 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Import base model
-try:
-    from archieve.manufactured_death_model import (
-        ManufacturedDeathModel, 
-        PolicyScenario,
-        create_policy_scenarios,
-        create_pwid_cascade,
-        CascadeStep
-    )
-except ImportError:
-    import sys
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from archieve.manufactured_death_model import (
-        ManufacturedDeathModel, 
-        PolicyScenario,
-        create_policy_scenarios,
-        create_pwid_cascade,
-        CascadeStep
-    )
+from architectural_barrier_model import (
+    ArchitecturalBarrierModel, 
+    PolicyScenario,
+    create_policy_scenarios,
+    create_pwid_cascade,
+    CascadeStep
+)
+ManufacturedDeathModel = ArchitecturalBarrierModel
 
 rng = np.random.default_rng(42)
 
-# Publication settings
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams['font.size'] = 8
-plt.rcParams['axes.titlesize'] = 10
-plt.rcParams['axes.labelsize'] = 9
-plt.rcParams['legend.fontsize'] = 8
-plt.rcParams['xtick.labelsize'] = 8
-plt.rcParams['ytick.labelsize'] = 8
-plt.rcParams['axes.linewidth'] = 0.8
-plt.rcParams['figure.dpi'] = 300
+# AIDS and Behavior dimensions (mm converted to inches)
+MM_TO_INCH = 1 / 25.4
+WIDTH_SINGLE = 84 * MM_TO_INCH
+WIDTH_DOUBLE = 174 * MM_TO_INCH
 
-# Lancet dimensions
-SINGLE_COL = 75 / 25.4  # 2.95 inches
-DOUBLE_COL = 154 / 25.4  # 6.06 inches
+# AIDS and Behavior publication quality settings
+plt.rcParams.update({
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica'],
+    'font.size': 10,
+    'axes.titlesize': 10,
+    'axes.labelsize': 10,
+    'xtick.labelsize': 9,
+    'ytick.labelsize': 9,
+    'legend.fontsize': 9,
+    'figure.titlesize': 10,
+    'figure.dpi': 300,
+    'savefig.dpi': 600,
+    'savefig.bbox': 'tight',
+    'axes.linewidth': 0.8,
+    'lines.linewidth': 1.0,
+})
+
+def save_publication_fig(fig, fig_name, output_dir):
+    """Saves figure in EPS and TIFF formats as per guidelines."""
+    # EPS for vector
+    fig.savefig(os.path.join(output_dir, f"{fig_name}.eps"), format='eps', dpi=600)
+    # TIFF for high-quality raster
+    fig.savefig(os.path.join(output_dir, f"{fig_name}.tif"), format='tif', dpi=600, 
+                pil_kwargs={"compression": "tiff_lzw"})
+    print(f"✓ Saved: {fig_name}.eps and .tif")
 
 
 # =============================================================================
@@ -283,7 +290,7 @@ class CascadeSensitivityAnalyzer:
                 name="No Stigma",
                 description="Stigma barriers removed",
                 stigma_reduction=1.0,
-                bias_training=True,
+                provider_stigma_training=True,
             ),
             "low_barrier_access": PolicyScenario(
                 name="Low Barrier Access",
@@ -304,7 +311,7 @@ class CascadeSensitivityAnalyzer:
                 incarceration_modifier=0.0,
                 in_custody_prep=True,
                 stigma_reduction=1.0,
-                bias_training=True,
+                provider_stigma_training=True,
                 ssp_integrated_delivery=True,
                 peer_navigation=True,
                 low_barrier_access=True,
@@ -416,7 +423,7 @@ def plot_cascade_uncertainty(psa_results: Dict, save_path: str = None):
     """
     Figure: Cascade step probability distributions with uncertainty.
     """
-    fig, axes = plt.subplots(2, 4, figsize=(DOUBLE_COL, 4.5))
+    fig, axes = plt.subplots(2, 4, figsize=(WIDTH_DOUBLE, 4.5))
     axes = axes.flatten()
     
     step_names = list(psa_results["step_probabilities"].keys())
@@ -425,23 +432,25 @@ def plot_cascade_uncertainty(psa_results: Dict, save_path: str = None):
         ax = axes[i]
         probs = psa_results["step_probabilities"][step]
         
-        ax.hist(probs, bins=25, color='#91bfdb', alpha=0.8)
+        ax.hist(probs, bins=25, color='#91bfdb', edgecolor='black')
         
-        mean = np.mean(probs)
-        ax.axvline(x=mean, color='black', linewidth=1, label=f'Mean: {mean:.2f}')
+        mean_val = np.mean(probs)
+        ax.axvline(x=mean_val, color='black', linewidth=1)
         
-        ax.set_title(step.replace('_', ' ').title(), fontsize=8, fontweight='bold')
+        # Add label for each subplot
+        ax.text(0.05, 0.9, step.replace('_', ' ').title(), transform=ax.transAxes, 
+                fontsize=8, fontweight='bold', va='top')
+        
         ax.set_xlim(0, 1)
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.set_yticks([]) # Hide y counts for cleaner look
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS5_CascadeUncertainty', output_dir)
+    plt.close()
     
     return fig
 
@@ -450,7 +459,7 @@ def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None)
     """
     Figure: Waterfall chart showing incremental barrier removal effects.
     """
-    fig, ax = plt.subplots(figsize=(DOUBLE_COL, 4))
+    fig, ax = plt.subplots(figsize=(WIDTH_DOUBLE, 5))
     
     scenarios = ['baseline', 'no_criminalization', 'no_stigma', 
                  'low_barrier_access', 'full_inclusion', 'all_removed']
@@ -467,7 +476,7 @@ def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None)
     
     colors = ['#d73027'] + ['#4575b4'] * (len(increments) - 1)
     
-    bars = ax.bar(range(len(scenarios)), increments, bottom=bottoms, color=colors)
+    bars = ax.bar(range(len(scenarios)), increments, bottom=bottoms, color=colors, edgecolor='black')
     
     # Add connecting lines
     for i in range(len(scenarios) - 1):
@@ -478,21 +487,20 @@ def plot_barrier_removal_waterfall(barrier_results: Dict, save_path: str = None)
         y_pos = bottoms[i] + val/2
         if val > 0.5:
             ax.text(bar.get_x() + bar.get_width()/2, y_pos, f'{val:.1f}%', 
-                    ha='center', va='center', color='white', fontsize=7, fontweight='bold')
+                    ha='center', va='center', color='white', fontsize=8, fontweight='bold')
     
     ax.set_xticks(range(len(scenarios)))
     ax.set_xticklabels(labels)
     ax.set_ylabel('P(R0=0) %')
-    ax.set_title('Impact of Cumulative Barrier Removal', fontweight='bold')
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS7_BarrierRemoval', output_dir)
+    plt.close()
     
     return fig
 
@@ -501,7 +509,7 @@ def plot_step_importance(importance_results: Dict, save_path: str = None):
     """
     Figure: Ranked importance of cascade steps.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE_COL, 3.5))
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 4))
     
     step_effects = importance_results["step_removal_effects"]
     ranked = importance_results["ranked_importance"]
@@ -510,12 +518,13 @@ def plot_step_importance(importance_results: Dict, save_path: str = None):
     ax = axes[0]
     original_probs = [step_effects[s]["original_probability"] for s in ranked]
     
-    ax.barh(range(len(ranked)), original_probs, color='#91bfdb')
+    ax.barh(range(len(ranked)), original_probs, color='#91bfdb', edgecolor='black')
     ax.set_yticks(range(len(ranked)))
-    ax.set_yticklabels([s.replace('_', ' ').title() for s in ranked], fontsize=7)
+    ax.set_yticklabels([s.replace('_', ' ').title() for s in ranked], fontsize=8)
     ax.set_xlabel('Current Step Probability')
-    ax.set_title('A', loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
     ax.set_xlim(0, 1)
+    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
@@ -523,20 +532,20 @@ def plot_step_importance(importance_results: Dict, save_path: str = None):
     ax = axes[1]
     improvements = [step_effects[s]["absolute_improvement"] * 100 for s in ranked]
     
-    ax.barh(range(len(ranked)), improvements, color='#fc8d59')
+    ax.barh(range(len(ranked)), improvements, color='#fc8d59', edgecolor='black')
     ax.set_yticks(range(len(ranked)))
     ax.set_yticklabels([]) 
-    ax.set_xlabel('Improvement in P(R0=0) pp')
-    ax.set_title('B', loc='left', fontweight='bold', fontsize=12)
+    ax.set_xlabel('Improvement in P(R0=0) %')
+    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
+    ax.grid(axis='x', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS8_StepImportance', output_dir)
+    plt.close()
     
     return fig
 
@@ -545,39 +554,40 @@ def plot_r0_zero_distribution(psa_results: Dict, save_path: str = None):
     """
     Figure: Distribution of P(R(0)=0) and Cascade Completion.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(DOUBLE_COL, 3.5))
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
     
     # Panel A: R(0)=0 distribution
     ax = axes[0]
     r0_rates = np.array(psa_results["r0_zero_rates"]) * 100
-    ax.hist(r0_rates, bins=30, color='#d73027', alpha=0.8)
+    ax.hist(r0_rates, bins=30, color='#d73027', edgecolor='black')
     
-    mean = np.mean(r0_rates)
-    ax.axvline(x=mean, color='black', linewidth=1)
-    ax.set_xlabel('P(R0=0) %')
+    mean_val = np.mean(r0_rates)
+    ax.axvline(x=mean_val, color='black', linewidth=1)
+    ax.set_xlabel('P(R(0)=0) %')
     ax.set_ylabel('Frequency')
-    ax.set_title('A', loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'a', transform=ax.transAxes, fontweight='bold', fontsize=12)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     # Panel B: Cascade completion distribution
     ax = axes[1]
     cascade_rates = np.array(psa_results["cascade_completions"]) * 100
-    ax.hist(cascade_rates, bins=30, color='#4575b4', alpha=0.8)
+    ax.hist(cascade_rates, bins=30, color='#4575b4', edgecolor='black')
     
     mean_c = np.mean(cascade_rates)
     ax.axvline(x=mean_c, color='black', linewidth=1)
     ax.set_xlabel('Cascade Completion %')
-    ax.set_title('B', loc='left', fontweight='bold', fontsize=12)
+    ax.text(-0.1, 1.05, 'b', transform=ax.transAxes, fontweight='bold', fontsize=12)
+    ax.grid(axis='y', color='lightgray', linestyle=':', linewidth=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        plt.savefig(save_path.replace('.png', '.pdf'), bbox_inches='tight')
-        print(f"Saved: {save_path}")
+    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    os.makedirs(output_dir, exist_ok=True)
+    save_publication_fig(fig, 'FigS6_R0ZeroDistribution', output_dir)
+    plt.close()
     
     return fig
 

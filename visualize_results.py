@@ -40,7 +40,7 @@ def main():
 
     # Create simple bar chart
     plt.figure(figsize=(12, 6))
-    bars = plt.bar(range(len(scenarios)), p_values, color='steelblue', alpha=0.7)
+    bars = plt.bar(range(len(scenarios)), p_values, color='steelblue')
 
     # Add values on bars
     for bar, val in zip(bars, p_values):
@@ -52,7 +52,7 @@ def main():
     plt.title('PWID LAI-PrEP Success Rate by Policy Scenario', fontsize=14, fontweight='bold')
     plt.xticks(range(len(scenarios)), scenarios, rotation=45, ha='right')
     plt.tight_layout()
-    plt.grid(axis='y', alpha=0.3)
+    plt.grid(axis='y', linestyle=':', color='gray')
 
     # Save
     output_path = Path(args.output)

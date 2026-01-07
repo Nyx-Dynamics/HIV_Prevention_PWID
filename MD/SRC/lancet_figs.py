@@ -67,7 +67,7 @@ print("Generating Figure 1: Scenario Comparison...")
 fig, ax = plt.subplots(figsize=(7.5, 4.5))
 
 x_pos = np.arange(len(scenarios))
-colors_gradient = plt.cm.RdYlGn(np.linspace(0.2, 0.9, len(scenarios)))
+colors_gradient = plt.colormaps.get_cmap('RdYlGn')(np.linspace(0.2, 0.9, len(scenarios)))
 
 # Error bars
 yerr_lower = p_values - ci_lower

@@ -518,7 +518,7 @@ class ManufacturedDeathModel:
                 prob += 0.10
                 
         # Bound probability
-        prob = max(0.01, min(0.99, prob))
+        prob = max(0.000001, min(0.999999, prob))
         
         return prob, decomposition
     
@@ -1102,9 +1102,9 @@ def main():
         ci_str = f"({r['r0_zero_95ci'][0]:.4f}, {r['r0_zero_95ci'][1]:.4f})"
         print(
             f"{r['scenario']:<40} "
-            f"{r['observed_r0_zero_rate']:.4f}       "
+            f"{r['observed_r0_zero_rate']:.6f}       "
             f"{ci_str:<22} "
-            f"{r['observed_cascade_completion_rate']:.4f}"
+            f"{r['observed_cascade_completion_rate']:.6f}"
         )
     
     # MSM comparison
@@ -1238,7 +1238,6 @@ def main():
     except Exception as e:
         logger.error(f"Failed to save results: {e}")
     
-    print(f"Results saved to {output_path}")
     print()
     
     # Key findings

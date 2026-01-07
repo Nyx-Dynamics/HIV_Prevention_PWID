@@ -174,11 +174,11 @@ The evidence speaks for itself without inflammatory language.
 
 ## GitHub Repository
 
-**URL**: https://github.com/Nyx-Dynamics/hiv-prevention-master
+**URL**: https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm
 
 ### Repository Structure (Target)
 ```
-hiv-prevention-master/
+HIV-Prevention_Master-Algorithm/
 ├── README.md
 ├── CITATION.cff
 ├── LICENSE (MIT)

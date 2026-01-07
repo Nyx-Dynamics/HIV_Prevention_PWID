@@ -91,8 +91,8 @@ This repository contains the computational models, simulation code, and visualiz
 
 ### Setup
 ```bash
-git clone https://github.com/Nyx-Dynamics/hiv-prevention-master.git
-cd hiv-prevention-master
+git clone https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm.git
+cd HIV-Prevention_Master-Algorithm
 pip install -r requirements.txt
 ```
 

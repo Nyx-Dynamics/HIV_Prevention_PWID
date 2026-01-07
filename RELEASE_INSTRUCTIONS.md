@@ -17,7 +17,7 @@
 
 ```bash
 # Navigate to your repository
-cd /path/to/hiv-prevention-master
+cd /path/to/HIV-Prevention_Master-Algorithm
 
 # Ensure you're on main branch
 git checkout main
@@ -69,7 +69,7 @@ git push origin main
 
 ### Via GitHub Web Interface:
 
-1. Go to https://github.com/Nyx-Dynamics/hiv-prevention-master
+1. Go to https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm
 2. Click **Releases** → **Draft a new release**
 3. Click **Choose a tag** → type `v1.2.0` → **Create new tag**
 4. **Release title:** `v1.2.0 - Terminology Refactor and CLI Update`
@@ -105,8 +105,8 @@ Demidont AC. Structural barriers drive near-zero population-level effectiveness 
 ```bash
 # Clone fresh copy to verify
 cd /tmp
-git clone https://github.com/Nyx-Dynamics/hiv-prevention-master.git
-cd hiv-prevention-master
+git clone https://github.com/Nyx-Dynamics/HIV-Prevention_Master-Algorithm.git
+cd HIV-Prevention_Master-Algorithm
 
 # Test main simulation with CLI flag
 python architectural_barrier_model.py --output-dir ./test_run --n-individuals 1000

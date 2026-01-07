@@ -335,10 +335,10 @@ POLICY_SCENARIOS = [
     ),
     
     PolicyScenario(
-        name="Decrim + Bias Training",
-        description="Decriminalization plus healthcare bias reduction initiatives",
+        name="Decrim + Stigma Reduction",
+        description="Decriminalization plus provider stigma reduction training",
         criminalization_removed=True,
-        bias_reduced=0.5,  # Training reduces bias by 50%
+        bias_reduced=0.5,  # Training reduces stigma by 50%
         structural_barriers_reduced=0.0,
         incarceration_rate_modifier=0.3,
         in_custody_prep_available=False,
