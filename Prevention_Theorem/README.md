@@ -12,7 +12,6 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 ## Publication Status
 - **Preprints.org**: Accepted (ID: 193808) - January 10, 2026
 - **Epidemics Journal**: Under Review (EPIDEMICS-S-26-00002)
-- **medRxiv**: Published (MEDRXIV-2026-343483v1)
 
 ## Repository Structure
 
