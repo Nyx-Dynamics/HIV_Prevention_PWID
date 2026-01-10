@@ -11,18 +11,33 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 ## Repository Contents
 
 ```
-├── SRC/                                    # Source code
-│   ├── architectural_barrier_model.py      # Cascade simulation framework (Monte Carlo)
-│   ├── cascade_sensitivity_analysis.py     # Probabilistic sensitivity analysis
-│   ├── stochastic_avoidance_enhanced.py    # Models outbreak probability under stochastic avoidance over 5-10 year horizons 
-│   └── generate_figures.py                 # Publication figure generator
+├── SRC/                                           # Source code
+│   ├── architectural_barrier_model.py             # Cascade simulation framework (Monte Carlo)
+│   ├── cascade_sensitivity_analysis.py            # Probabilistic sensitivity analysis
+│   ├── stochastic_avoidance_enhanced.py           # Outbreak probability modeling (5-10 year horizons)
+│   ├── structural_barrier_model.py                # Three-layer barrier framework simulation
+│   ├── figures_AIDS_Behavior.py                   # Graphical abstract generator
+│   ├── reproduce_supplementary_results.py         # Reproduces supplementary figures S1-S5 and data
+│   ├── generate_outputs.py                        # Output generation utilities
+│   ├── prevention_theorem_figures.py              # Prevention theorem visualization
+│   ├── pwid_cascade_v1.py                         # PWID cascade model (v1)
+│   └── PEP_mucosal.py                             # PEP mucosal exposure modeling
 ├── data/
-│   ├── csv_xlsx/                           # Model outputs (JSON, CSV, XLSX)
-│   └── figures/                            # Generated figures (TIFF, PNG, EPS)
+│   ├── csv_xlsx/                                  # Model outputs (JSON, CSV, XLSX)
+│   ├── figures/                                   # Main manuscript figures (TIFF, PNG, EPS)
+│   └── aids_behavior_figures_canonical/           # Canonical figure versions
 ├── config/
-│   └── parameters.json                     # Model configuration and literature values
-├── LICENSE                                 # MIT License
-└── requirements.txt                        # Python dependencies
+│   └── parameters.json                            # Model configuration and literature values
+├── AIDS_Behvior_submission/                       # Journal submission files
+│   ├── AIDS_Behavior_Manuscript_BLINDED.docx/pdf  # Blinded manuscript
+│   ├── AIDS_Behavior_OnlineResource_S1.docx       # Online Resource S1
+│   ├── AIDS_Behavior_OnlineResource_S2.docx       # Online Resource S2
+│   ├── Fig1-5.tif                                 # Main figures (TIFF format)
+│   └── FigS1-S4.tif                               # Supplementary figures
+├── Structural_Barriers_PWIDS_preprints_submission/ # Preprint submission files
+├── Supplementary Figures/                         # High-resolution supplementary figures (EPS, TIFF)
+├── LICENSE                                        # MIT License
+└── requirements.txt                               # Python dependencies
 ```
 
 ## Extended Stochastic Avoidance and Outbreak Modeling
@@ -31,9 +46,14 @@ This repository includes additional data and figures related to stochastic avoid
 
 ### Key Scripts
 
-| `cascade_sensitivity_analysis.py` | Runs 1,000-sample probabilistic sensitivity analysis |
-| `stochastic_avoidance_enhanced.py` | Models outbreak probability over 5-10 year horizons |
-| `generate_figures.py` | Generates all manuscript figures (Figs 1-5) |
+| Script | Description |
+|--------|-------------|
+| `architectural_barrier_model.py` | Monte Carlo cascade simulation (100,000 individuals) |
+| `structural_barrier_model.py` | Three-layer barrier framework with policy scenarios |
+| `cascade_sensitivity_analysis.py` | 1,000-sample probabilistic sensitivity analysis |
+| `stochastic_avoidance_enhanced.py` | Outbreak probability modeling (5-10 year horizons) |
+| `reproduce_supplementary_results.py` | Reproduces all supplementary figures and data tables |
+| `figures_AIDS_Behavior.py` | Generates graphical abstract with corrected values |
 
 ## Reproducibility:
 The commands below reproduce the analyses reported in the manuscript and Supplementary Materials.
@@ -67,8 +87,11 @@ python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples
 # 6. Run stochastic outbreak model
 python stochastic_avoidance_enhanced.py --output-dir ../data/csv_xlsx
 
-# 7. Generate publication figures
-python generate_figures.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
+# 7. Generate supplementary results and figures
+python reproduce_supplementary_results.py
+
+# 8. Generate graphical abstract
+python figures_AIDS_Behavior.py
 ```
 
 ### Expected Runtime
@@ -112,6 +135,11 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 | `cascade_sensitivity_results.*` | Parameter sensitivity rankings |
 | `stochastic_avoidance_sensitivity_results.*` | Outbreak probability distributions |
 | `structural_barrier_results.*` | Three-layer barrier decomposition |
+| `national_forecast_summary.csv` | National outbreak forecast summary |
+| `regional_comparison.csv` | Regional heterogeneity analysis |
+| `scenario_comparison.csv` | Policy scenario comparisons |
+| `tornado_analysis.csv` | Tornado diagram sensitivity data |
+| `supplementary_data_master.xlsx` | Combined supplementary data workbook |
 
 ### Key Results
 Summary statistics below reflect simulated outcomes under specified structural scenarios and are provided for transparency; they are not intended as population forecasts.
@@ -128,7 +156,7 @@ This code accompanies the manuscript:
 
 > Demidont AC. *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. AIDS and Behavior (submitted 1/2026).
 
-### Figures
+### Main Figures
 
 | Figure | File | Description |
 |--------|------|-------------|
@@ -137,6 +165,16 @@ This code accompanies the manuscript:
 | Fig 3 | `Fig3_PolicyScenarios.*` | Policy scenario analysis |
 | Fig 4 | `Fig4_StochasticAvoidance.*` | Stochastic avoidance failure prediction |
 | Fig 5 | `Fig5_SNR_LOOCV.*` | Signal-to-noise ratio / LOOCV framework |
+
+### Supplementary Figures
+
+| Figure | File | Description |
+|--------|------|-------------|
+| Fig S1 | `FigS1_ContextualStochasticFailureDriver.*` | Contextual stochastic failure trajectories |
+| Fig S2 | `FigS2_OutbreakForecast.*` | Outbreak probability forecast |
+| Fig S3 | `FigS3_TornadoDiagram.*` | Sensitivity tornado diagram |
+| Fig S4 | `FigS4_ScenarioComparison.*` | Policy scenario comparison |
+| Fig S5 | `FigS5_ScenarioComparisonDetail.png` | Detailed scenario comparison |
 
 ## License
 
