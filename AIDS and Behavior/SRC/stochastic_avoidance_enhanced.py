@@ -614,7 +614,7 @@ class EnhancedStochasticAvoidanceModel:
 
 class SensitivityAnalyzer:
     """
-    Comprehensive sensitivity analysis for the manufactured death models.
+    Comprehensive sensitivity analysis for the structural barrier models.
     """
     
     def __init__(self, base_model: EnhancedStochasticAvoidanceModel = None):

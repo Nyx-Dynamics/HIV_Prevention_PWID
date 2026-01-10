@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-06T19:28:37.858478",
+  "timestamp": "2026-01-10T00:52:16.419776",
   "model_parameters": {
     "literature_params": {
       "global_pwid_population": 15600000,
@@ -38,20 +38,20 @@
   "cascade_results": [
     {
       "scenario": "Current Policy",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
       "achieved_r0_zero": 0,
-      "completed_cascade": 0,
-      "incarceration_disrupted": 0,
+      "completed_cascade": 5,
+      "incarceration_disrupted": 5,
       "step_failure_counts": {
-        "awareness": 902,
-        "willingness": 70,
-        "healthcare_access": 20,
-        "disclosure": 7,
-        "provider_willing": 0,
-        "hiv_testing_adequate": 0,
-        "first_injection": 0,
-        "sustained_engagement": 1
+        "awareness": 89939,
+        "willingness": 7035,
+        "healthcare_access": 1969,
+        "disclosure": 757,
+        "provider_willing": 193,
+        "hiv_testing_adequate": 56,
+        "first_injection": 29,
+        "sustained_engagement": 17
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -76,7 +76,7 @@
       "incarceration_survival_probability": 0.16806999999999994,
       "theoretical_r0_zero_probability": 7.81722457031249e-06,
       "observed_r0_zero_rate": 0.0,
-      "observed_cascade_completion_rate": 0.0,
+      "observed_cascade_completion_rate": 5e-05,
       "r0_zero_95ci": [
         0,
         0.0
@@ -98,20 +98,20 @@
     },
     {
       "scenario": "Decriminalization Only",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 2,
-      "completed_cascade": 2,
-      "incarceration_disrupted": 0,
+      "achieved_r0_zero": 145,
+      "completed_cascade": 234,
+      "incarceration_disrupted": 89,
       "step_failure_counts": {
-        "awareness": 654,
-        "willingness": 130,
-        "healthcare_access": 109,
-        "disclosure": 47,
-        "provider_willing": 38,
-        "hiv_testing_adequate": 12,
-        "first_injection": 3,
-        "sustained_engagement": 5
+        "awareness": 65032,
+        "willingness": 12409,
+        "healthcare_access": 12392,
+        "disclosure": 4572,
+        "provider_willing": 3379,
+        "hiv_testing_adequate": 1099,
+        "first_injection": 517,
+        "sustained_engagement": 366
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -135,11 +135,11 @@
       "theoretical_cascade_probability": 0.0027871593749999985,
       "incarceration_survival_probability": 0.6240321451000002,
       "theoretical_r0_zero_probability": 0.0017392770435168247,
-      "observed_r0_zero_rate": 0.002,
-      "observed_cascade_completion_rate": 0.002,
+      "observed_r0_zero_rate": 0.00145,
+      "observed_cascade_completion_rate": 0.00234,
       "r0_zero_95ci": [
-        0,
-        0.00476908533635206
+        0.0012141559193874054,
+        0.0016858440806125944
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -158,20 +158,20 @@
     },
     {
       "scenario": "Decrim + Stigma Reduction",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 3,
-      "completed_cascade": 4,
-      "incarceration_disrupted": 1,
+      "achieved_r0_zero": 440,
+      "completed_cascade": 721,
+      "incarceration_disrupted": 281,
       "step_failure_counts": {
-        "awareness": 600,
-        "willingness": 111,
-        "healthcare_access": 152,
-        "disclosure": 42,
-        "provider_willing": 46,
-        "hiv_testing_adequate": 29,
-        "first_injection": 10,
-        "sustained_engagement": 6
+        "awareness": 61650,
+        "willingness": 10921,
+        "healthcare_access": 14121,
+        "disclosure": 4736,
+        "provider_willing": 3791,
+        "hiv_testing_adequate": 2422,
+        "first_injection": 982,
+        "sustained_engagement": 656
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -195,11 +195,11 @@
       "theoretical_cascade_probability": 0.007208920922175382,
       "incarceration_survival_probability": 0.6240321451000002,
       "theoretical_r0_zero_probability": 0.004498598386921375,
-      "observed_r0_zero_rate": 0.003,
-      "observed_cascade_completion_rate": 0.004,
+      "observed_r0_zero_rate": 0.0044,
+      "observed_cascade_completion_rate": 0.00721,
       "r0_zero_95ci": [
-        0,
-        0.006389723528549194
+        0.003989772421404899,
+        0.004810227578595102
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -218,20 +218,20 @@
     },
     {
       "scenario": "SSP-Integrated Delivery",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 51,
-      "completed_cascade": 76,
-      "incarceration_disrupted": 25,
+      "achieved_r0_zero": 4384,
+      "completed_cascade": 7043,
+      "incarceration_disrupted": 2659,
       "step_failure_counts": {
-        "awareness": 360,
-        "willingness": 104,
-        "healthcare_access": 109,
-        "disclosure": 140,
-        "provider_willing": 120,
-        "hiv_testing_adequate": 55,
-        "first_injection": 8,
-        "sustained_engagement": 28
+        "awareness": 35375,
+        "willingness": 11009,
+        "healthcare_access": 9813,
+        "disclosure": 14580,
+        "provider_willing": 11700,
+        "hiv_testing_adequate": 6948,
+        "first_injection": 591,
+        "sustained_engagement": 2941
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -255,11 +255,11 @@
       "theoretical_cascade_probability": 0.06942923415455196,
       "incarceration_survival_probability": 0.6240321451000002,
       "theoretical_r0_zero_probability": 0.04332607392211526,
-      "observed_r0_zero_rate": 0.051,
-      "observed_cascade_completion_rate": 0.076,
+      "observed_r0_zero_rate": 0.04384,
+      "observed_cascade_completion_rate": 0.07043,
       "r0_zero_95ci": [
-        0.03736439959517733,
-        0.06463560040482266
+        0.0425710145872271,
+        0.045108985412772896
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -278,20 +278,20 @@
     },
     {
       "scenario": "Full Harm Reduction",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 91,
-      "completed_cascade": 91,
+      "achieved_r0_zero": 9432,
+      "completed_cascade": 9432,
       "incarceration_disrupted": 0,
       "step_failure_counts": {
-        "awareness": 318,
-        "willingness": 102,
-        "healthcare_access": 85,
-        "disclosure": 158,
-        "provider_willing": 126,
-        "hiv_testing_adequate": 76,
-        "first_injection": 3,
-        "sustained_engagement": 41
+        "awareness": 33065,
+        "willingness": 10864,
+        "healthcare_access": 8199,
+        "disclosure": 15229,
+        "provider_willing": 12607,
+        "hiv_testing_adequate": 6471,
+        "first_injection": 418,
+        "sustained_engagement": 3715
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -315,11 +315,11 @@
       "theoretical_cascade_probability": 0.09493143975566562,
       "incarceration_survival_probability": 1.0,
       "theoretical_r0_zero_probability": 0.09493143975566562,
-      "observed_r0_zero_rate": 0.091,
-      "observed_cascade_completion_rate": 0.091,
+      "observed_r0_zero_rate": 0.09432,
+      "observed_cascade_completion_rate": 0.09432,
       "r0_zero_95ci": [
-        0.073173802693788,
-        0.108826197306212
+        0.09250847072790926,
+        0.09613152927209075
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -338,20 +338,20 @@
     },
     {
       "scenario": "Full HR + PURPOSE-4 Data",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 101,
-      "completed_cascade": 101,
+      "achieved_r0_zero": 11865,
+      "completed_cascade": 11865,
       "incarceration_disrupted": 0,
       "step_failure_counts": {
-        "awareness": 289,
-        "willingness": 115,
-        "healthcare_access": 87,
-        "disclosure": 174,
-        "provider_willing": 101,
-        "hiv_testing_adequate": 78,
-        "first_injection": 4,
-        "sustained_engagement": 51
+        "awareness": 28127,
+        "willingness": 11745,
+        "healthcare_access": 8741,
+        "disclosure": 16453,
+        "provider_willing": 9974,
+        "hiv_testing_adequate": 7919,
+        "first_injection": 533,
+        "sustained_engagement": 4643
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -375,11 +375,11 @@
       "theoretical_cascade_probability": 0.11859768083745126,
       "incarceration_survival_probability": 1.0,
       "theoretical_r0_zero_probability": 0.11859768083745126,
-      "observed_r0_zero_rate": 0.101,
-      "observed_cascade_completion_rate": 0.101,
+      "observed_r0_zero_rate": 0.11865,
+      "observed_cascade_completion_rate": 0.11865,
       "r0_zero_95ci": [
-        0.08232345218194755,
-        0.11967654781805247
+        0.11664569344389637,
+        0.12065430655610364
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -398,20 +398,20 @@
     },
     {
       "scenario": "Full HR + Algorithmic Debiasing",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 168,
-      "completed_cascade": 168,
+      "achieved_r0_zero": 17468,
+      "completed_cascade": 17468,
       "incarceration_disrupted": 0,
       "step_failure_counts": {
-        "awareness": 156,
-        "willingness": 90,
-        "healthcare_access": 122,
-        "disclosure": 235,
-        "provider_willing": 77,
-        "hiv_testing_adequate": 103,
-        "first_injection": 4,
-        "sustained_engagement": 45
+        "awareness": 17932,
+        "willingness": 9512,
+        "healthcare_access": 10466,
+        "disclosure": 19821,
+        "provider_willing": 7738,
+        "hiv_testing_adequate": 11170,
+        "first_injection": 680,
+        "sustained_engagement": 5213
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -435,11 +435,11 @@
       "theoretical_cascade_probability": 0.17446926098616503,
       "incarceration_survival_probability": 1.0,
       "theoretical_r0_zero_probability": 0.17446926098616503,
-      "observed_r0_zero_rate": 0.168,
-      "observed_cascade_completion_rate": 0.168,
+      "observed_r0_zero_rate": 0.17468,
+      "observed_cascade_completion_rate": 0.17468,
       "r0_zero_95ci": [
-        0.14482752750352265,
-        0.19117247249647737
+        0.17232663739763682,
+        0.1770333626023632
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -458,20 +458,20 @@
     },
     {
       "scenario": "Theoretical Maximum",
-      "n_individuals": 1000,
+      "n_individuals": 100000,
       "years": 5,
-      "achieved_r0_zero": 205,
-      "completed_cascade": 205,
+      "achieved_r0_zero": 19894,
+      "completed_cascade": 19894,
       "incarceration_disrupted": 0,
       "step_failure_counts": {
-        "awareness": 160,
-        "willingness": 84,
-        "healthcare_access": 101,
-        "disclosure": 191,
-        "provider_willing": 62,
-        "hiv_testing_adequate": 132,
-        "first_injection": 6,
-        "sustained_engagement": 59
+        "awareness": 17203,
+        "willingness": 8300,
+        "healthcare_access": 10267,
+        "disclosure": 19360,
+        "provider_willing": 6687,
+        "hiv_testing_adequate": 12225,
+        "first_injection": 611,
+        "sustained_engagement": 5453
       },
       "barrier_attribution_totals": {
         "pathogen_biology": 0.0,
@@ -495,11 +495,11 @@
       "theoretical_cascade_probability": 0.19869287950879544,
       "incarceration_survival_probability": 1.0,
       "theoretical_r0_zero_probability": 0.19869287950879544,
-      "observed_r0_zero_rate": 0.205,
-      "observed_cascade_completion_rate": 0.205,
+      "observed_r0_zero_rate": 0.19894,
+      "observed_cascade_completion_rate": 0.19894,
       "r0_zero_95ci": [
-        0.17997831420547367,
-        0.2300216857945263
+        0.1964657154044487,
+        0.2014142845955513
       ],
       "barrier_decomposition_pct": {
         "pathogen_biology": 0.0,
@@ -537,15 +537,15 @@
   },
   "disparity_fold": Infinity,
   "stochastic_avoidance": {
-    "median_years_to_outbreak": 5.0,
-    "mean_years_to_outbreak": 6.148936170212766,
-    "std_years": 4.837700893202882,
+    "median_years_to_outbreak": 4.0,
+    "mean_years_to_outbreak": 5.449839859489617,
+    "std_years": 4.673793228200334,
     "p10_years": 0.0,
-    "p25_years": 2.25,
-    "p75_years": 9.75,
-    "p90_years": 12.700000000000003,
-    "probability_outbreak_5_years": 0.5212765957446809,
-    "probability_outbreak_10_years": 0.7553191489361702,
-    "probability_no_outbreak": 0.06
+    "p25_years": 2.0,
+    "p75_years": 8.0,
+    "p90_years": 13.0,
+    "probability_outbreak_5_years": 0.5909701415435479,
+    "probability_outbreak_10_years": 0.8404793883665668,
+    "probability_no_outbreak": 0.0321
   }
 }

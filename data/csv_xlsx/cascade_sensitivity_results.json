@@ -1,181 +1,181 @@
 {
-  "timestamp": "2026-01-06T14:39:21.276214",
+  "timestamp": "2026-01-10T00:51:34.562885",
   "probabilistic_sensitivity": {
     "summary": {
       "cascade_completion": {
-        "mean": 1e-05,
-        "std": 3e-05,
+        "mean": 1.93e-05,
+        "std": 5.511360993438917e-05,
         "p5": 0.0,
-        "p95": 5.4999999999999894e-05
+        "p95": 0.0001
       },
       "r0_zero_rate": {
-        "mean": 0.0,
-        "std": 0.0,
+        "mean": 4.1e-06,
+        "std": 2.175293083701596e-05,
         "p5": 0.0,
         "p95": 0.0
       },
       "step_probabilities": {
         "awareness": {
-          "mean": 0.08326352336654157,
-          "std": 0.05370132413416605,
+          "mean": 0.08337548841229107,
+          "std": 0.07243165029569981,
           "p5": 0.01,
-          "p95": 0.14816319276679876
+          "p95": 0.22112101997358805
         },
         "willingness": {
-          "mean": 0.25729373045963816,
-          "std": 0.10841580058735482,
-          "p5": 0.07776402266650126,
-          "p95": 0.3746020939722587
+          "mean": 0.2977882908870149,
+          "std": 0.08583338890551989,
+          "p5": 0.15548242123348543,
+          "p95": 0.44065276502722994
         },
         "healthcare_access": {
-          "mean": 0.28775096001415745,
-          "std": 0.05724355243726068,
-          "p5": 0.21365856635196187,
-          "p95": 0.3756355215805543
+          "mean": 0.31370688792822626,
+          "std": 0.094191597157354,
+          "p5": 0.16534599369127806,
+          "p95": 0.47278671141177464
         },
         "disclosure": {
-          "mean": 0.21457916177269482,
-          "std": 0.11089014701515532,
-          "p5": 0.06592693435786577,
-          "p95": 0.3760909244680801
+          "mean": 0.22229328039668547,
+          "std": 0.09339056081691854,
+          "p5": 0.06495366664527268,
+          "p95": 0.38105569588984406
         },
         "provider_willing": {
-          "mean": 0.34490783436840206,
-          "std": 0.09426089632109473,
-          "p5": 0.20775624147295532,
-          "p95": 0.4899361563463381
+          "mean": 0.3187071408431352,
+          "std": 0.07466217517298143,
+          "p5": 0.1977569032810899,
+          "p95": 0.4455921222565872
         },
         "hiv_testing_adequate": {
-          "mean": 0.41195792105132023,
-          "std": 0.07433768085169333,
-          "p5": 0.2832457944677525,
-          "p95": 0.50273769383765
+          "mean": 0.38911985010945954,
+          "std": 0.06689473301020482,
+          "p5": 0.2757802838104644,
+          "p95": 0.5017224813641509
         },
         "first_injection": {
-          "mean": 0.3432448861208568,
-          "std": 0.07520364824001433,
-          "p5": 0.2571929787887917,
-          "p95": 0.46805094335910397
+          "mean": 0.41469638181654095,
+          "std": 0.07989887026645427,
+          "p5": 0.282892293135347,
+          "p95": 0.5447831558025023
         },
         "sustained_engagement": {
-          "mean": 0.2684697705133189,
-          "std": 0.08222872648048035,
-          "p5": 0.1800092405925419,
-          "p95": 0.3978878675322387
+          "mean": 0.19791070671296968,
+          "std": 0.08805913110917495,
+          "p5": 0.04721851340424669,
+          "p95": 0.34092211787586313
         }
       }
     },
-    "n_samples": 10
+    "n_samples": 1000
   },
   "barrier_removal": {
     "baseline": {
-      "r0_zero_rate": 0.0,
-      "cascade_completion": 2e-05,
+      "r0_zero_rate": 1e-05,
+      "cascade_completion": 0.00012,
       "ci_95": [
-        0.0,
-        0.0
+        0,
+        2.9599901999754997e-05
       ]
     },
     "no_criminalization": {
-      "r0_zero_rate": 0.00184,
+      "r0_zero_rate": 0.00166,
       "cascade_completion": 0.0028,
       "ci_95": [
-        0.001464352881575274,
-        0.002215647118424726
+        0.0014076813505299302,
+        0.0019123186494700698
       ]
     },
     "no_stigma": {
-      "r0_zero_rate": 4e-05,
-      "cascade_completion": 0.0004,
+      "r0_zero_rate": 0.00012,
+      "cascade_completion": 0.00054,
       "ci_95": [
-        0.0,
-        9.543606289050477e-05
+        5.210768224902025e-05,
+        0.00018789231775097977
       ]
     },
     "low_barrier_access": {
-      "r0_zero_rate": 0.00014,
-      "cascade_completion": 0.0011,
+      "r0_zero_rate": 0.00022,
+      "cascade_completion": 0.002,
       "ci_95": [
-        3.629380880198135e-05,
-        0.00024370619119801863
+        0.00012807796420008966,
+        0.00031192203579991036
       ]
     },
     "full_inclusion": {
-      "r0_zero_rate": 0.0,
-      "cascade_completion": 0.00026,
+      "r0_zero_rate": 5e-05,
+      "cascade_completion": 0.00028,
       "ci_95": [
-        0.0,
-        0.0
+        6.17416332800936e-06,
+        9.382583667199065e-05
       ]
     },
     "all_removed": {
-      "r0_zero_rate": 0.19714,
-      "cascade_completion": 0.19714,
+      "r0_zero_rate": 0.19887,
+      "cascade_completion": 0.19887,
       "ci_95": [
-        0.19365278795698157,
-        0.20062721204301845
+        0.19639604266435137,
+        0.2013439573356486
       ]
     }
   },
   "step_importance": {
     "ranked": [
       "awareness",
-      "healthcare_access",
       "disclosure",
-      "willingness",
       "provider_willing",
       "hiv_testing_adequate",
+      "sustained_engagement",
+      "healthcare_access",
       "first_injection",
-      "sustained_engagement"
+      "willingness"
     ],
     "effects": {
       "awareness": {
         "original_probability": 0.09999999999999995,
-        "cascade_if_fixed": 0.0005333333333333334,
-        "r0_zero_if_fixed": 0.0002,
-        "improvement": 0.00018
+        "cascade_if_fixed": 0.00036,
+        "r0_zero_if_fixed": 4e-05,
+        "improvement": 3.0000000000000004e-05
       },
       "willingness": {
         "original_probability": 0.3000000000000001,
-        "cascade_if_fixed": 0.00013333333333333334,
-        "r0_zero_if_fixed": 0.0,
-        "improvement": -2e-05
+        "cascade_if_fixed": 0.00015,
+        "r0_zero_if_fixed": 1e-05,
+        "improvement": 0.0
       },
       "healthcare_access": {
         "original_probability": 0.35,
-        "cascade_if_fixed": 6.666666666666667e-05,
-        "r0_zero_if_fixed": 3.3333333333333335e-05,
-        "improvement": 1.3333333333333333e-05
+        "cascade_if_fixed": 0.00011,
+        "r0_zero_if_fixed": 2e-05,
+        "improvement": 1e-05
       },
       "disclosure": {
         "original_probability": 0.24999999999999997,
-        "cascade_if_fixed": 0.00016666666666666666,
-        "r0_zero_if_fixed": 3.3333333333333335e-05,
-        "improvement": 1.3333333333333333e-05
+        "cascade_if_fixed": 0.00013,
+        "r0_zero_if_fixed": 4e-05,
+        "improvement": 3.0000000000000004e-05
       },
       "provider_willing": {
         "original_probability": 0.35,
-        "cascade_if_fixed": 3.3333333333333335e-05,
-        "r0_zero_if_fixed": 0.0,
-        "improvement": -2e-05
+        "cascade_if_fixed": 0.0002,
+        "r0_zero_if_fixed": 4e-05,
+        "improvement": 3.0000000000000004e-05
       },
       "hiv_testing_adequate": {
         "original_probability": 0.44999999999999996,
-        "cascade_if_fixed": 0.00013333333333333334,
-        "r0_zero_if_fixed": 0.0,
-        "improvement": -2e-05
+        "cascade_if_fixed": 0.00015,
+        "r0_zero_if_fixed": 4e-05,
+        "improvement": 3.0000000000000004e-05
       },
       "first_injection": {
         "original_probability": 0.44999999999999996,
-        "cascade_if_fixed": 0.0001,
-        "r0_zero_if_fixed": 0.0,
-        "improvement": -2e-05
+        "cascade_if_fixed": 8e-05,
+        "r0_zero_if_fixed": 2e-05,
+        "improvement": 1e-05
       },
       "sustained_engagement": {
         "original_probability": 0.24999999999999994,
-        "cascade_if_fixed": 0.0002,
-        "r0_zero_if_fixed": 0.0,
-        "improvement": -2e-05
+        "cascade_if_fixed": 0.00012,
+        "r0_zero_if_fixed": 3e-05,
+        "improvement": 1.9999999999999998e-05
       }
     }
   }

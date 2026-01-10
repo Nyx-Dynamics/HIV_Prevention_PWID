@@ -9,7 +9,7 @@ This module extends the base stochastic avoidance model to include:
 3. Outbreak probability forecasting under multiple scenarios
 4. Comprehensive sensitivity analyses on key parameters
 
-Author: AC Demidont, MD / Nyx Dynamics LLC
+Author: AC Demidont, DO / Nyx Dynamics LLC
 Date: December 2024
 """
 
@@ -614,7 +614,7 @@ class EnhancedStochasticAvoidanceModel:
 
 class SensitivityAnalyzer:
     """
-    Comprehensive sensitivity analysis for the manufactured death models.
+    Comprehensive sensitivity analysis for the structural barrier models.
     """
     
     def __init__(self, base_model: EnhancedStochasticAvoidanceModel = None):

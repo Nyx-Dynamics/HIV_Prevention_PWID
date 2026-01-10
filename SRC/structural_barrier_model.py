@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Manufactured Death: HIV Prevention Barrier Modeling for PWID
-=============================================================
+Structural Barriers: HIV Prevention Barrier Modeling for PWID
+==============================================================
 
 Comprehensive Monte Carlo simulation modeling nested barriers to HIV prevention
 for people who inject drugs (PWID), demonstrating the mathematical impossibility
@@ -25,7 +25,7 @@ Layer 3: Architectural Failures
     - Research Exclusion (LOOCV framework)
     - Machine Learning (WMD algorithmic deprioritization)
 
-Author: AC Demidont, MD / Nyx Dynamics LLC
+Author: AC Demidont, DO / Nyx Dynamics LLC
 Date: December 2024
 """
 
@@ -422,7 +422,7 @@ def create_pwid_cascade() -> List[CascadeStep]:
 # MONTE CARLO SIMULATION ENGINE
 # =============================================================================
 
-class ManufacturedDeathModel:
+class StructuralBarrierModel:
     """
     Main simulation engine for nested barrier modeling.
     """
@@ -1068,13 +1068,13 @@ def main():
     """Run complete analysis and generate outputs."""
     
     print("=" * 80)
-    print("MANUFACTURED DEATH: HIV PREVENTION BARRIER MODELING")
+    print("STRUCTURAL BARRIERS: HIV PREVENTION BARRIER MODELING")
     print("Monte Carlo Simulation with 3-Layer Barrier Framework")
     print("=" * 80)
     print()
     
     # Initialize model
-    model = ManufacturedDeathModel()
+    model = StructuralBarrierModel()
     scenarios = create_policy_scenarios()
     
     # Run simulations
@@ -1190,8 +1190,8 @@ def main():
     data_dir = "../data/csv_xlsx"
     os.makedirs(data_dir, exist_ok=True)
     
-    output_path = os.path.join(data_dir, "manufactured_death_results.json")
-    csv_path = os.path.join(data_dir, "manufactured_death_results.csv")
+    output_path = os.path.join(data_dir, "structural_barrier_results.json")
+    csv_path = os.path.join(data_dir, "structural_barrier_results.csv")
     try:
         with open(output_path, 'w') as f:
             json.dump(output, f, indent=2, default=str, allow_nan=False)
@@ -1242,7 +1242,7 @@ def main():
         print(f"Results saved to {csv_path}")
 
         # Save to Excel
-        xlsx_path = os.path.join(data_dir, "manufactured_death_results.xlsx")
+        xlsx_path = os.path.join(data_dir, "structural_barrier_results.xlsx")
         try:
             with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer_xl:
                 # Main Scenario Results
