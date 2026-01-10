@@ -107,7 +107,6 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 
 | File | Description |
 |------|-------------|
-| `architectural_barrier_results.*` | Cascade completion rates by scenario |
 | `cascade_sensitivity_results.*` | Parameter sensitivity rankings |
 | `stochastic_avoidance_sensitivity_results.*` | Outbreak probability distributions |
 | `structural_barrier_results.*` | Three-layer barrier decomposition |

@@ -154,3 +154,6 @@ cython_debug/
 # We keep the final data/ and figures/ but ignore temporary files
 AIDS and Behavior/data/**/*.tmp
 AIDS and Behavior/SRC/*.log
+
+# Legacy/deprecated files
+legacy/
