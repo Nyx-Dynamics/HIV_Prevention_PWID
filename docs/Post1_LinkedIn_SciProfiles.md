@@ -35,6 +35,7 @@ I'm releasing a series of interconnected research publications examining structu
 📄 Preprints: https://preprints.org
 💻 GitHub: https://github.com/Nyx-Dynamics/HIV_Prevention_PWID
 💻 GitHub: https://github.com/Nyx-Dynamics/Prevention-Theorem
+💻 GitHub: https://github.com/Nyx-Dynamics/lai-prep-bridge-tool-pub
 
 #HIVPrevention #PublicHealth #HealthEquity #PWID #PrEP #OpenScience #ComputationalEpidemiology
 
@@ -64,6 +65,8 @@ This research program employs Monte Carlo simulation, probabilistic sensitivity 
 
 All code, simulation outputs, and supplementary materials are available under open-access licenses:
 - GitHub: [github.com/Nyx-Dynamics/HIV_Prevention_PWID](https://github.com/Nyx-Dynamics/HIV_Prevention_PWID)
+- GitHub: [github.com/Nyx-Dynamics/Prevention-Theorem](https://github.com/Nyx-Dynamics/Prevention-Theorem)
+- GitHub: [github.com/Nyx-Dynamics/lai-prep-bridge-tool-pub](https://github.com/Nyx-Dynamics/lai-prep-bridge-tool-pub)
 - Zenodo: DOI 10.5281/zenodo.18116991
 
 **Correspondence:** acdemidont@nyxdynamics.org
