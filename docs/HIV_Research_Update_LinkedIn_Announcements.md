@@ -239,12 +239,12 @@ The math is public. The clock is ticking. The choice is ours.
 
 | Day | Post | Content |
 |-----|------|---------|
-| Friday Jan 10 | Post 1 | Series Introduction |
-| Saturday Jan 11 | Post 2 | Paper 1 - Bridging the Gap |
-| Sunday Jan 12 | Post 3 | Paper 2 - Prevention Theorem |
-| Monday Jan 13 | Post 4 | Paper 3 - Structural Barriers |
-| Tuesday Jan 14 | Post 5 | Paper 4 - Algorithmic Bias |
-| Wednesday Jan 15 | Post 6 | Conclusion & Call to Action |
+| Saturday Jan 11 | Post 1 | Series Introduction |
+| Sunday Jan 12 | Post 2 | Paper 1 - Bridging the Gap |
+| Monday Jan 13 | Post 3 | Paper 2 - Prevention Theorem |
+| Tuesday Jan 14 | Post 4 | Paper 3 - Structural Barriers |
+| Wednesday Jan 15 | Post 5 | Paper 4 - Algorithmic Bias |
+| Thursday Jan 16 | Post 6 | Conclusion & Call to Action |
 
 **Optimal posting times:** 8-9 AM EST (professional audience) or 12-1 PM EST (lunch browsing)
 
