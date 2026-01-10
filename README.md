@@ -12,10 +12,10 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 
 ```
 ├── SRC/                                    # Source code
-│   ├── architectural_barrier_model.py      # Cascade simulation framework (Monte Carlo)
+│   ├── structural_barrier_model.py      # Cascade simulation framework (Monte Carlo)
 │   ├── cascade_sensitivity_analysis.py     # Probabilistic sensitivity analysis
 │   ├── stochastic_avoidance_enhanced.py    # Models outbreak probability under stochastic avoidance over 5-10 year horizons 
-│   └── generate_figures.py                 # Publication figure generator
+│   └── generate_outputs.py                 # Publication figure and data generator
 ├── data/
 │   ├── csv_xlsx/                           # Model outputs (JSON, CSV, XLSX)
 │   └── figures/                            # Generated figures (TIFF, PNG, EPS)
@@ -29,10 +29,10 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 
 | Script | Purpose |
 |--------|---------|
-| `architectural_barrier_model.py` | Simulates 100,000 individuals through 8-step prevention cascade |
+| `structural_barrier_model.py` | Simulates 100,000 individuals through 8-step prevention cascade |
 | `cascade_sensitivity_analysis.py` | Runs 1,000-sample probabilistic sensitivity analysis |
 | `stochastic_avoidance_enhanced.py` | Models outbreak probability over 5-10 year horizons |
-| `generate_figures.py` | Generates all manuscript figures (Figs 1-5) |
+| `generate_outputs.py` | Generates all manuscript figures and data outputs |
 
 ## Reproducibility:
 The commands below reproduce the analyses reported in the manuscript and Supplementary Materials.
@@ -58,7 +58,7 @@ pip install -r requirements.txt
 
 # 4. Run main simulation (generates cascade results)
 cd SRC
-python architectural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
+python structural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
 
 # 5. Run sensitivity analysis
 python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples 1000
@@ -67,7 +67,7 @@ python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples
 python stochastic_avoidance_enhanced.py --output-dir ../data/csv_xlsx
 
 # 7. Generate publication figures
-python generate_figures.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
+python generate_outputs.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
 ```
 
 ### Expected Runtime
