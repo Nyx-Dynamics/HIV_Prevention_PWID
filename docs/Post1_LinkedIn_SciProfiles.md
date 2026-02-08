@@ -24,7 +24,7 @@ I'm releasing a series of interconnected research publications examining structu
 **Peer Review Submissions:**
 - Papers 1 & 2 → *Viruses* (MDPI)
 - Paper 2 → *Epidemics* (Elsevier)
-- Paper 3 → *AIDS and Behavior* (Springer)
+- Paper 3 → *BMC Public Health* (Springer)
 
 **Key Findings:**
 • 5,434-fold disparity in prevention outcomes (MSM vs PWID)
@@ -53,7 +53,7 @@ I am pleased to announce the release of a four-paper research series examining t
 
 2. **Demidont AC.** The Prevention Theorem: Time-Dependent Constraints on Post-Exposure Prophylaxis for HIV. *Preprints.* 2026;193601. [Accepted]. *Submitted for peer review: Epidemics (Elsevier).*
 
-3. **Demidont AC.** Structural Barriers, Stochastic Avoidance, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *Preprints.* 2026;193808. [In Review]. *Submitted for peer review: AIDS and Behavior (Springer).*
+3. **Demidont AC.** Structural Barriers, Stochastic Avoidance, and Outbreak Risk in HIV Prevention for People Who Inject Drugs. *Preprints.* 2026;193808. [In Review]. *Submitted for peer review: BMC Public Health (Springer).*
 
 4. **Demidont AC.** Computational Validation of Clinical Decision Support Algorithm for LAI-PrEP Bridge Period Navigation at UNAIDS Global Target Scale. [Resubmitted]. *Submitted for peer review: Viruses (MDPI).*
 

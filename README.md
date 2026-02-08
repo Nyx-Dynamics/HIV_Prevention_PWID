@@ -125,7 +125,7 @@ Summary statistics below reflect simulated outcomes under specified structural s
 
 This code accompanies the manuscript:
 
-> Demidont AC. *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. AIDS and Behavior (submitted 1/2026).
+> Demidont AC. *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. BMC Public Health (submitted 2/2026).
 
 ### Figures
 
@@ -156,7 +156,7 @@ If you use this code or data, please cite:
 @article{demidont2026pwid,
   author = {Demidont, AC},
   title = {Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs},
-  journal = {AIDS and Behavior},
+  journal = {BMC Public Health},
   year = {2026},
   publisher = {Springer}
 }

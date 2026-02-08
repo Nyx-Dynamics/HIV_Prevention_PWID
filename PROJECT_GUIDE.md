@@ -1,6 +1,6 @@
-# PROJECT GUIDE: AIDS and Behavior Publication Pipeline
+# PROJECT GUIDE: BMC Public Health Publication Pipeline
 
-This guide provides instructions for executing the computational pipeline and reproducing the figures and data tables for the *AIDS and Behavior* submission.
+This guide provides instructions for executing the computational pipeline and reproducing the figures and data tables for the *BMC Public Health* submission.
 
 ## 1. Environment Setup
 The scripts require Python 3.9+ and the following dependencies:
@@ -9,7 +9,7 @@ pip install numpy matplotlib scipy pandas openpyxl
 ```
 
 ## 2. Execution Sequence
-For full reproducibility, execute the scripts in the following order from within the `AIDS and Behavior/SRC/` directory.
+For full reproducibility, execute the scripts in the following order from within the `BMC Public Health/SRC/` directory.
 
 ### Step 1: Core Simulation
 Run the `architectural_barrier_model.py` to generate the primary dataset.
