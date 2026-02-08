@@ -1,7 +1,6 @@
 
 ## Repository Overview
-This repository contains the code, simulation outputs, and supplementary analyses supporting the manuscript *Structural Barriers, Stochastic Avoidance, and Outbreak Risk
-in HIV Prevention for People Who Inject Drugs* The study examines why people who inject drugs (PWID) continue to experience high HIV incidence despite the availability of highly efficacious biomedical prevention tools. Building on a feasibility-based definition of prevention, the analyses demonstrate how strict biological timing constraints on post-exposure prophylaxis interact with structural barriers to care, network dynamics, and incarceration to place reactive prevention strategies outside the feasible biological domain. The materials provided here support the computational modeling, sensitivity analyses, and scenario evaluations described in the manuscript and are intended to enable transparency and reproducibility of the reported findings.
+This repository contains the code, simulation outputs, and supplementary analyses supporting the manuscript *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. The study examines why people who inject drugs (PWID) continue to experience high HIV incidence despite the availability of highly efficacious biomedical prevention tools. Building on a feasibility-based definition of prevention, the analyses demonstrate how strict biological timing constraints on post-exposure prophylaxis interact with structural barriers to care, network dynamics, and incarceration to place reactive prevention strategies outside the feasible biological domain. The materials provided here support the computational modeling, sensitivity analyses, and scenario evaluations described in the manuscript and are intended to enable transparency and reproducibility of the reported findings.
 
 ## Author
 **AC Demidont, DO**
@@ -12,28 +11,45 @@ GitHub: [Nyx-Dynamics](https://github.com/Nyx-Dynamics)
 ## Repository Contents
 
 ```
-├── SRC/                                    # Source code
-│   ├── structural_barrier_model.py      # Cascade simulation framework (Monte Carlo)
-│   ├── cascade_sensitivity_analysis.py     # Probabilistic sensitivity analysis
-│   ├── stochastic_avoidance_enhanced.py    # Models outbreak probability under stochastic avoidance over 5-10 year horizons 
-│   └── generate_outputs.py                 # Publication figure and data generator
+├── SRC/                                           # Source code
+│   ├── architectural_barrier_model.py             # Cascade simulation framework (Monte Carlo)
+│   ├── cascade_sensitivity_analysis.py            # Probabilistic sensitivity analysis
+│   ├── stochastic_avoidance_enhanced.py           # Outbreak probability modeling (5-10 year horizons)
+│   ├── structural_barrier_model.py                # Three-layer barrier framework simulation
+│   ├── figures_BMC_Public_Health.py               # Graphical abstract generator
+│   ├── reproduce_supplementary_results.py         # Reproduces supplementary figures S1-S5 and data
+│   ├── generate_outputs.py                        # Output generation utilities
+│   ├── prevention_theorem_figures.py              # Prevention theorem visualization
+│   ├── pwid_cascade_v1.py                         # PWID cascade model (v1)
+│   └── PEP_mucosal.py                             # PEP mucosal exposure modeling
 ├── data/
-│   ├── csv_xlsx/                           # Model outputs (JSON, CSV, XLSX)
-│   └── figures/                            # Generated figures (TIFF, PNG, EPS)
+│   ├── csv_xlsx/                                  # Model outputs (JSON, CSV, XLSX)
+│   └── figures/                                   # Main manuscript figures (TIFF, PNG, EPS)
 ├── config/
-│   └── parameters.json                     # Model configuration and literature values
-├── LICENSE                                 # MIT License
-└── requirements.txt                        # Python dependencies
+│   └── parameters.json                            # Model configuration and literature values
+├── legacy/                                        # Archived project materials and previous submissions
+├── docs/                                          # Project documentation
+├── BMC_Public_Health_Manuscript.docx              # Main manuscript file
+├── Makefile                                       # Automation for reproducibility suite
+├── REPRODUCIBILITY.md                             # Reproducibility instructions
+├── LICENSE                                        # MIT License
+└── requirements.txt                               # Python dependencies
 ```
+
+## Extended Stochastic Avoidance and Outbreak Modeling
+
+This repository includes additional data and figures related to stochastic avoidance failure and outbreak probability that are not shown in the main manuscript. These materials provide extended context on network-driven instability, regional heterogeneity, and sensitivity of outbreak risk to structural parameters. They are included to support transparency and robustness assessment rather than to expand the scope of the main analysis.
 
 ### Key Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `structural_barrier_model.py` | Simulates 100,000 individuals through 8-step prevention cascade |
-| `cascade_sensitivity_analysis.py` | Runs 1,000-sample probabilistic sensitivity analysis |
-| `stochastic_avoidance_enhanced.py` | Models outbreak probability over 5-10 year horizons |
-| `generate_outputs.py` | Generates all manuscript figures and data outputs |
+| Script | Description |
+|--------|-------------|
+| `architectural_barrier_model.py` | Monte Carlo cascade simulation (100,000 individuals) |
+| `structural_barrier_model.py` | Three-layer barrier framework with policy scenarios |
+| `cascade_sensitivity_analysis.py` | 1,000-sample probabilistic sensitivity analysis |
+| `stochastic_avoidance_enhanced.py` | Outbreak probability modeling (5-10 year horizons) |
+| `reproduce_supplementary_results.py` | Reproduces all supplementary figures and data tables |
+| `figures_BMC_Public_Health.py` | Generates graphical abstract with corrected values |
 
 ## Reproducibility:
 The commands below reproduce the analyses reported in the manuscript and Supplementary Materials.
@@ -59,7 +75,7 @@ pip install -r requirements.txt
 
 # 4. Run main simulation (generates cascade results)
 cd SRC
-python structural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
+python architectural_barrier_model.py --output-dir ../data/csv_xlsx --n-individuals 100000
 
 # 5. Run sensitivity analysis
 python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples 1000
@@ -67,8 +83,11 @@ python cascade_sensitivity_analysis.py --output-dir ../data/csv_xlsx --n-samples
 # 6. Run stochastic outbreak model
 python stochastic_avoidance_enhanced.py --output-dir ../data/csv_xlsx
 
-# 7. Generate publication figures
-python generate_outputs.py --input-dir ../data/csv_xlsx --output-dir ../data/figures
+# 7. Generate supplementary results and figures
+python reproduce_supplementary_results.py
+
+# 8. Generate graphical abstract
+python figures_BMC_Public_Health.py
 ```
 
 ### Expected Runtime
@@ -108,9 +127,15 @@ All epidemiological parameters in `config/parameters.json` are derived from peer
 
 | File | Description |
 |------|-------------|
+| `architectural_barrier_results.*` | Cascade completion rates by scenario |
 | `cascade_sensitivity_results.*` | Parameter sensitivity rankings |
 | `stochastic_avoidance_sensitivity_results.*` | Outbreak probability distributions |
 | `structural_barrier_results.*` | Three-layer barrier decomposition |
+| `national_forecast_summary.csv` | National outbreak forecast summary |
+| `regional_comparison.csv` | Regional heterogeneity analysis |
+| `scenario_comparison.csv` | Policy scenario comparisons |
+| `tornado_analysis.csv` | Tornado diagram sensitivity data |
+| `supplementary_data_master.xlsx` | Combined supplementary data workbook |
 
 ### Key Results
 Summary statistics below reflect simulated outcomes under specified structural scenarios and are provided for transparency; they are not intended as population forecasts.
@@ -127,7 +152,7 @@ This code accompanies the manuscript:
 
 > Demidont AC. *Structural Violation of HIV Prevention Timing Constraints Among People Who Inject Drugs*. BMC Public Health (submitted 2/2026).
 
-### Figures
+### Main Figures
 
 | Figure | File | Description |
 |--------|------|-------------|
@@ -136,6 +161,16 @@ This code accompanies the manuscript:
 | Fig 3 | `Fig3_PolicyScenarios.*` | Policy scenario analysis |
 | Fig 4 | `Fig4_StochasticAvoidance.*` | Stochastic avoidance failure prediction |
 | Fig 5 | `Fig5_SNR_LOOCV.*` | Signal-to-noise ratio / LOOCV framework |
+
+### Supplementary Figures
+
+| Figure | File | Description |
+|--------|------|-------------|
+| Fig S1 | `FigS1_ContextualStochasticFailureDriver.*` | Contextual stochastic failure trajectories |
+| Fig S2 | `FigS2_OutbreakForecast.*` | Outbreak probability forecast |
+| Fig S3 | `FigS3_TornadoDiagram.*` | Sensitivity tornado diagram |
+| Fig S4 | `FigS4_ScenarioComparison.*` | Policy scenario comparison |
+| Fig S5 | `FigS5_ScenarioComparisonDetail.png` | Detailed scenario comparison |
 
 ## License
 
