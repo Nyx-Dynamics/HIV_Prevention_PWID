@@ -25,7 +25,7 @@ Layer 3: Architectural Failures
     - Research Exclusion (LOOCV framework)
     - Machine Learning (WMD algorithmic deprioritization)
 
-Author: AC Demidont, DO / Nyx Dynamics LLC
+Author: AC Demidont, MD / Nyx Dynamics LLC
 Date: December 2024
 """
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Enhanced Stochastic Avoidance Model with Methamphetamine Trajectory Analysis
+Enhanced Stochastic Avoidance Model with Contextual Stochastic Failure Driver Analysis
 and Comprehensive Sensitivity Analyses
 
 This module extends the base stochastic avoidance model to include:
-1. Methamphetamine prevalence trajectory projections by region
+1. Contextual Stochastic Failure Driver prevalence trajectory projections by region
 2. Network density evolution modeling
 3. Outbreak probability forecasting under multiple scenarios
 4. Comprehensive sensitivity analyses on key parameters
 
-Author: AC Demidont, DO / Nyx Dynamics LLC
+Author: AC Demidont, MD / Nyx Dynamics LLC
 Date: December 2024
 """
 
@@ -256,11 +256,11 @@ KEY_PARAMETERS = {
 
 
 # =============================================================================
-# REGIONAL METHAMPHETAMINE TRAJECTORY MODEL
+# REGIONAL CONTEXTUAL STOCHASTIC FAILURE DRIVER MODEL
 # =============================================================================
 
 @dataclass
-class RegionalMethProfile:
+class RegionalContextualFailureDriverProfile:
     """Regional methamphetamine prevalence profile."""
     region: str
     baseline_prevalence_2018: float
@@ -291,49 +291,49 @@ class RegionalMethProfile:
 
 # Regional profiles based on literature
 REGIONAL_PROFILES = {
-    "appalachia": RegionalMethProfile(
+    "appalachia": RegionalContextualFailureDriverProfile(
         region="Appalachia (WV, KY, OH)",
         baseline_prevalence_2018=0.25,  # High meth-opioid co-use
         annual_growth_rate=0.04,
         pwid_population=150000,
         hiv_prevalence_pwid=0.05
     ),
-    "pacific_northwest": RegionalMethProfile(
+    "pacific_northwest": RegionalContextualFailureDriverProfile(
         region="Pacific Northwest (WA, OR)",
         baseline_prevalence_2018=0.35,  # Already high
         annual_growth_rate=0.03,
         pwid_population=120000,
         hiv_prevalence_pwid=0.08
     ),
-    "southwest": RegionalMethProfile(
+    "southwest": RegionalContextualFailureDriverProfile(
         region="Southwest (AZ, NM, NV)",
         baseline_prevalence_2018=0.30,
         annual_growth_rate=0.035,
         pwid_population=100000,
         hiv_prevalence_pwid=0.06
     ),
-    "northeast_urban": RegionalMethProfile(
+    "northeast_urban": RegionalContextualFailureDriverProfile(
         region="Northeast Urban (MA, NY, PA)",
         baseline_prevalence_2018=0.12,  # Lower but growing
         annual_growth_rate=0.05,  # Faster growth
         pwid_population=400000,
         hiv_prevalence_pwid=0.10
     ),
-    "southeast": RegionalMethProfile(
+    "southeast": RegionalContextualFailureDriverProfile(
         region="Southeast (FL, GA, NC)",
         baseline_prevalence_2018=0.18,
         annual_growth_rate=0.04,
         pwid_population=250000,
         hiv_prevalence_pwid=0.07
     ),
-    "midwest": RegionalMethProfile(
+    "midwest": RegionalContextualFailureDriverProfile(
         region="Midwest (IN, IL, MI, WI)",
         baseline_prevalence_2018=0.20,
         annual_growth_rate=0.035,
         pwid_population=300000,
         hiv_prevalence_pwid=0.04
     ),
-    "national_average": RegionalMethProfile(
+    "national_average": RegionalContextualFailureDriverProfile(
         region="National Average",
         baseline_prevalence_2018=0.143,
         annual_growth_rate=0.025,
@@ -352,7 +352,7 @@ class EnhancedStochasticAvoidanceModel:
     Enhanced model for stochastic avoidance failure prediction.
     
     Incorporates:
-    - Regional methamphetamine trajectories
+    - Regional contextual stochastic failure driver trajectories
     - Network density evolution
     - Multiple risk factor interactions
     - Uncertainty quantification
@@ -842,9 +842,9 @@ class SensitivityAnalyzer:
 # VISUALIZATION FUNCTIONS
 # =============================================================================
 
-def plot_regional_meth_trajectories(save_path: str = None):
+def plot_regional_contextual_failure_driver_trajectories(save_path: str = None):
     """
-    Figure: Regional methamphetamine prevalence trajectories.
+    Figure: Regional contextual stochastic failure driver prevalence trajectories.
     """
     fig, axes = plt.subplots(1, 2, figsize=(WIDTH_DOUBLE, 3.5))
     
@@ -902,9 +902,9 @@ def plot_regional_meth_trajectories(save_path: str = None):
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    output_dir = "MD/Data - Results/MD_figures_bmc_public_health"
     os.makedirs(output_dir, exist_ok=True)
-    save_publication_fig(fig, 'FigS1_MethTrajectories', output_dir)
+    save_publication_fig(fig, 'FigS1_ContextualStochasticFailureDriver', output_dir)
     plt.close()
     
     return fig
@@ -972,7 +972,7 @@ def plot_outbreak_probability_forecast(results: Dict, save_path: str = None):
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    output_dir = "MD/Data - Results/MD_figures_bmc_public_health"
     os.makedirs(output_dir, exist_ok=True)
     save_publication_fig(fig, 'FigS2_OutbreakForecast', output_dir)
     plt.close()
@@ -1015,7 +1015,7 @@ def plot_tornado_diagram(tornado_results: Dict, save_path: str = None):
     ax.legend(handles=legend_elements, loc='lower right', frameon=False, fontsize=9)
     
     plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    output_dir = "MD/Data - Results/MD_figures_bmc_public_health"
     os.makedirs(output_dir, exist_ok=True)
     save_publication_fig(fig, 'FigS3_TornadoDiagram', output_dir)
     plt.close()
@@ -1072,7 +1072,7 @@ def plot_scenario_comparison(scenario_results: Dict, save_path: str = None):
     ax.spines['right'].set_visible(False)
     
     plt.tight_layout()
-    output_dir = "MD/Data - Results/MD_figures_aids_behavior"
+    output_dir = "MD/Data - Results/MD_figures_bmc_public_health"
     os.makedirs(output_dir, exist_ok=True)
     save_publication_fig(fig, 'FigS4_ScenarioComparison', output_dir)
     plt.close()
@@ -1099,7 +1099,7 @@ def main():
 
     print("=" * 80)
     print("ENHANCED STOCHASTIC AVOIDANCE MODEL")
-    print("With Methamphetamine Trajectory and Sensitivity Analyses")
+    print("With Contextual Stochastic Failure Driver and Sensitivity Analyses")
     print(f"Output directory: {os.path.abspath(args.output_dir)}")
     print(f"Data directory: {os.path.abspath(args.data_dir)}")
     print("=" * 80)
@@ -1108,9 +1108,9 @@ def main():
     output_dir = args.output_dir
     data_dir = args.data_dir
 
-    # 1. Regional meth trajectories
-    print("1. Generating regional methamphetamine trajectories...")
-    fig1 = plot_regional_meth_trajectories(f"{output_dir}/FigS1_MethTrajectories.png")
+    # 1. Regional contextual failure driver trajectories
+    print("1. Generating regional contextual stochastic failure driver trajectories...")
+    fig1 = plot_regional_contextual_failure_driver_trajectories(f"{output_dir}/FigS1_ContextualStochasticFailureDriver.png")
 
     # 2. National outbreak forecast
     print(f"2. Running national outbreak probability forecast ({args.n_sims} simulations)...")
@@ -1371,7 +1371,7 @@ def main():
     print("=" * 80)
     
     print("""
-METHAMPHETAMINE TRAJECTORY ANALYSIS:
+CONTEXTUAL STOCHASTIC FAILURE DRIVER ANALYSIS:
 - Appalachia shows highest baseline (25%) with rapid growth
 - Pacific Northwest already at 35% co-use prevalence
 - Northeast urban areas growing fastest (5%/year)

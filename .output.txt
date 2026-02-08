@@ -1,0 +1,248 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        deleted:    AIDS_Behavior_Manuscript_Final.docx
+        deleted:    BMC Public Health/.gitignore
+        deleted:    BMC Public Health/BMC_Public_Health_Manuscript.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/figures/Fig1.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/figures/Fig2.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/figures/Fig3.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/figures/Fig4.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/figures/Fig5.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/manuscript/BMC_Public_Health_Manuscript_BLINDED.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/manuscript/BMC_Public_Health_TitlePage.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplemental_figures/FigS1.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplemental_figures/FigS2.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplemental_figures/FigS3.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplemental_figures/FigS4.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplements/BMC_Public_Health_OnlineResource_S1.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission/supplements/BMC_Public_Health_OnlineResource_S2.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/BMC_Public_Health_Manuscript_BLINDED.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/BMC_Public_Health_Manuscript_BLINDED.pdf
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/BMC_Public_Health_OnlineResource_S1.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/BMC_Public_Health_OnlineResource_S2.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/Fig1.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/Fig2.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/Fig3.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/Fig4.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/Fig5.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/FigS1.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/FigS2.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/FigS3.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/FigS4.tif
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/bmc_public_health_title_page.docx
+        deleted:    BMC Public Health/BMC_Public_Health_Submission_Legacy/sn-vancouver-num.bst
+        deleted:    BMC Public Health/CHANGELOG.md
+        deleted:    BMC Public Health/LICENSE
+        deleted:    BMC Public Health/Makefile
+        deleted:    BMC Public Health/PROJECT_GUIDE.md
+        deleted:    BMC Public Health/README.md
+        deleted:    BMC Public Health/REPRODUCIBILITY.md
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS1_ContextualStochasticFailureDriver.eps
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS1_ContextualStochasticFailureDriver.tif
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS2_OutbreakForecast.eps
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS2_OutbreakForecast.tif
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS3_TornadoDiagram.eps
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS3_TornadoDiagram.tif
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS4_ScenarioComparison.eps
+        deleted:    BMC Public Health/SRC/MD/Data - Results/MD_figures_bmc_public_health/FigS4_ScenarioComparison.tif
+        deleted:    BMC Public Health/SRC/PEP_mucosal.py
+        deleted:    BMC Public Health/SRC/architectural_barrier_model.py
+        deleted:    BMC Public Health/SRC/cascade_sensitivity_analysis.py
+        deleted:    BMC Public Health/SRC/figures_BMC_Public_Health.py
+        deleted:    BMC Public Health/SRC/generate_outputs.py
+        deleted:    BMC Public Health/SRC/prevention_theorem_figures.py
+        deleted:    BMC Public Health/SRC/pwid_cascade_v1.py
+        deleted:    BMC Public Health/SRC/reproduce_supplementary_results.py
+        deleted:    BMC Public Health/SRC/stochastic_avoidance_enhanced.py
+        deleted:    BMC Public Health/SRC/structural_barrier_model.py
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/Structural_Barriers_PWID_Complete_Final_Corrected.docx
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/Structural_Barriers_PWID_Complete_Final_Corrected.pdf
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/Supplement_S2_Supplementary_Figures 2.pdf
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/graphical_abstract_prevention_theorem.pdf
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/graphical_abstract_pwid_corrected.png
+        deleted:    BMC Public Health/Structural_Barriers_PWIDS_preprints_submission/pwid_preprints_figures_final_acd.zip
+        deleted:    BMC Public Health/Supplemental Data/data/national_forecast_summary.csv
+        deleted:    BMC Public Health/Supplemental Data/data/regional_comparison.csv
+        deleted:    BMC Public Health/Supplemental Data/data/scenario_comparison.csv
+        deleted:    BMC Public Health/Supplemental Data/data/supplementary_data_master.xlsx
+        deleted:    BMC Public Health/Supplemental Data/data/tornado_analysis.csv
+        deleted:    BMC Public Health/Supplementary Figures/FigS1_ContextualStochasticFailureDriver.eps
+        deleted:    BMC Public Health/Supplementary Figures/FigS1_ContextualStochasticFailureDriver.tif
+        deleted:    BMC Public Health/Supplementary Figures/FigS2_OutbreakForecast.eps
+        deleted:    BMC Public Health/Supplementary Figures/FigS2_OutbreakForecast.tif
+        deleted:    BMC Public Health/Supplementary Figures/FigS3_TornadoDiagram.eps
+        deleted:    BMC Public Health/Supplementary Figures/FigS3_TornadoDiagram.tif
+        deleted:    BMC Public Health/Supplementary Figures/FigS4_ScenarioComparison.eps
+        deleted:    BMC Public Health/Supplementary Figures/FigS4_ScenarioComparison.tif
+        deleted:    BMC Public Health/Supplementary Figures/FigS5_ScenarioComparisonDetail.png
+        deleted:    BMC Public Health/config/architectural_barrier_results.json
+        deleted:    BMC Public Health/config/cascade_sensitivity_results.json
+        deleted:    BMC Public Health/config/parameters.json
+        deleted:    BMC Public Health/config/pwid_simulation_results.json
+        deleted:    BMC Public Health/config/stochastic_avoidance_sensitivity_results.json
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig1_CascadeComparison.eps
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig1_CascadeComparison.png
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig1_CascadeComparison.tif
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig2_BarrierDecomposition.eps
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig2_BarrierDecomposition.png
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig2_BarrierDecomposition.tif
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig3_PolicyScenarios.eps
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig3_PolicyScenarios.png
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig3_PolicyScenarios.tif
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig4_StochasticAvoidance.eps
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig4_StochasticAvoidance.png
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig4_StochasticAvoidance.tif
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig5_SNR_LOOCV.eps
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig5_SNR_LOOCV.png
+        deleted:    BMC Public Health/data/bmc_public_health_figures_canonical/Fig5_SNR_LOOCV.tif
+        deleted:    BMC Public Health/data/csv_xlsx/architectural_barrier_results.csv
+        deleted:    BMC Public Health/data/csv_xlsx/architectural_barrier_results.json
+        deleted:    BMC Public Health/data/csv_xlsx/architectural_barrier_results.xlsx
+        deleted:    BMC Public Health/data/csv_xlsx/cascade_sensitivity_results.csv
+        deleted:    BMC Public Health/data/csv_xlsx/cascade_sensitivity_results.json
+        deleted:    BMC Public Health/data/csv_xlsx/cascade_sensitivity_results.xlsx
+        deleted:    BMC Public Health/data/csv_xlsx/national_forecast_summary.csv
+        deleted:    BMC Public Health/data/csv_xlsx/regional_comparison.csv
+        deleted:    BMC Public Health/data/csv_xlsx/scenario_comparison.csv
+        deleted:    BMC Public Health/data/csv_xlsx/stochastic_avoidance_sensitivity_results.csv
+        deleted:    BMC Public Health/data/csv_xlsx/stochastic_avoidance_sensitivity_results.json
+        deleted:    BMC Public Health/data/csv_xlsx/stochastic_avoidance_sensitivity_results.xlsx
+        deleted:    BMC Public Health/data/csv_xlsx/structural_barrier_results.csv
+        deleted:    BMC Public Health/data/csv_xlsx/structural_barrier_results.json
+        deleted:    BMC Public Health/data/csv_xlsx/structural_barrier_results.xlsx
+        deleted:    BMC Public Health/data/csv_xlsx/supplementary_data_master.xlsx
+        deleted:    BMC Public Health/data/csv_xlsx/tornado_analysis.csv
+        deleted:    BMC Public Health/data/figures/Fig1.eps
+        deleted:    BMC Public Health/data/figures/Fig1.tif
+        deleted:    BMC Public Health/data/figures/Fig1_CascadeComparison.eps
+        deleted:    BMC Public Health/data/figures/Fig1_CascadeComparison.tif
+        deleted:    BMC Public Health/data/figures/Fig2.eps
+        deleted:    BMC Public Health/data/figures/Fig2.tif
+        deleted:    BMC Public Health/data/figures/Fig2_BarrierDecomposition.eps
+        deleted:    BMC Public Health/data/figures/Fig2_BarrierDecomposition.tif
+        deleted:    BMC Public Health/data/figures/Fig3.eps
+        deleted:    BMC Public Health/data/figures/Fig3.tif
+        deleted:    BMC Public Health/data/figures/Fig3_PolicyScenarios.eps
+        deleted:    BMC Public Health/data/figures/Fig3_PolicyScenarios.tif
+        deleted:    BMC Public Health/data/figures/Fig4_StochasticAvoidance.eps
+        deleted:    BMC Public Health/data/figures/Fig4_StochasticAvoidance.tif
+        deleted:    BMC Public Health/data/figures/Fig5_SNR_LOOCV.eps
+        deleted:    BMC Public Health/data/figures/Fig5_SNR_LOOCV.tif
+        deleted:    BMC Public Health/data/figures/Figure_1_Prevention_Theorem_Dynamics.eps
+        deleted:    BMC Public Health/data/figures/Figure_1_Prevention_Theorem_Dynamics.tif
+        deleted:    BMC Public Health/data/figures/Figure_2_Window_Compression.eps
+        deleted:    BMC Public Health/data/figures/Figure_2_Window_Compression.tif
+        deleted:    BMC Public Health/prevention_theorem_clean-2.bib
+        deleted:    BMC Public Health/requirements.txt
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS1_ContextualStochasticFailureDriver.eps
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS1_ContextualStochasticFailureDriver.tif
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS2_OutbreakForecast.eps
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS2_OutbreakForecast.tif
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS3_TornadoDiagram.eps
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS3_TornadoDiagram.tif
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS4_ScenarioComparison.eps
+        deleted:    MD/Data - Results/MD_figures_aids_behavior/FigS4_ScenarioComparison.tif
+        modified:   PROJECT_GUIDE.md
+        deleted:    Prevention_Theorem/README.md
+        deleted:    Prevention_Theorem/SRC/PEP_mucosal.py
+        deleted:    Prevention_Theorem/SRC/graphical_abstracts.py
+        deleted:    Prevention_Theorem/SRC/prevention_theorem_figures.py
+        deleted:    Prevention_Theorem/SRC/prevention_theorem_figures_v2.py
+        deleted:    Prevention_Theorem/data/figures/Figure_1_Prevention_Theorem_Dynamics.eps
+        deleted:    Prevention_Theorem/data/figures/Figure_1_Prevention_Theorem_Dynamics.tif
+        deleted:    Prevention_Theorem/data/figures/Figure_2_Window_Compression.eps
+        deleted:    Prevention_Theorem/data/figures/Figure_2_Window_Compression.tif
+        deleted:    Prevention_Theorem/data/figures/fig1_mucosal_timeline.pdf
+        deleted:    Prevention_Theorem/references/Prevention_theorem_references.bib
+        deleted:    Prevention_Theorem/references/prevention_theorem_clean-2.bib
+        deleted:    Prevention_Theorem/references/prevention_theorem_clean.bib
+        deleted:    Prevention_Theorem/submissions/Epidemics/EPIDEMICS-S-26-00002.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/Epidemics_cover_letter.docx
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_1_Prevention_Theorem_Dynamics.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_1_Prevention_Theorem_Dynamics.png
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_1_Prevention_Theorem_Dynamics.tif
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_2_Window_Compression.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_2_Window_Compression.png
+        deleted:    Prevention_Theorem/submissions/Epidemics/Figure_2_Window_Compression.tif
+        deleted:    Prevention_Theorem/submissions/Epidemics/Prevention_theorem_references.bib
+        deleted:    Prevention_Theorem/submissions/Epidemics/declarationStatement.docx
+        deleted:    Prevention_Theorem/submissions/Epidemics/declarationStatement.docx.zip
+        deleted:    Prevention_Theorem/submissions/Epidemics/epidemics_manuscript.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/epidemics_manuscript_LaTeX_source_file.tex
+        deleted:    Prevention_Theorem/submissions/Epidemics/figures.zip
+        deleted:    Prevention_Theorem/submissions/Epidemics/figures/Figure_1_Prevention_Theorem_Dynamics.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/figures/Figure_2_Window_Compression.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/graphical_abstract.pdf
+        deleted:    Prevention_Theorem/submissions/Epidemics/graphical_abstract.png
+        deleted:    Prevention_Theorem/submissions/Epidemics/graphical_abstract.tif
+        deleted:    Prevention_Theorem/submissions/Epidemics/graphical_abstract.tif.zip
+        deleted:    Prevention_Theorem/submissions/Epidemics/preprints_prevention_theorem.docx
+        deleted:    Prevention_Theorem/submissions/Epidemics/preprints_prevention_theorem_figures.zip
+        deleted:    Prevention_Theorem/submissions/Epidemics/prevention_theorem_clean.bib
+        deleted:    Prevention_Theorem/submissions/Preprints/preprints_prevention_theorem.docx
+        deleted:    Prevention_Theorem/submissions/Preprints/preprints_prevention_theorem_figures.zip
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS1_MethTrajectories.eps
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS1_MethTrajectories.tif
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS2_OutbreakForecast.eps
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS2_OutbreakForecast.tif
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS3_TornadoDiagram.eps
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS3_TornadoDiagram.tif
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS4_ScenarioComparison.eps
+        deleted:    SRC/MD/Data - Results/MD_figures_aids_behavior/FigS4_ScenarioComparison.tif
+        modified:   SRC/generate_outputs.py
+        deleted:    SRC/graphical_abstracts.py
+        modified:   SRC/stochastic_avoidance_enhanced.py
+        modified:   SRC/structural_barrier_model.py
+        deleted:    data/aids_behavior_figures_canonical/Fig1_CascadeComparison.eps
+        deleted:    data/aids_behavior_figures_canonical/Fig1_CascadeComparison.png
+        deleted:    data/aids_behavior_figures_canonical/Fig1_CascadeComparison.tif
+        deleted:    data/aids_behavior_figures_canonical/Fig2_BarrierDecomposition.eps
+        deleted:    data/aids_behavior_figures_canonical/Fig2_BarrierDecomposition.png
+        deleted:    data/aids_behavior_figures_canonical/Fig2_BarrierDecomposition.tif
+        deleted:    data/aids_behavior_figures_canonical/Fig3_PolicyScenarios.eps
+        deleted:    data/aids_behavior_figures_canonical/Fig3_PolicyScenarios.png
+        deleted:    data/aids_behavior_figures_canonical/Fig3_PolicyScenarios.tif
+        deleted:    data/aids_behavior_figures_canonical/Fig4_StochasticAvoidance.eps
+        deleted:    data/aids_behavior_figures_canonical/Fig4_StochasticAvoidance.png
+        deleted:    data/aids_behavior_figures_canonical/Fig4_StochasticAvoidance.tif
+        deleted:    data/aids_behavior_figures_canonical/Fig5_SNR_LOOCV.eps
+        deleted:    data/aids_behavior_figures_canonical/Fig5_SNR_LOOCV.png
+        deleted:    data/aids_behavior_figures_canonical/Fig5_SNR_LOOCV.tif
+        modified:   data/csv_xlsx/cascade_sensitivity_results.json
+        modified:   data/csv_xlsx/stochastic_avoidance_sensitivity_results.csv
+        modified:   data/csv_xlsx/stochastic_avoidance_sensitivity_results.json
+        modified:   data/csv_xlsx/stochastic_avoidance_sensitivity_results.xlsx
+        modified:   data/csv_xlsx/structural_barrier_results.csv
+        modified:   data/csv_xlsx/structural_barrier_results.json
+        modified:   data/csv_xlsx/structural_barrier_results.xlsx
+        modified:   data/figures/Figure_1_Prevention_Theorem_Dynamics.eps
+        modified:   data/figures/Figure_2_Window_Compression.eps
+        deleted:    move_files.sh
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        BMC_Public_Health_Manuscript.docx
+        HIV_Prevention_PWID_Project.zip
+        Makefile
+        REPRODUCIBILITY.md
+        SRC/architectural_barrier_model.py
+        SRC/figures_BMC_Public_Health.py
+        SRC/reproduce_supplementary_results.py
+        data/bmc_public_health_figures_canonical/
+        data/csv_xlsx/architectural_barrier_results.csv
+        data/csv_xlsx/architectural_barrier_results.json
+        data/csv_xlsx/architectural_barrier_results.xlsx
+        data/csv_xlsx/national_forecast_summary.csv
+        data/csv_xlsx/regional_comparison.csv
+        data/csv_xlsx/scenario_comparison.csv
+        data/csv_xlsx/supplementary_data_master.xlsx
+        data/csv_xlsx/tornado_analysis.csv
+        data/figures/Fig1.eps
+        data/figures/Fig1.tif
+        data/figures/Fig2.eps
+        data/figures/Fig2.tif
+        data/figures/Fig3.eps
+        data/figures/Fig3.tif
+no changes added to commit (use "git add" and/or "git commit -a")
