@@ -1,0 +1,88 @@
+{
+  "cascade_steps": {
+    "pwid": {
+      "awareness": {
+        "base_probability": 0.7,
+        "policy_penalty": 0.25,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.15,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.05,
+        "ml_penalty": 0.1
+      },
+      "willingness": {
+        "base_probability": 0.8,
+        "policy_penalty": 0.35,
+        "stigma_penalty": 0.1,
+        "infrastructure_penalty": 0.0,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.05
+      },
+      "healthcare_access": {
+        "base_probability": 0.75,
+        "policy_penalty": 0.1,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.25,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.0
+      },
+      "disclosure": {
+        "base_probability": 0.7,
+        "policy_penalty": 0.3,
+        "stigma_penalty": 0.15,
+        "infrastructure_penalty": 0.0,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.0
+      },
+      "provider_willing": {
+        "base_probability": 0.85,
+        "policy_penalty": 0.05,
+        "stigma_penalty": 0.25,
+        "infrastructure_penalty": 0.0,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.1,
+        "ml_penalty": 0.1
+      },
+      "hiv_testing_adequate": {
+        "base_probability": 0.9,
+        "policy_penalty": 0.05,
+        "stigma_penalty": 0.0,
+        "infrastructure_penalty": 0.15,
+        "testing_penalty": 0.25,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.0
+      },
+      "first_injection": {
+        "base_probability": 0.75,
+        "policy_penalty": 0.1,
+        "stigma_penalty": 0.05,
+        "infrastructure_penalty": 0.15,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.0
+      },
+      "sustained_engagement": {
+        "base_probability": 0.7,
+        "policy_penalty": 0.2,
+        "stigma_penalty": 0.1,
+        "infrastructure_penalty": 0.1,
+        "testing_penalty": 0.0,
+        "research_penalty": 0.0,
+        "ml_penalty": 0.05
+      }
+    },
+    "msm": {
+      "awareness": 0.9,
+      "willingness": 0.85,
+      "healthcare_access": 0.8,
+      "disclosure": 0.75,
+      "provider_willing": 0.9,
+      "hiv_testing_adequate": 0.85,
+      "first_injection": 0.8,
+      "sustained_engagement": 0.75
+    }
+  }
+}
