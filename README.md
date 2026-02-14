@@ -12,6 +12,16 @@ Using an 8-step prevention cascade parameterized from published literature, we s
 
 **Keywords:** HIV prevention, people who inject drugs, structural barriers, Monte Carlo simulation, PrEP cascade, harm reduction, stochastic avoidance
 
+## Quickstart\
+\
+````bash\
+git clone https://github.com/Nyx-Dynamics/Prevention-Theorem.git\
+cd Prevention-Theorem\
+python -m venv .venv \&\& source .venv/bin/activate\
+pip install -r requirements.txt\
+python reproduce_all.py\
+```\
+
 ## Repository Structure
 
 ```
