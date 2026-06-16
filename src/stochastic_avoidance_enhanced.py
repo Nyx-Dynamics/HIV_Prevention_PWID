@@ -297,6 +297,30 @@ KEY_PARAMETERS = {
         distribution="uniform",
         source="UNSOURCED — flagged for AC",
     ),
+    "ssp_effectiveness": ParameterWithUncertainty(
+        name="SSP coverage effectiveness multiplier on outbreak probability",
+        point_estimate=0.4,
+        lower_bound=0.4,
+        upper_bound=0.4,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "oat_effectiveness": ParameterWithUncertainty(
+        name="OAT coverage effectiveness multiplier on outbreak probability",
+        point_estimate=0.3,
+        lower_bound=0.3,
+        upper_bound=0.3,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "prevalence_normalization": ParameterWithUncertainty(
+        name="HIV prevalence normalization baseline for seed-case multiplier",
+        point_estimate=0.10,
+        lower_bound=0.10,
+        upper_bound=0.10,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
 }
 
 
@@ -491,11 +515,11 @@ class EnhancedStochasticAvoidanceModel:
             density_multiplier = network_density / threshold
             
         # HIV prevalence effect (more seeds = higher outbreak risk)
-        prevalence_multiplier = 1 + (hiv_prevalence / 0.10)  # Normalized to 10%
-        
+        prevalence_multiplier = 1 + (hiv_prevalence / self.params["prevalence_normalization"].point_estimate)
+
         # Protective effects of interventions
-        ssp_protection = 1 - (ssp_coverage * 0.4)  # Up to 40% reduction
-        oat_protection = 1 - (oat_coverage * 0.3)  # Up to 30% reduction
+        ssp_protection = 1 - (ssp_coverage * self.params["ssp_effectiveness"].point_estimate)
+        oat_protection = 1 - (oat_coverage * self.params["oat_effectiveness"].point_estimate)
         
         p_outbreak = (
             baseline * 
