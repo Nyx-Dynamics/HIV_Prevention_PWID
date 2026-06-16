@@ -158,22 +158,30 @@ def step_1_core_simulation():
     return all_results, msm
 
 
-def step_2_stochastic_avoidance():
-    """Run enhanced stochastic avoidance model."""
+def step_2_stochastic_avoidance(cascade_completion=None):
+    """Run enhanced stochastic avoidance model.
+
+    cascade_completion: if provided (Option B coupling), scales effective network
+    density by (1 - cascade_completion) in simulate_trajectory. Pass None to run
+    uncoupled (backward-compatible).
+    """
     os.chdir(str(SRC))
     from stochastic_avoidance_enhanced import (
         EnhancedStochasticAvoidanceModel, SensitivityAnalyzer
     )
 
+    cc_label = f"cascade_completion={cascade_completion:.4f}" if cascade_completion is not None else "uncoupled"
+    print(f"    Running with {cc_label}")
+
     # National outbreak forecast
     model = EnhancedStochasticAvoidanceModel(region="national_average")
-    national = model.simulate_trajectory(n_simulations=1000)
+    national = model.simulate_trajectory(n_simulations=1000, cascade_completion=cascade_completion)
     print(f"    National 5yr outbreak prob: {national['summary'].get('p_outbreak_5yr', 'N/A')}")
 
     # Regional comparison
     for region in ["appalachia", "pacific_northwest", "northeast_urban"]:
         reg_model = EnhancedStochasticAvoidanceModel(region=region)
-        reg_results = reg_model.simulate_trajectory(n_simulations=500)
+        reg_results = reg_model.simulate_trajectory(n_simulations=500, cascade_completion=cascade_completion)
         print(f"    {region}: 5yr outbreak prob = {reg_results['summary'].get('p_outbreak_5yr', 'N/A')}")
 
     os.chdir(str(ROOT))
@@ -282,7 +290,19 @@ def main():
 
     # Run all steps
     sim_results = runner.run_step("1. Core Barrier Model Simulation", step_1_core_simulation)
-    stoch_results = runner.run_step("2. Stochastic Avoidance Model", step_2_stochastic_avoidance)
+
+    # Option B coupling: extract PWID cascade completion (Current Policy) to pass to Step 2
+    pwid_cc = None
+    if sim_results:
+        _all, _msm = sim_results
+        _current = next((r for r in _all if "Current" in r.get('scenario', '')), None)
+        if _current:
+            pwid_cc = _current['observed_cascade_completion_rate']
+
+    stoch_results = runner.run_step(
+        "2. Stochastic Avoidance Model",
+        lambda: step_2_stochastic_avoidance(cascade_completion=pwid_cc)
+    )
     sens_results = runner.run_step("3. Sensitivity Analysis (PSA + Barrier Removal)", step_3_sensitivity_analysis)
     v2_results = runner.run_step("4. V2 Model (Meth × Housing Interaction)", step_4_v2_model)
     runner.run_step("5. Hood et al. (2018) Parameter Comparison", step_5_hood_comparison)

@@ -487,15 +487,16 @@ class EnhancedStochasticAvoidanceModel:
         network_density: float,
         ssp_coverage: float = None,
         oat_coverage: float = None,
-        hiv_prevalence: float = None
+        hiv_prevalence: float = None,
+        cascade_completion: float = None,
     ) -> float:
         """
         Calculate annual probability of major outbreak.
-        
-        Based on:
-        - Network density (primary driver)
-        - Intervention coverage (protective)
-        - Existing HIV prevalence (seed cases)
+
+        Option B coupling: when cascade_completion is provided, the effective
+        network density is scaled by (1 - cascade_completion), so cascade failure
+        inflates the susceptible network and drives outbreak through the threshold
+        mechanism. cascade_completion=None uses the uncoupled path (backward-compatible).
         """
         if ssp_coverage is None:
             ssp_coverage = self.params["ssp_coverage"].point_estimate
@@ -503,32 +504,38 @@ class EnhancedStochasticAvoidanceModel:
             oat_coverage = self.params["oat_coverage"].point_estimate
         if hiv_prevalence is None:
             hiv_prevalence = self.profile.hiv_prevalence_pwid
-            
+
         baseline = self.params["baseline_outbreak_prob"].point_estimate
         threshold = self.params["critical_network_threshold"].point_estimate
-        
-        # Network density effect (exponential above threshold)
-        if network_density > threshold:
-            excess = network_density - threshold
-            density_multiplier = np.exp(self.params["outbreak_escalation_rate"].point_estimate * excess)
+        escalation = self.params["outbreak_escalation_rate"].point_estimate
+
+        # Option B: scale density by susceptible fraction
+        if cascade_completion is not None:
+            susceptible_fraction = 1.0 - cascade_completion
+            effective_density = network_density * susceptible_fraction
         else:
-            density_multiplier = network_density / threshold
-            
+            effective_density = network_density
+
+        if effective_density > threshold:
+            density_multiplier = np.exp(escalation * (effective_density - threshold))
+        else:
+            density_multiplier = effective_density / threshold
+
         # HIV prevalence effect (more seeds = higher outbreak risk)
         prevalence_multiplier = 1 + (hiv_prevalence / self.params["prevalence_normalization"].point_estimate)
 
         # Protective effects of interventions
         ssp_protection = 1 - (ssp_coverage * self.params["ssp_effectiveness"].point_estimate)
         oat_protection = 1 - (oat_coverage * self.params["oat_effectiveness"].point_estimate)
-        
+
         p_outbreak = (
-            baseline * 
-            density_multiplier * 
-            prevalence_multiplier * 
-            ssp_protection * 
+            baseline *
+            density_multiplier *
+            prevalence_multiplier *
+            ssp_protection *
             oat_protection
         )
-        
+
         return min(p_outbreak, 1.0)
     
     def simulate_trajectory(
@@ -536,7 +543,8 @@ class EnhancedStochasticAvoidanceModel:
         start_year: int = 2024,
         end_year: int = 2040,
         n_simulations: int = 1000,
-        include_uncertainty: bool = True
+        include_uncertainty: bool = True,
+        cascade_completion: float = None,
     ) -> Dict:
         """
         Simulate outbreak trajectories with uncertainty using vectorized operations.
@@ -581,13 +589,19 @@ class EnhancedStochasticAvoidanceModel:
         
         density = baseline_density[:, np.newaxis] + meth_effect + housing_effect + incarc_effect + sex_work
         density = np.minimum(density, 1.0)
-        
+
+        # Option B coupling: scale by susceptible fraction
+        if cascade_completion is not None:
+            effective_density = density * (1.0 - cascade_completion)
+        else:
+            effective_density = density
+
         # Outbreak probability
         # We need to vectorize calculate_outbreak_probability
         # Baseline probability
         baseline_prob = 0.03 # Hardcoded in original calculate_outbreak_probability
-        
-        density_multiplier = 1.0 + (density * 5.0)
+
+        density_multiplier = 1.0 + (effective_density * 5.0)
         
         prevalence_pwid = self.profile.hiv_prevalence_pwid
         prevalence_multiplier = 1.0 + (prevalence_pwid * 10.0)
