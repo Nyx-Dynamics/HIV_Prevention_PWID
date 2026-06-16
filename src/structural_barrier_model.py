@@ -432,14 +432,15 @@ class StructuralBarrierModel:
         pathogen_params: PathogenBiologyParams = None,
         testing_params: HIVTestingParams = None,
         architectural_params: ArchitecturalBarrierParams = None,
-        stochastic_params: StochasticAvoidanceParams = None
+        stochastic_params: StochasticAvoidanceParams = None,
+        cascade: List[CascadeStep] = None,
     ):
         self.pathogen = pathogen_params or PathogenBiologyParams()
         self.testing = testing_params or HIVTestingParams()
         self.architectural = architectural_params or ArchitecturalBarrierParams()
         self.stochastic = stochastic_params or StochasticAvoidanceParams()
-        
-        self.cascade = create_pwid_cascade()
+
+        self.cascade = cascade if cascade is not None else create_pwid_cascade()
         
     def calculate_step_probability(
         self,
