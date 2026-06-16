@@ -730,193 +730,11 @@ class StructuralBarrierModel:
 
 # =============================================================================
 # STOCHASTIC AVOIDANCE FAILURE MODEL
+# DEPRECATED — canonical implementation in stochastic_avoidance_enhanced.py
+# (EnhancedStochasticAvoidanceModel). This class is not called by any
+# reproduction-path code and has diverged from the canonical version
+# (missing the prevalence multiplier). Removed; all callers use the canonical.
 # =============================================================================
-
-class StochasticAvoidanceModel:
-    """
-    Models the probability of catastrophic failure of stochastic avoidance
-    as primary HIV prevention mechanism for PWID.
-    
-    Hypothesis: HIV prevention in PWID has relied on probability rather than
-    intervention. As network density increases (meth introduction, housing
-    instability, sex work bridges), stochastic avoidance will fail.
-    """
-    
-    def __init__(self, params: StochasticAvoidanceParams = None):
-        self.params = params or StochasticAvoidanceParams()
-        
-    def calculate_network_density(
-        self,
-        year: int,
-        base_year: int = 2024,
-        meth_prevalence: float = 0.143  # 2018 baseline
-    ) -> float:
-        """
-        Calculate effective network density given temporal dynamics.
-        
-        Network density increases with:
-        - Methamphetamine prevalence
-        - Housing instability (forced clustering)
-        - Sex work bridges
-        """
-        years_elapsed = year - base_year
-        
-        # Methamphetamine prevalence growth
-        current_meth = meth_prevalence * (
-            1 + self.params.meth_prevalence_trend_annual
-        ) ** years_elapsed
-        current_meth = min(current_meth, 0.5)  # Cap at 50%
-        
-        # Meth effect on network density
-        meth_density_effect = (
-            current_meth * self.params.meth_network_density_multiplier
-        )
-        
-        # Housing instability effect
-        housing_effect = self.params.housing_instability_rate * 0.5
-        
-        # Sex work bridging effect
-        bridge_effect = self.params.sex_work_network_bridge_prob * 0.3
-        
-        # Combined network density
-        density = (
-            self.params.baseline_network_density +
-            meth_density_effect +
-            housing_effect +
-            bridge_effect
-        )
-        
-        return min(density, 1.0)
-    
-    def calculate_annual_outbreak_probability(
-        self,
-        network_density: float,
-        ssp_coverage: float = 0.21,
-        oat_coverage: float = 0.08
-    ) -> float:
-        """
-        Calculate annual probability of major outbreak.
-        
-        Based on Des Jarlais et al. (2022) modeling and
-        outbreak data from Scott County, MA, WV.
-        """
-        # Baseline probability
-        p_outbreak = self.params.baseline_annual_outbreak_prob
-        
-        # Network density effect (exponential relationship)
-        if network_density > self.params.critical_network_threshold:
-            excess = network_density - self.params.critical_network_threshold
-            p_outbreak *= np.exp(3 * excess)  # Rapid increase above threshold
-        
-        # Protective effect of interventions
-        ssp_protection = 1 - (ssp_coverage * 0.4)  # SSP reduces by up to 40%
-        oat_protection = 1 - (oat_coverage * 0.3)  # OAT reduces by up to 30%
-        
-        p_outbreak *= ssp_protection * oat_protection
-        
-        return min(p_outbreak, 1.0)
-    
-    def simulate_time_to_outbreak(
-        self,
-        n_simulations: int = 10000,
-        max_years: int = 20,
-        outbreak_threshold_cases: int = 100  # "Catastrophic" threshold
-    ) -> Dict:
-        """
-        Simulate time until stochastic avoidance fails.
-        
-        Returns distribution of years until major outbreak.
-        """
-        outbreak_years = []
-        no_outbreak_count = 0
-        
-        for _ in range(n_simulations):
-            outbreak_occurred = False
-            
-            for year in range(2024, 2024 + max_years):
-                density = self.calculate_network_density(year)
-                p_outbreak = self.calculate_annual_outbreak_probability(density)
-                
-                if random.random() < p_outbreak:
-                    outbreak_years.append(year - 2024)
-                    outbreak_occurred = True
-                    break
-                    
-            if not outbreak_occurred:
-                no_outbreak_count += 1
-                
-        # Calculate statistics
-        if outbreak_years:
-            outbreak_years = np.array(outbreak_years)
-            results = {
-                "median_years_to_outbreak": np.median(outbreak_years),
-                "mean_years_to_outbreak": np.mean(outbreak_years),
-                "std_years": np.std(outbreak_years),
-                "p10_years": np.percentile(outbreak_years, 10),
-                "p25_years": np.percentile(outbreak_years, 25),
-                "p75_years": np.percentile(outbreak_years, 75),
-                "p90_years": np.percentile(outbreak_years, 90),
-                "probability_outbreak_5_years": np.mean(outbreak_years <= 5),
-                "probability_outbreak_10_years": np.mean(outbreak_years <= 10),
-                "probability_no_outbreak": no_outbreak_count / n_simulations,
-            }
-        else:
-            results = {
-                "median_years_to_outbreak": None,
-                "probability_no_outbreak": 1.0
-            }
-            
-        # Add annual trajectory
-        trajectory = []
-        for year_offset in range(max_years):
-            year = 2024 + year_offset
-            density = self.calculate_network_density(year)
-            p_outbreak = self.calculate_annual_outbreak_probability(density)
-            trajectory.append({
-                "year": year,
-                "network_density": density,
-                "annual_outbreak_probability": p_outbreak,
-                "cumulative_outbreak_probability": 1 - (
-                    (1 - p_outbreak) ** (year_offset + 1)
-                ) if year_offset > 0 else p_outbreak
-            })
-        results["trajectory"] = trajectory
-        
-        return results
-    
-    def run_scenario_analysis(
-        self,
-        scenarios: Dict[str, Dict]
-    ) -> Dict[str, Dict]:
-        """
-        Run stochastic avoidance analysis across multiple scenarios.
-        
-        scenarios should be dict like:
-        {
-            "current_policy": {"ssp_coverage": 0.21, "oat_coverage": 0.08},
-            "expanded_ssp": {"ssp_coverage": 0.60, "oat_coverage": 0.08},
-            ...
-        }
-        """
-        results = {}
-        
-        for name, params in scenarios.items():
-            # Create modified model for scenario
-            model = StochasticAvoidanceModel()
-            
-            # Override coverage parameters
-            ssp = params.get("ssp_coverage", 0.21)
-            oat = params.get("oat_coverage", 0.08)
-            
-            # Run simulation with modified outbreak calculation
-            scenario_results = model.simulate_time_to_outbreak()
-            scenario_results["scenario_name"] = name
-            scenario_results["ssp_coverage"] = ssp
-            scenario_results["oat_coverage"] = oat
-            
-            results[name] = scenario_results
-            
-        return results
 
 
 # =============================================================================
@@ -1144,31 +962,7 @@ def main():
             print(f"    {barrier.replace('_', ' ').title():<28}: {pct:>6.1f}%")
     
     print()
-    
-    # Run stochastic avoidance model
-    print("=" * 80)
-    print("STOCHASTIC AVOIDANCE FAILURE PREDICTION")
-    print("=" * 80)
-    print()
-    
-    sa_model = StochasticAvoidanceModel()
-    sa_results = sa_model.simulate_time_to_outbreak(n_simulations=10000)
-    
-    if sa_results["median_years_to_outbreak"]:
-        print(f"Median years to major outbreak: {sa_results['median_years_to_outbreak']:.1f}")
-        print(f"P(outbreak within 5 years):     {sa_results['probability_outbreak_5_years']*100:.1f}%")
-        print(f"P(outbreak within 10 years):    {sa_results['probability_outbreak_10_years']*100:.1f}%")
-    else:
-        print("Outbreak risk below detection threshold in simulation")
-    
-    print()
-    print("Network Density Trajectory (5-year projection):")
-    for t in sa_results["trajectory"][:5]:
-        print(f"  {t['year']}: density={t['network_density']:.3f}, "
-              f"p_outbreak={t['annual_outbreak_probability']:.3f}")
-    
-    print()
-    
+
     # Save results
     output = {
         "timestamp": datetime.now().isoformat(),
@@ -1181,10 +975,6 @@ def main():
         ],
         "msm_comparison": msm_results,
         "disparity_fold": disparity,
-        "stochastic_avoidance": {
-            k: v for k, v in sa_results.items() 
-            if k != "trajectory"
-        },
     }
     
     data_dir = "../data/csv_xlsx"
@@ -1310,16 +1100,14 @@ def main():
     print(f"   Difference is policy-determined, not pharmacology-determined")
     print()
     print("3. STOCHASTIC AVOIDANCE AS PRIMARY MECHANISM")
-    if sa_results["median_years_to_outbreak"]:
-        print(f"   Current 'prevention' relies on probability, not intervention")
-        print(f"   Median time to avoidance failure: {sa_results['median_years_to_outbreak']:.1f} years")
+    print("   Stochastic avoidance modeling in stochastic_avoidance_enhanced.py")
     print()
-    
-    return all_results, sa_results
+
+    return all_results
 
 
 if __name__ == "__main__":
-    results, sa_results = main()
+    results = main()
 
 # =============================================================================
 # BACKWARD COMPATIBILITY ALIASES
