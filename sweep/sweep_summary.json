@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-06-16T10:27:12.006696",
+  "n_samples": 2000,
+  "n_dims": 9,
+  "sweep_dimensions": {
+    "outbreak_escalation_rate": {
+      "lower": 1.0,
+      "upper": 5.0
+    },
+    "critical_network_threshold": {
+      "lower": 0.25,
+      "upper": 0.45
+    },
+    "baseline_outbreak_prob": {
+      "lower": 0.01,
+      "upper": 0.08
+    },
+    "baseline_network_density": {
+      "lower": 0.08,
+      "upper": 0.25
+    },
+    "meth_annual_growth_rate": {
+      "lower": 0.01,
+      "upper": 0.05
+    },
+    "housing_instability_rate": {
+      "lower": 0.55,
+      "upper": 0.8
+    },
+    "incarceration_annual_rate": {
+      "lower": 0.2,
+      "upper": 0.45
+    },
+    "ssp_coverage": {
+      "lower": 0.15,
+      "upper": 0.3
+    },
+    "oat_coverage": {
+      "lower": 0.04,
+      "upper": 0.15
+    }
+  },
+  "cascade_scenarios": {
+    "current_policy": 5e-05,
+    "decriminalization": 0.001,
+    "full_harm_reduction": 0.05,
+    "theoretical_max": 0.5
+  },
+  "scenario_summaries": {
+    "current_policy": {
+      "mean": 0.20258783631694927,
+      "std": 0.14400841430218939,
+      "p5": 0.04694695530197525,
+      "median": 0.16576522873824373,
+      "p95": 0.49524691556460343,
+      "frac_above_50pct": 0.0485
+    },
+    "decriminalization": {
+      "mean": 0.20211757736190436,
+      "std": 0.14355323796126584,
+      "p5": 0.046870872635900666,
+      "median": 0.16549171389923242,
+      "p95": 0.49401537460077827,
+      "frac_above_50pct": 0.047
+    },
+    "full_harm_reduction": {
+      "mean": 0.17935306529716347,
+      "std": 0.12161446282037311,
+      "p5": 0.04360081077742665,
+      "median": 0.14958716618184648,
+      "p95": 0.4263762501809888,
+      "frac_above_50pct": 0.023
+    },
+    "theoretical_max": {
+      "mean": 0.06484204021627162,
+      "std": 0.031546240932689755,
+      "p5": 0.019422987842729517,
+      "median": 0.06346612948670605,
+      "p95": 0.1198272276069096,
+      "frac_above_50pct": 0.0
+    }
+  },
+  "sobol": {
+    "first_order": {
+      "outbreak_escalation_rate": 0.3460291713804133,
+      "critical_network_threshold": 0.07828286822152696,
+      "baseline_outbreak_prob": 0.3214438694735831,
+      "baseline_network_density": 0.07474702512050087,
+      "meth_annual_growth_rate": 0.0,
+      "housing_instability_rate": 0.020807215129140556,
+      "incarceration_annual_rate": 0.00631394769373468,
+      "ssp_coverage": 0.0014899796509323829,
+      "oat_coverage": 0.0
+    },
+    "total_effect": {
+      "outbreak_escalation_rate": 0.4667545981513725,
+      "critical_network_threshold": 0.1316637164377369,
+      "baseline_outbreak_prob": 0.4477346896164131,
+      "baseline_network_density": 0.10726693416649219,
+      "meth_annual_growth_rate": 0.0,
+      "housing_instability_rate": 0.019856284099249926,
+      "incarceration_annual_rate": 0.010020598400606739,
+      "ssp_coverage": 0.0009928416998631479,
+      "oat_coverage": 0.00026756111186547726
+    }
+  },
+  "escalation_robustness": {
+    "p_outbreak_by_escalation_rate": {
+      "1.0": 0.059793,
+      "1.21": 0.064119,
+      "1.42": 0.068756,
+      "1.63": 0.07373,
+      "1.84": 0.079063,
+      "2.05": 0.084782,
+      "2.26": 0.090914,
+      "2.47": 0.097491,
+      "2.68": 0.104543,
+      "2.89": 0.112104,
+      "3.11": 0.120213,
+      "3.32": 0.128909,
+      "3.53": 0.138233,
+      "3.74": 0.148232,
+      "3.95": 0.158954,
+      "4.16": 0.170452,
+      "4.37": 0.182782,
+      "4.58": 0.196003,
+      "4.79": 0.21018,
+      "5.0": 0.225383
+    },
+    "n_rates_above_50pct": 0,
+    "min_rate_exceeding_50pct": null,
+    "conclusion_robust_across_full_range": false,
+    "conclusion_robust_at_lower_half": false
+  }
+}

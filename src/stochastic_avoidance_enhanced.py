@@ -180,7 +180,7 @@ KEY_PARAMETERS = {
         lower_bound=0.25,
         upper_bound=0.45,
         distribution="uniform",
-        source="Theoretical/modeling"
+        source="Theoretical/modeling — AC-approved range [0.25,0.45] for sensitivity sweep",
     ),
     
     # Structural parameters
@@ -260,10 +260,10 @@ KEY_PARAMETERS = {
     "outbreak_escalation_rate": ParameterWithUncertainty(
         name="Outbreak escalation rate above network threshold",
         point_estimate=3.0,
-        lower_bound=3.0,
-        upper_bound=3.0,
+        lower_bound=1.0,
+        upper_bound=5.0,
         distribution="uniform",
-        source="UNSOURCED — flagged for AC",
+        source="AC-approved range [1,5] for sensitivity sweep — point estimate unsourced, flagged for AC",
     ),
     "meth_density_weight": ParameterWithUncertainty(
         name="Meth prevalence contribution to network density",
