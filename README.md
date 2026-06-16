@@ -16,8 +16,8 @@ Using an 8-step prevention cascade parameterized from published literature, we s
 
 ````bash
 ## Quickstart
-git clone https://github.com/Nyx-Dynamics/Prevention-Theorem.git\
-cd Prevention-Theorem\
+git clone https://github.com/Nyx-Dynamics/HIV_Prevention_PWID.git\
+cd HIV_Prevention_PWID\
 python -m venv .venv \&\& source .venv/bin/activate\
 pip install -r requirements.txt\
 python reproduce_all.py\
