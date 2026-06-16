@@ -252,6 +252,51 @@ KEY_PARAMETERS = {
         distribution="beta",
         source="Muncan et al. 2020"
     ),
+
+    # Outbreak/network density coefficients — promoted from inline literals.
+    # Bounds are degenerate placeholders (lower=upper=point_estimate) so behavior
+    # is identical to the original hardcoded values. AC must set real bounds and
+    # source before enrolling these in sensitivity sweeps.
+    "outbreak_escalation_rate": ParameterWithUncertainty(
+        name="Outbreak escalation rate above network threshold",
+        point_estimate=3.0,
+        lower_bound=3.0,
+        upper_bound=3.0,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "meth_density_weight": ParameterWithUncertainty(
+        name="Meth prevalence contribution to network density",
+        point_estimate=0.5,
+        lower_bound=0.5,
+        upper_bound=0.5,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "housing_density_weight": ParameterWithUncertainty(
+        name="Housing instability contribution to network density",
+        point_estimate=0.3,
+        lower_bound=0.3,
+        upper_bound=0.3,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "incarceration_density_weight": ParameterWithUncertainty(
+        name="Incarceration rate contribution to network density",
+        point_estimate=0.2,
+        lower_bound=0.2,
+        upper_bound=0.2,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
+    "sexwork_bridge_weight": ParameterWithUncertainty(
+        name="Sex work bridging contribution to network density",
+        point_estimate=0.15,
+        lower_bound=0.15,
+        upper_bound=0.15,
+        distribution="uniform",
+        source="UNSOURCED — flagged for AC",
+    ),
 }
 
 
@@ -397,17 +442,17 @@ class EnhancedStochasticAvoidanceModel:
         # - Hypersexuality (more partners)
         # - Injection frequency (more sharing events)
         # - Network bridging (MSM-PWID connections)
-        meth_effect = meth_prevalence * meth_multiplier * 0.5
-        
+        meth_effect = meth_prevalence * meth_multiplier * self.params["meth_density_weight"].point_estimate
+
         # Housing effect: homeless PWID cluster in specific locations
-        housing_effect = housing_instability * 0.3
-        
+        housing_effect = housing_instability * self.params["housing_density_weight"].point_estimate
+
         # Incarceration effect: post-release clustering in specific neighborhoods
         # and sex-segregated housing
-        incarceration_effect = incarceration_rate * 0.2
-        
+        incarceration_effect = incarceration_rate * self.params["incarceration_density_weight"].point_estimate
+
         # Sex work bridging (correlated with meth use)
-        sex_work_bridge = meth_prevalence * 0.15
+        sex_work_bridge = meth_prevalence * self.params["sexwork_bridge_weight"].point_estimate
         
         total_density = baseline + meth_effect + housing_effect + incarceration_effect + sex_work_bridge
         
@@ -441,7 +486,7 @@ class EnhancedStochasticAvoidanceModel:
         # Network density effect (exponential above threshold)
         if network_density > threshold:
             excess = network_density - threshold
-            density_multiplier = np.exp(3 * excess)
+            density_multiplier = np.exp(self.params["outbreak_escalation_rate"].point_estimate * excess)
         else:
             density_multiplier = network_density / threshold
             
