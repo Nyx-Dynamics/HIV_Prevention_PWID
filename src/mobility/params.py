@@ -19,6 +19,10 @@ from stochastic_avoidance_enhanced import ParameterWithUncertainty
 # ─────────────────────────────────────────────────────────────────────────────
 PLACEHOLDER = "PLACEHOLDER — no defensible source; AC must approve before use in results"
 
+# Hard per-act β cap: β_acute = min(β_chronic * acute_multiplier, BETA_CAP)
+# Not a ParameterWithUncertainty — a sanity constraint, not a free parameter.
+BETA_CAP = 0.5
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # LAYER 1 — Walk / Traversement-potential distribution
@@ -57,7 +61,7 @@ MOBILITY_PARAMS = {
         lower_bound=1.0,
         upper_bound=5.0,
         distribution="lognormal",
-        source="Ober AJ et al. Int J Drug Policy 25(3):308 (2014). DOI 10.1016/j.drugpo.2013.11.008. "
+        source="Cooper HLF, Tempalski B. Integrating place into research on drug use, drug users' health, and drug policy. Int J Drug Policy 25(3) (2014). DOI 10.1016/j.drugpo.2013.11.008. [Author verified against DOI; original attribution 'Ober 2014' was incorrect — corrected per HANDOFF 4.] "
                "N=1084, San Francisco. GAP: self-reported anchor distance ≠ GPS r_g; "
                "single-city urban mean; treat scale as major sensitivity axis.",
     ),
@@ -118,7 +122,7 @@ MOBILITY_PARAMS = {
         lower_bound=0.05,
         upper_bound=0.20,
         distribution="beta",
-        source="Ober AJ et al. Int J Drug Policy 25(3):308 (2014). DOI 10.1016/j.drugpo.2013.11.008.",
+        source="Cooper HLF, Tempalski B. Integrating place into research on drug use, drug users' health, and drug policy. Int J Drug Policy 25(3) (2014). DOI 10.1016/j.drugpo.2013.11.008. [Author verified against DOI; original attribution 'Ober 2014' was incorrect — corrected per HANDOFF 4.]",
     ),
 
     # Drug market attractor weight — PLACEHOLDER, no clean dataset
@@ -163,23 +167,36 @@ MOBILITY_PARAMS = {
     ),
 
     # kappa_share: calibration scalar converting 12-mo prevalence → per-event probability
-    # DEFAULT = 1.0 (conservative ceiling — maximum edges)
-    # TODO: calibrate from daily injection frequency × sharing fraction × co-location rate
+    # DEFAULT = 1.0 (conservative ceiling — maximum edges in run_generator)
+    # run_generator uses 0.01 (approximate calibration anchoring <k>≈2.6)
+    # TRUE DERIVATION: injection_freq_per_day × shared_fraction_per_partner × co-location_rate
+    # shared_fraction_per_partner is defined above — change there, not here, so T and
+    # kappa_share cannot drift apart.
+    # ANCHOR WARNING: at kappa_share=0.01, <k> is anchored to ~2.6 (target). This means
+    # <k> is NOT a held-out validation check when kappa_share is set by anchoring.
     "kappa_share": ParameterWithUncertainty(
         name="Sharing-probability calibration scalar (per-event / 12-mo-prevalence)",
         point_estimate=1.0,
         lower_bound=0.01,
         upper_bound=1.0,
         distribution="uniform",
-        source=PLACEHOLDER + " — default=1.0 is conservative ceiling (maximum edges). "
-               "TODO: calibrate from daily injection frequency × fraction shared × "
-               "mean network co-location rate before use in threshold or R₀ calculations.",
+        source=PLACEHOLDER + " — 1.0 is conservative ceiling. run_generator default=0.01 "
+               "anchors <k>≈2.6; this makes <k> an anchor, not a held-out check. "
+               "Derive from: injection_freq_per_day × shared_fraction_per_partner / "
+               "mean_co-locations_per_agent. shared_fraction_per_partner defined above.",
     ),
 
-    # HIV per-shared-injection transmissibility β
+    # ─────────────────────────────────────────────────────────────────────
+    # Per-edge transmissibility T (duration-integrated, acute-weighted)
+    # T = 1 − (1−β_acute)^m_acute × (1−β_chronic)^m_chronic
+    # where m = injection_freq_per_day × shared_fraction_per_partner × duration_days
+    # ─────────────────────────────────────────────────────────────────────
+
+    # Per-shared-injection HIV transmissibility β (chronic phase)
     # NOTE: Rolls 1–3% is HCV, not HIV — do not use for HIV β
-    "hiv_transmissibility": ParameterWithUncertainty(
-        name="HIV per-shared-injection transmissibility β",
+    # Renamed from hiv_transmissibility for clarity
+    "beta_chronic_per_shared_injection": ParameterWithUncertainty(
+        name="HIV per-shared-injection transmissibility β (chronic phase)",
         point_estimate=0.008,
         lower_bound=0.006,
         upper_bound=0.024,
@@ -187,6 +204,73 @@ MOBILITY_PARAMS = {
         source="Baggaley RF et al. meta-analysis (per-act transmission probability). "
                "NOTE: Rolls et al. 2011 1–3% is HCV — do NOT use for HIV β.",
     ),
+
+    # Acute-phase multiplier on per-act β
+    # Acute viremia elevates β by ~8–26×; IDU outbreaks are acute-phase driven
+    "acute_multiplier": ParameterWithUncertainty(
+        name="Acute-phase transmissibility multiplier on β_chronic",
+        point_estimate=15.0,
+        lower_bound=8.0,
+        upper_bound=26.0,
+        distribution="lognormal",
+        source="Corner 2 acute kinetics; Hollingsworth TQ et al. Nat Med 2008; "
+               "Wawer MJ et al. J Infect Dis 2005; Pinkerton SD. AIDS 2007. "
+               "Acute viremia elevation factor.",
+    ),
+
+    # Acute-phase duration (Fiebig staging)
+    "acute_duration_days": ParameterWithUncertainty(
+        name="Acute HIV infection duration (days)",
+        point_estimate=77.0,
+        lower_bound=49.0,
+        upper_bound=112.0,
+        distribution="normal",
+        source="Corner 2 / Fiebig staging; Hollingsworth TQ et al. Nat Med 2008. "
+               "~7–16 weeks.",
+    ),
+
+    # Injection frequency (acts per day)
+    # Wide variance — flag for sensitivity
+    "injection_freq_per_day": ParameterWithUncertainty(
+        name="Injection frequency (injections per day per PWID)",
+        point_estimate=3.0,
+        lower_bound=1.0,
+        upper_bound=6.0,
+        distribution="lognormal",
+        source="Burnett JC et al. MMWR 67(1) (2018). DOI 10.15585/mmwr.mm6701a5; "
+               "literature review. Wide variance — treat as sensitivity axis.",
+    ),
+
+    # Shared fraction per partner (fraction of injections shared with a given partner)
+    # DEFINED ONCE — referenced by both T integration and kappa_share.
+    # If these drift apart, the T and the edge formation probability become inconsistent.
+    "shared_fraction_per_partner": ParameterWithUncertainty(
+        name="Fraction of injections shared with a given network partner",
+        point_estimate=0.15,
+        lower_bound=0.05,
+        upper_bound=0.30,
+        distribution="beta",
+        source=PLACEHOLDER + " — derived from NHBS syringe sharing prevalence (0.27 over 12 months) "
+               "adjusted for injection frequency and partnership count. Unit-tricky: this is per-partner, "
+               "not per-injection-event. TODO: derive from injection freq × sharing prevalence / mean degree. "
+               "Shared with kappa_share — do not change one without the other.",
+    ),
+
+    # Chronic-phase transmission window (partnership duration / time-to-treatment)
+    # Acute phase dominates; this is secondary
+    "chronic_window_days": ParameterWithUncertainty(
+        name="Chronic HIV partnership transmission window (days)",
+        point_estimate=180.0,
+        lower_bound=60.0,
+        upper_bound=365.0,
+        distribution="lognormal",
+        source=PLACEHOLDER + " — bounded by partnership duration and time-to-diagnosis/treatment. "
+               "Acute phase dominates IDU outbreak dynamics; this is secondary.",
+    ),
+
+    # Per-act β cap (sanity constraint: β_acute ≤ BETA_CAP per act)
+    # Not a ParameterWithUncertainty — a hard constraint
+    # BETA_CAP = 0.5 (accessed directly, not via .point_estimate)
 
     # Seed HIV prevalence among PWID
     "seed_hiv_prevalence": ParameterWithUncertainty(
