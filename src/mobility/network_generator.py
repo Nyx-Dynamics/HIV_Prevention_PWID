@@ -338,6 +338,126 @@ def sharing_edges(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# PERSISTENT DYADS (Task 1–3 of Handoff 6)
+# Distinct from sharing_edges: accumulated co-location count drives dyad
+# formation; node-level intensity is the structural fix for clustering.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def colocation_counter(
+    trajectories: List[Trajectory],
+    space_bin: float = 0.5,
+    time_bin: int = 5,
+) -> Dict[Tuple[int, int], int]:
+    """
+    Count co-location events per unique agent pair.
+
+    Returns {(a, b): n_colocations} with a < b (canonical order).
+    Distinct from colocations() which returns a flat list; this accumulates.
+    """
+    from collections import Counter
+    counter: Dict[Tuple[int, int], int] = {}
+
+    bin_map: Dict[Tuple[int, int, int], List[int]] = {}
+    for traj in trajectories:
+        for x, y, step in traj.visits:
+            sx = int(np.floor(x / space_bin))
+            sy = int(np.floor(y / space_bin))
+            tb = step // time_bin
+            key = (sx, sy, tb)
+            if key not in bin_map:
+                bin_map[key] = []
+            bin_map[key].append(traj.agent_id)
+
+    for agents_in_bin in bin_map.values():
+        unique = list(set(agents_in_bin))
+        for i in range(len(unique)):
+            for j in range(i + 1, len(unique)):
+                pair = (min(unique[i], unique[j]), max(unique[i], unique[j]))
+                counter[pair] = counter.get(pair, 0) + 1
+
+    return counter
+
+
+def assign_node_sharing_intensity(
+    n_agents: int,
+    sharing_prevalence: float,
+    rng: np.random.Generator,
+    shape: float = 0.5,
+    scale: float = 0.05,
+) -> np.ndarray:
+    """
+    Task 2: Assign each node a sharing intensity from a mixture distribution.
+
+    Two-component mixture (not a global constant — node-level heterogeneity
+    creates correlated edges and thereby closes triangles):
+      - With probability (1 − sharing_prevalence): zero intensity (non-sharer)
+      - With probability sharing_prevalence: Gamma(shape, scale) intensity
+
+    CALIBRATION:
+      - sharing_prevalence = 0.27 from NHBS any-sharing 12-mo prevalence
+        (Burnett JC et al. MMWR 67(1) 2018. DOI 10.15585/mmwr.mm6701a5).
+      - Within-sharer intensity (frequency given any sharing): NHBS reports
+        proportions (every time / >half / <half) but exact breakdown is
+        not pre-loaded. Gamma(shape=0.5, scale=0.05) is a heavy-tailed
+        PLACEHOLDER: mean = 0.025 per injection per partner, variance high.
+        PENDING AC SIGN-OFF on intensity scale.
+
+    Node-level (not per-edge) is the structural fix: high-intensity nodes
+    form edges with many venue co-visitors → triangles → clustering.
+    """
+    is_sharer = rng.random(n_agents) < sharing_prevalence
+    intensities = rng.gamma(shape=shape, scale=scale, size=n_agents)
+    return intensities * is_sharer.astype(float)
+
+
+def form_dyads(
+    coloc_counts: Dict[Tuple[int, int], int],
+    node_intensities: np.ndarray,
+    kappa_dyad: float = 2.0,
+    rng: np.random.Generator = None,
+) -> Tuple[List[Tuple[int, int]], Dict[Tuple[int, int], float]]:
+    """
+    Task 1+2: Form persistent sharing dyads from accumulated co-locations
+    and node-level sharing intensities.
+
+    A dyad forms when both partners have non-zero intensity AND the
+    accumulated co-location × geometric-mean-intensity exceeds a threshold.
+
+    P(dyad | n_coloc, s_i, s_j) = 1 − exp(−kappa_dyad × n_coloc × √(s_i × s_j))
+
+    Distinct from sharing_edges():
+    - sharing_edges: independent Bernoulli per co-location event, global p
+    - form_dyads: accumulated counts, node-level intensity, no global p
+
+    Returns (edge_list, edge_intensity_dict) where edge_intensity is the
+    geometric mean of the two nodes' propensities — used for per-edge T.
+
+    kappa_dyad : calibration scalar; default 2.0 tuned to produce ⟨k⟩≈2.6
+    with typical co-location counts and NHBS intensity parameters.
+    ANCHOR WARNING: kappa_dyad is effectively the calibration knob for ⟨k⟩.
+    """
+    if rng is None:
+        rng = np.random.default_rng(42)
+
+    edges: List[Tuple[int, int]] = []
+    edge_intensities: Dict[Tuple[int, int], float] = {}
+
+    for (a, b), n_coloc in coloc_counts.items():
+        si = node_intensities[a]
+        sj = node_intensities[b]
+        if si <= 0 or sj <= 0:
+            continue  # at least one non-sharer — no dyad
+        dyad_intensity = float(np.sqrt(si * sj))  # geometric mean
+        p_form = 1.0 - np.exp(-kappa_dyad * n_coloc * dyad_intensity)
+        if rng.random() < p_form:
+            edge = (min(a, b), max(a, b))
+            edges.append(edge)
+            edge_intensities[edge] = dyad_intensity
+
+    return edges, edge_intensities
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # STEP 5 — Contact graph
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -462,6 +582,77 @@ def run_generator(
     graph, stats = build_contact_graph(edges, n_agents=n_agents)
 
     return graph, stats, agents
+
+
+def run_generator_dyads(
+    n_agents: int = 300,
+    n_steps: int = 80,
+    rg_scale_km: float = 2.4,
+    rg_growth_exponent: float = 1.65,
+    seed_hiv_prevalence: float = 0.07,
+    epr_rho: float = 0.60,
+    epr_gamma: float = 0.21,
+    jump_length_exponent: float = 0.60,
+    sharing_prevalence: float = 0.27,
+    intensity_shape: float = 0.5,
+    intensity_scale: float = 0.05,
+    kappa_dyad: float = 2.0,
+    space_bin: float = 0.5,
+    time_bin: int = 5,
+    venues: Optional[List[Venue]] = None,
+    venue_return_boost: float = 5.0,
+    seed: int = 42,
+) -> Tuple[nx.Graph, NetworkStats, List[Agent], np.ndarray, Dict]:
+    """
+    Dyad-based pipeline (Handoff 6). Replaces the per-co-location Bernoulli
+    with persistent dyad formation driven by accumulated co-location counts and
+    node-level heterogeneous sharing intensity.
+
+    Returns (graph, stats, agents, node_intensities, edge_intensity_dict).
+    node_intensities[i] = agent i's sharing propensity (0 = non-sharer).
+    edge_intensity_dict[(a,b)] = geometric-mean intensity for that dyad.
+
+    kappa_dyad is the calibration knob for ⟨k⟩ (analogous to kappa_share).
+    Calibrated default 2.0 gives ⟨k⟩ ≈ 2–3 for typical inputs.
+    """
+    rng = np.random.default_rng(seed)
+
+    if venues is None:
+        venues = _synthetic_venue_layer(rg_scale_km, rng)
+
+    agents = sample_traversement_potential(
+        n=n_agents,
+        rg_scale_km=rg_scale_km,
+        rg_growth_exponent=rg_growth_exponent,
+        seed_hiv_prevalence=seed_hiv_prevalence,
+        rng=rng,
+    )
+
+    trajectories = generate_walks(
+        agents=agents,
+        venues=venues,
+        n_steps=n_steps,
+        epr_rho=epr_rho,
+        epr_gamma=epr_gamma,
+        jump_length_exponent=jump_length_exponent,
+        rng=rng,
+        venue_return_boost=venue_return_boost,
+    )
+
+    coloc_counts = colocation_counter(trajectories, space_bin=space_bin, time_bin=time_bin)
+
+    node_intensities = assign_node_sharing_intensity(
+        n_agents=n_agents,
+        sharing_prevalence=sharing_prevalence,
+        rng=rng,
+        shape=intensity_shape,
+        scale=intensity_scale,
+    )
+
+    edges, edge_intensities = form_dyads(coloc_counts, node_intensities, kappa_dyad, rng)
+    graph, stats = build_contact_graph(edges, n_agents=n_agents)
+
+    return graph, stats, agents, node_intensities, edge_intensities
 
 
 def _synthetic_venue_layer(rg_scale_km: float, rng: np.random.Generator) -> List[Venue]:

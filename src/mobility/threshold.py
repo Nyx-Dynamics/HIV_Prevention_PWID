@@ -136,6 +136,49 @@ def compute_per_edge_T(
     return T
 
 
+def compute_per_edge_T_from_dyad_intensities(
+    edge_intensity_dict: Dict,
+    params: dict = None,
+    rng: np.random.Generator = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Task 3: Compute per-edge T from dyad intensities.
+
+    For each edge (a, b) with dyad_intensity intensity_ij, T_ij integrates
+    β over shared injections:
+        m_acute_ij = injection_freq × intensity_ij × acute_duration_days
+        T_ij = 1 − (1−β_acute)^m_acute_ij × (1−β_chronic)^m_chronic_ij
+
+    Returns (T_array, intensities_array) in the same order as edge_intensity_dict.
+
+    T is now heterogeneous across edges and positively correlated with node
+    propensity (high-propensity hubs have high-T edges → underestimates of
+    R₀ from mean T assumption; the actual R₀ is higher due to k-T correlation).
+    """
+    if params is None:
+        params = MOBILITY_PARAMS
+    if rng is None:
+        rng = np.random.default_rng(42)
+    if not edge_intensity_dict:
+        return np.array([]), np.array([])
+
+    beta_c = params["beta_chronic_per_shared_injection"].point_estimate
+    mult = params["acute_multiplier"].point_estimate
+    acute_dur = params["acute_duration_days"].point_estimate
+    inj_freq = params["injection_freq_per_day"].point_estimate
+    chronic_win = params["chronic_window_days"].point_estimate
+
+    beta_acute = min(beta_c * mult, BETA_CAP)
+
+    intensities = np.array(list(edge_intensity_dict.values()))
+    m_acute = inj_freq * intensities * acute_dur
+    m_chronic = inj_freq * intensities * chronic_win
+
+    T = 1.0 - (1.0 - beta_acute) ** m_acute * (1.0 - beta_c) ** m_chronic
+    T = np.clip(T, 0.0, 1.0)
+    return T, intensities
+
+
 def saturation_diagnostic(params: dict = None) -> Dict:
     """
     Task 1: Report the shared_fraction at which T crosses 0.95 (saturation).
