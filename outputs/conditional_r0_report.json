@@ -1,0 +1,203 @@
+{
+  "seed": 42,
+  "venue_return_boost": 5.0,
+  "saturation_diagnostic": {
+    "crossover_shared_fraction": 0.0884561004068517,
+    "current_shared_fraction": 0.001,
+    "current_T_point_estimate": 0.033299818283321625,
+    "is_saturated": false,
+    "saturation_note": "T saturates (>0.95) at shared_fraction \u2265 0.0885. Current value 0.0010 is BELOW the saturation point (T=0.0333). Default placeholder 0.15 was past saturation; calibrated 0.001 is well below it."
+  },
+  "proxies": [
+    {
+      "proxy": "ssp_only",
+      "description": "CANDIDATE A \u2014 SSP-only: Only SSP/SEP venues as attractors. The only defensible, source-able attractor layer (NASEN-style). No drug market proxy. Represents minimum venue-anchoring assumption.",
+      "network_stats": {
+        "mean_degree": 4.26,
+        "k2_moment": 23.453333333333333,
+        "dispersion": 1.2923655653272794,
+        "clustering": 0.015656898656898656,
+        "giant_component_fraction": 0.9733333333333334,
+        "mean_path_length": 3.997952266629007,
+        "n_edges": 639
+      },
+      "tau_c": 0.2219520666898228,
+      "r0_conditional": {
+        "tau_c": 0.2219520666898228,
+        "decomposed": {
+          "mean": 0.3346335050206186,
+          "median": 0.14289069763556161,
+          "p5": 0.01546451544234878,
+          "p25": 0.05718622269120749,
+          "p75": 0.33943540162292474,
+          "p95": 1.411613328704481,
+          "p_r0_gt_1": 0.083,
+          "straddles_1": true,
+          "p_r0_gt1": 0.083
+        },
+        "T_edge": {
+          "mean": 1.5697448288527518,
+          "median": 1.4515180765060167,
+          "p5": 0.2566667651252594,
+          "p25": 0.8149377063654145,
+          "p75": 2.230191427140594,
+          "p95": 3.292940396400956,
+          "p_r0_gt_1": 0.674,
+          "straddles_1": true,
+          "p_r0_gt1": 0.674
+        }
+      }
+    },
+    {
+      "proxy": "ssp_diffuse_market",
+      "description": "CANDIDATE B \u2014 SSP + diffuse market field: SSP venues plus synthetic drug market venues spread across the activity space at moderate density. ASSUMPTION: markets are distributed (no single hotspot). SOURCE: PLACEHOLDER \u2014 proxy only. AC must approve before use in results.",
+      "network_stats": {
+        "mean_degree": 3.92,
+        "k2_moment": 20.24,
+        "dispersion": 1.3171595168679717,
+        "clustering": 0.008264309764309764,
+        "giant_component_fraction": 0.9566666666666667,
+        "mean_path_length": 4.139762676348043,
+        "n_edges": 588
+      },
+      "tau_c": 0.24019607843137253,
+      "r0_conditional": {
+        "tau_c": 0.24019607843137253,
+        "decomposed": {
+          "mean": 0.31599628858111756,
+          "median": 0.12748368367628748,
+          "p5": 0.015691405157139546,
+          "p25": 0.05413440902492556,
+          "p75": 0.353464499609616,
+          "p95": 1.2378670966695462,
+          "p_r0_gt_1": 0.076,
+          "straddles_1": true,
+          "p_r0_gt1": 0.076
+        },
+        "T_edge": {
+          "mean": 1.5314202128267784,
+          "median": 1.4195938805688009,
+          "p5": 0.22364679111160296,
+          "p25": 0.8138667681658784,
+          "p75": 2.2005799572573093,
+          "p95": 3.1187823229594533,
+          "p_r0_gt_1": 0.668,
+          "straddles_1": true,
+          "p_r0_gt1": 0.668
+        }
+      }
+    },
+    {
+      "proxy": "ssp_concentrated_hotspot",
+      "description": "CANDIDATE C \u2014 SSP + concentrated hotspot clusters: SSP venues plus 2 tightly-clustered market/hotspot concentrations. ASSUMPTION: a small number of fixed high-activity sites dominate. Models 'shooting gallery' or known open-air market concentration. SOURCE: PLACEHOLDER \u2014 proxy only. AC must approve before use in results.",
+      "network_stats": {
+        "mean_degree": 7.406666666666666,
+        "k2_moment": 67.69333333333333,
+        "dispersion": 1.2339577792162655,
+        "clustering": 0.0366193387222799,
+        "giant_component_fraction": 0.99,
+        "mean_path_length": 3.0822185822185824,
+        "n_edges": 1111
+      },
+      "tau_c": 0.12285745880791774,
+      "r0_conditional": {
+        "tau_c": 0.12285745880791774,
+        "decomposed": {
+          "mean": 0.6398502601879045,
+          "median": 0.2826609891250118,
+          "p5": 0.029362524066461244,
+          "p25": 0.11499699050817633,
+          "p75": 0.7543084085645748,
+          "p95": 2.6381030250197903,
+          "p_r0_gt_1": 0.18,
+          "straddles_1": true,
+          "p_r0_gt1": 0.18
+        },
+        "T_edge": {
+          "mean": 2.788008192810723,
+          "median": 2.510638817681449,
+          "p5": 0.3646990552672807,
+          "p25": 1.408275403254459,
+          "p75": 3.995299017558492,
+          "p95": 5.941499084582485,
+          "p_r0_gt_1": 0.828,
+          "straddles_1": true,
+          "p_r0_gt1": 0.828
+        }
+      }
+    }
+  ],
+  "sensitivity_ranking_top10": [
+    {
+      "parameter": "chronic_window_days",
+      "r0_at_low": 1.5548,
+      "r0_at_high": 1.3303,
+      "delta_r0": 0.2245,
+      "source_note": "PLACEHOLDER \u2014 no defensible source; AC must approve before u"
+    },
+    {
+      "parameter": "ssp_utilization_rate",
+      "r0_at_low": 1.5194,
+      "r0_at_high": 1.2959,
+      "delta_r0": 0.2235,
+      "source_note": "Burnett JC et al. MMWR 67(1):23 (2018). DOI 10.15585/mmwr.mm"
+    },
+    {
+      "parameter": "acute_multiplier",
+      "r0_at_low": 1.3794,
+      "r0_at_high": 1.6004,
+      "delta_r0": 0.2209,
+      "source_note": "Corner 2 acute kinetics; Hollingsworth TQ et al. Nat Med 200"
+    },
+    {
+      "parameter": "ssp_route_overlap",
+      "r0_at_low": 1.3471,
+      "r0_at_high": 1.567,
+      "delta_r0": 0.2198,
+      "source_note": "Cooper HLF, Tempalski B. Integrating place into research on "
+    },
+    {
+      "parameter": "jump_length_exponent",
+      "r0_at_low": 1.3448,
+      "r0_at_high": 1.5519,
+      "delta_r0": 0.2071,
+      "source_note": "Gonz\u00e1lez, Hidalgo & Barab\u00e1si. Nature 453:779 (2008). DOI 10."
+    },
+    {
+      "parameter": "seed_hiv_prevalence",
+      "r0_at_low": 1.3589,
+      "r0_at_high": 1.5375,
+      "delta_r0": 0.1786,
+      "source_note": "Burnett JC et al. MMWR 67(1):23 (2018). DOI 10.15585/mmwr.mm"
+    },
+    {
+      "parameter": "sharing_prob_syringe",
+      "r0_at_low": 1.2995,
+      "r0_at_high": 1.4771,
+      "delta_r0": 0.1775,
+      "source_note": "Burnett JC et al. MMWR 67(1):23 (2018). DOI 10.15585/mmwr.mm"
+    },
+    {
+      "parameter": "n_steps",
+      "r0_at_low": 1.67,
+      "r0_at_high": 1.4967,
+      "delta_r0": 0.1733,
+      "source_note": "PLACEHOLDER \u2014 no defensible source; AC must approve before u"
+    },
+    {
+      "parameter": "acute_duration_days",
+      "r0_at_low": 1.3657,
+      "r0_at_high": 1.5251,
+      "delta_r0": 0.1594,
+      "source_note": "Corner 2 / Fiebig staging; Hollingsworth TQ et al. Nat Med 2"
+    },
+    {
+      "parameter": "drug_market_attractor_weight",
+      "r0_at_low": 1.4593,
+      "r0_at_high": 1.5826,
+      "delta_r0": 0.1233,
+      "source_note": "PLACEHOLDER \u2014 no defensible source; AC must approve before u"
+    }
+  ],
+  "disclaimer": "ALL RESULTS ARE CONDITIONAL ON THE ATTRACTOR PROXY. No proxy is enshrined as final. Drug-market proxy = AC's judgment call. kappa_share and shared_fraction_per_partner PENDING AC SIGN-OFF. Outbreak path and critical_network_threshold=0.35 are UNTOUCHED."
+}

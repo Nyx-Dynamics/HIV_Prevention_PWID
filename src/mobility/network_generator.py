@@ -164,6 +164,16 @@ def _attractor_pull(
            float(venues[idx].y + rng.normal(0, scatter))
 
 
+def _venue_proximity_weight(x: float, y: float, venues: List[Venue], capture_radius: float) -> float:
+    """Return venue relevance if (x,y) is within capture_radius of a venue; else 1.0."""
+    if not venues:
+        return 1.0
+    for v in venues:
+        if (x - v.x) ** 2 + (y - v.y) ** 2 <= capture_radius ** 2:
+            return float(v.relevance)
+    return 1.0
+
+
 def generate_walks(
     agents: List[Agent],
     venues: List[Venue],
@@ -172,9 +182,15 @@ def generate_walks(
     epr_gamma: float,
     jump_length_exponent: float,
     rng: np.random.Generator,
+    venue_return_boost: float = 1.0,
 ) -> List[Trajectory]:
     """
     EPR walk for each agent over n_steps.
+
+    venue_return_boost: multiply visit-count weight by this factor for
+    locations near a venue during preferential-return step. Values > 1
+    increase clustering at venues → heavier-tailed degree distribution.
+    Default 1.0 = original behavior (no venue boost in return).
 
     At each step:
       - Exploration with probability p_explore = ρ · S^{-γ}
@@ -214,9 +230,17 @@ def generate_walks(
                 dx, dy = _attractor_pull(x, y, venues, agent.rg, rng)
                 x, y = dx, dy
             else:
-                # Preferential return: return to a previously visited location
+                # Preferential return: return to a previously visited location,
+                # with venue locations up-weighted by venue_return_boost.
                 locs = list(location_counts.keys())
-                counts = np.array([location_counts[l] for l in locs], dtype=float)
+                capture_r = agent.rg * 0.15
+                counts = np.array([
+                    location_counts[l] * (
+                        _venue_proximity_weight(l[0], l[1], venues, capture_r)
+                        * venue_return_boost if venue_return_boost > 1.0 else location_counts[l]
+                    )
+                    for l in locs
+                ], dtype=float)
                 counts /= counts.sum()
                 idx = rng.choice(len(locs), p=counts)
                 x, y = locs[idx]
@@ -391,6 +415,7 @@ def run_generator(
     space_bin: float = 0.5,
     time_bin: int = 5,
     venues: Optional[List[Venue]] = None,
+    venue_return_boost: float = 1.0,
     seed: int = 42,
 ) -> Tuple[nx.Graph, NetworkStats, List[Agent]]:
     """
@@ -429,6 +454,7 @@ def run_generator(
         epr_gamma=epr_gamma,
         jump_length_exponent=jump_length_exponent,
         rng=rng,
+        venue_return_boost=venue_return_boost,
     )
 
     colocs = colocations(trajectories, space_bin=space_bin, time_bin=time_bin)

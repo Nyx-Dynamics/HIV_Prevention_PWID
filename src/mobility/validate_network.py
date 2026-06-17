@@ -103,12 +103,18 @@ def validate(stats: NetworkStats) -> Dict[str, Any]:
     target_mpl = VALIDATION_TARGETS["mean_path_length"]["value"]
     mpl = stats.mean_path_length
     if mpl is not None:
-        mpl_ok = mpl <= target_mpl * 3.0
+        # Target ~3.1; allow generous range for sparse first-pass network
+        mpl_realistic = mpl <= 8.0
+        mpl_good = mpl <= target_mpl * 1.5
         results["mean_path_length"] = {
             "generated": round(mpl, 3),
-            "target": f"~{target_mpl}",
-            "status": "PASS" if mpl_ok else "REVIEW",
-            "note": "Klovdahl/Potterat 1994. Not pinned by mean degree.",
+            "target": f"~{target_mpl} (Klovdahl/Potterat 1994 small-world core)",
+            "status": "PASS" if mpl_good else ("REVIEW" if mpl_realistic else "FAIL"),
+            "note": (
+                f"Target ~{target_mpl} (small-world core). "
+                f"PASS: ≤{target_mpl*1.5:.1f}; REVIEW: ≤8.0; FAIL: >8.0. "
+                "Gap vs target reflects sparse network or weaker venue-anchoring."
+            ),
         }
     else:
         results["mean_path_length"] = {
@@ -123,26 +129,45 @@ def validate(stats: NetworkStats) -> Dict[str, Any]:
     # Dispersion > 1 iff Var(k)/⟨k⟩ > 1 iff ⟨k²⟩ > ⟨k⟩(⟨k⟩+1).
     # This is the τ_c-relevant check: τ_c = ⟨k⟩/(⟨k²⟩-⟨k⟩); over-dispersion lowers τ_c.
     dispersion = k2 / (mean_k ** 2) if mean_k > 0 else 0.0
-    disp_ok = dispersion > 1.0
-    results["dispersion_k2_over_k2"] = {
-        "generated": round(dispersion, 3),
-        "target": "> 1.0 (over-dispersed; real injection networks have heavy-tailed degree)",
-        "status": "PASS" if disp_ok else "REVIEW",
+
+    # ── HELD-OUT: Clustering vs Erdős–Rényi floor ──────────────────────────
+    # ER floor: ⟨k⟩/n — if clustering ≈ ER floor, network is essentially random.
+    # Real injection networks: Rolls 2011, Buchanan 2019 → clustering ≈ 0.1–0.4.
+    n = stats.n_nodes
+    er_floor = mean_k / n if n > 0 else 0.0
+    cc_above_floor = stats.clustering_coefficient > er_floor * 3.0  # meaningfully above ER
+    cc_realistic = 0.1 <= stats.clustering_coefficient <= 0.5
+    results["clustering_coefficient"] = {
+        "generated": round(stats.clustering_coefficient, 4),
+        "er_floor": round(er_floor, 5),
+        "target": "0.1–0.4 (empirical injection networks; Rolls 2011, Buchanan 2019)",
+        "status": "PASS" if cc_realistic else ("ABOVE_FLOOR" if cc_above_floor else "REVIEW"),
         "note": (
-            "HELD-OUT check. ⟨k²⟩/⟨k⟩² > 1 = over-dispersed. "
-            "Rolls 2011, Buchanan 2019: empirical injection networks are over-dispersed. "
-            "This is the τ_c-relevant statistic — NOT pinned by anchoring ⟨k⟩."
+            f"ER floor (random baseline) = ⟨k⟩/n = {er_floor:.5f}. "
+            f"Generated = {stats.clustering_coefficient:.4f}. "
+            f"PASS requires [0.1, 0.4]; ABOVE_FLOOR means > 3×ER but below 0.1; "
+            f"REVIEW means at or near the random floor. "
+            "Rolls 2011; Buchanan 2019."
         ),
     }
 
-    # ── HELD-OUT: Clustering ────────────────────────────────────────────────
-    # Empirical injection networks show clustering; not a strict pass/fail
-    cc_ok = stats.clustering_coefficient >= 0.0  # just check it's computable
-    results["clustering_coefficient"] = {
-        "generated": round(stats.clustering_coefficient, 4),
-        "target": "> 0 (empirical networks show local clustering)",
-        "status": "PASS" if cc_ok else "REVIEW",
-        "note": "Rolls 2011. Not anchored by mean. Useful for structural realism.",
+    # ── HELD-OUT: Dispersion vs Poisson baseline ────────────────────────────
+    # Poisson degree distribution (ER graph): dispersion = 1 + 1/⟨k⟩ ≈ 1.38 at ⟨k⟩=2.6.
+    # Real injection networks have heavier tails (Buchanan max k=14 vs mean 2.6).
+    # Realistic target: > Poisson baseline, ideally substantially so.
+    poisson_baseline = 1.0 + (1.0 / mean_k) if mean_k > 0 else 2.0
+    disp_ok = dispersion > poisson_baseline * 1.5  # meaningfully above Poisson
+    results["dispersion_k2_over_k2"] = {
+        "generated": round(dispersion, 3),
+        "poisson_baseline": round(poisson_baseline, 3),
+        "target": f"> {poisson_baseline:.2f} × 1.5 = {poisson_baseline*1.5:.2f} (Buchanan max_k=14 implies heavy tail)",
+        "status": "PASS" if disp_ok else "REVIEW",
+        "note": (
+            f"Poisson (ER) baseline = 1 + 1/⟨k⟩ = {poisson_baseline:.3f}. "
+            f"Real injection networks substantially exceed this (Buchanan max_degree=14 "
+            f"vs mean=2.6 → heavy tail). PASS requires dispersion > {poisson_baseline*1.5:.2f}. "
+            "This is the τ_c-relevant check — not pinned by anchoring ⟨k⟩."
+        ),
     }
 
     # ── ⟨k²⟩ — SENSITIVITY RANGE (not pass/fail; dominant τ_c input) ───────
