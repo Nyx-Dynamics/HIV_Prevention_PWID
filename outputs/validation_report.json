@@ -1,0 +1,195 @@
+{
+  "run_dir": "/Users/acdstudpro/air/HIV_Prevention_PWID/outputs",
+  "timestamp": "2026-06-17T12:56:30.908386",
+  "schema_discovery": {
+    "network_stats": {
+      "source_file": "network_validation_report.json",
+      "spec_name": "network_stats.json",
+      "realized": true,
+      "schema_note": "Spec name not found; using realized name 'network_validation_report.json'. Top keys: ['generated', 'checks', 'all_non_range_passed']"
+    },
+    "outbreak_sim": {
+      "source_file": null,
+      "spec_name": "outbreak_sim.json",
+      "realized": false,
+      "schema_note": "not_emitted"
+    }
+  },
+  "scored": {
+    "giant_component_fraction": {
+      "status": "PASS",
+      "model_value": 0.8866666666666667,
+      "model_ci": null,
+      "target_range": [
+        0.45,
+        1.0
+      ],
+      "target_source": "Buchanan R et al. J Infect 80:225 (2019). DOI 10.1016/j.jinf.2019.12.010 (137/595 in giant, ~23\u2013100%); Klovdahl/Potterat 1994. Minimum ~45% as operationally relevant connected component.",
+      "ci_overlaps_target": null,
+      "median_in_range": true,
+      "note": "Current dyad model: ~29% \u2014 fails this check; Handoff 7A connectivity fix expected to raise this."
+    },
+    "clustering_coefficient": {
+      "status": "FAIL",
+      "model_value": 0.0091,
+      "model_ci": null,
+      "target_range": [
+        0.1,
+        0.4
+      ],
+      "target_source": "Rolls DA et al. J Theor Biol 297:73 (2011). DOI 10.1016/j.jtbi.2011.12.008; Buchanan 2019.",
+      "ci_overlaps_target": null,
+      "median_in_range": false,
+      "note": "ABOVE_FLOOR (~0.08) currently; Proxy C first to reach PASS."
+    },
+    "mean_path_length": {
+      "status": "PASS",
+      "model_value": 5.180451127819549,
+      "model_ci": null,
+      "target_range": [
+        2.0,
+        6.0
+      ],
+      "target_source": "Klovdahl AS, Potterat JJ et al. Soc Sci Med 38:79 (1994). DOI 10.1016/0277-9536(94)90302-6",
+      "ci_overlaps_target": null,
+      "median_in_range": true,
+      "note": "Target ~3.1; range allows sparse first-pass networks."
+    },
+    "dispersion_k2_over_k2": {
+      "status": "FAIL",
+      "model_value": 1.501,
+      "model_ci": [
+        1.38
+      ],
+      "target_range": [
+        2.07,
+        "\u221e"
+      ],
+      "target_source": "Buchanan 2019 \u2014 max degree 14 vs mean 2.6 implies heavy tail substantially above Poisson (1 + 1/\u27e8k\u27e9).",
+      "ci_overlaps_target": null,
+      "median_in_range": false,
+      "note": "Poisson baseline = 1 + 1/\u27e8k\u27e9; target = baseline \u00d7 1.5."
+    },
+    "final_size": {
+      "status": "NOT_EMITTED",
+      "model_value": "not_emitted",
+      "ci_overlaps_target": null,
+      "median_in_range": null
+    },
+    "single_cluster_fraction": {
+      "status": "NOT_EMITTED",
+      "model_value": "not_emitted",
+      "ci_overlaps_target": null,
+      "median_in_range": null
+    },
+    "degree_risk_gradient": {
+      "status": "NOT_EMITTED",
+      "model_value": "not_emitted",
+      "ci_overlaps_target": null,
+      "median_in_range": null
+    },
+    "explosive_incidence": {
+      "status": "NOT_EMITTED",
+      "model_value": "not_emitted",
+      "ci_overlaps_target": null,
+      "median_in_range": null
+    }
+  },
+  "held_out": {
+    "hiv_r0": {
+      "class": "HELD_OUT",
+      "model_value": "not_emitted",
+      "model_ci": null,
+      "note": "HIV forward prediction \u2014 reported here, NEVER scored."
+    },
+    "hiv_p_r0_gt1": {
+      "class": "HELD_OUT",
+      "model_value": "not_emitted",
+      "model_ci": null,
+      "note": "HIV forward prediction \u2014 reported here, NEVER scored."
+    }
+  },
+  "provenance": {
+    "sir_removal_rate": {
+      "class": "PROVENANCE",
+      "value": 0.024,
+      "range": null,
+      "source": "Gonsalves GS & Crawford FW. Lancet HIV 5(6):e297 (2018). DOI 10.1016/S2352-3018(18)30176-0",
+      "note": "Input parameter \u2014 not a model output; record only."
+    },
+    "composite_sti_cofactor_ahr": {
+      "class": "PROVENANCE",
+      "value": 2.7,
+      "range": [
+        1.2,
+        6.4
+      ],
+      "source": "Kelley CF et al. AIDS Res Hum Retroviruses 31(10):1009 (2015). DOI 10.1089/AID.2015.0013",
+      "note": "Input parameter \u2014 not a model output; record only."
+    },
+    "beta_chronic": {
+      "class": "PROVENANCE",
+      "value": 0.008,
+      "range": [
+        0.006,
+        0.024
+      ],
+      "source": "Baggaley RF et al. AIDS (2006). DOI 10.1097/01.aids.0000218543.46963.6d",
+      "note": "Input parameter \u2014 not a model output; record only."
+    },
+    "acute_multiplier": {
+      "class": "PROVENANCE",
+      "value": 26.0,
+      "range": null,
+      "source": "Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501",
+      "note": "Input parameter \u2014 not a model output; record only."
+    },
+    "late_stage_multiplier": {
+      "class": "PROVENANCE",
+      "value": 7.0,
+      "range": null,
+      "source": "Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501",
+      "note": "Input parameter \u2014 not a model output; record only."
+    },
+    "sharing_prevalence": {
+      "class": "PROVENANCE",
+      "value": 0.27,
+      "range": null,
+      "source": "Burnett JC et al. MMWR 67(1) (2018). DOI 10.15585/mmwr.mm6701a5",
+      "note": "Input parameter \u2014 not a model output; record only."
+    }
+  },
+  "stubbed": {
+    "rectal_gc_hiv_incidence": {
+      "class": "STUBBED",
+      "status": "not_computable_yet",
+      "note": "Requires bridge / multi-pathogen layer (Handoff 7+)."
+    },
+    "syphilis_hiv_incidence": {
+      "class": "STUBBED",
+      "status": "not_computable_yet",
+      "note": "Requires bridge / multi-pathogen layer (Handoff 7+)."
+    },
+    "sexual_hcv_incidence": {
+      "class": "STUBBED",
+      "status": "not_computable_yet",
+      "note": "Requires bridge / multi-pathogen layer (Handoff 7+)."
+    },
+    "hcv_consistency_check": {
+      "class": "STUBBED",
+      "status": "not_computable_yet",
+      "note": "Requires bridge / multi-pathogen layer (Handoff 7+)."
+    }
+  },
+  "summary": {
+    "scored_total": 8,
+    "scored_pass": 2,
+    "scored_fail": 2,
+    "scored_not_emitted": 4,
+    "scored_pass_rate": 0.5,
+    "held_out_count": 2,
+    "provenance_count": 6,
+    "stubbed_count": 4,
+    "warning": "HELD_OUT items (HIV R\u2080, HIV incidence) appear in the 'held_out' section and are NOT counted in scored_pass_rate. HIV outbreak frequency remains the held-out forward prediction."
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "generated": {
+    "mean_degree": 2.83,
+    "k2_moment": 41.047,
+    "giant_component_fraction": 0.283,
+    "mean_path_length": 2.29,
+    "n_nodes": 300,
+    "n_edges": 424
+  },
+  "checks": {
+    "mean_degree_ANCHOR": {
+      "generated": 2.83,
+      "status": "ANCHOR",
+      "note": "ANCHOR — kappa_dyad-set; not a held-out check."
+    },
+    "giant_component": {
+      "generated": 0.283,
+      "target": "> 0 (empirical: 137-600+ nodes)",
+      "status": "PASS",
+      "note": "validate_network.py uses >0 bar; harness uses 45-100% bar."
+    },
+    "mean_path_length": {
+      "generated": 2.29,
+      "target": "~3.1",
+      "status": "PASS",
+      "note": "Below target but within tolerance."
+    },
+    "clustering_coefficient": {
+      "generated": 0.0825,
+      "er_floor": 0.00942,
+      "target": "0.1-0.4",
+      "status": "ABOVE_FLOOR",
+      "note": "Above ER floor but below 0.1 target."
+    },
+    "dispersion_k2_over_k2": {
+      "generated": 5.137,
+      "poisson_baseline": 1.354,
+      "target": "> 1.354 x 1.5 = 2.03",
+      "status": "PASS",
+      "note": "Well above Poisson baseline."
+    }
+  },
+  "all_non_range_passed": false
+}

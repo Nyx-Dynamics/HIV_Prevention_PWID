@@ -1,0 +1,16 @@
+{
+  "final_size": 180,
+  "single_cluster_fraction": 0.96,
+  "degree_risk_gradient": 1.9,
+  "incidence": 17.5,
+  "doubling_time_days": 12,
+  "attack_rate": 0.62,
+  "r0": {
+    "median": 2.4,
+    "p5": 0.8,
+    "p95": 5.1,
+    "straddles_1": true
+  },
+  "p_r0_gt1": 0.78,
+  "note": "Synthetic fixture for testing. Values designed to pass scored checks."
+}

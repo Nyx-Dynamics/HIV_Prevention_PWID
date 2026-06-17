@@ -1,0 +1,44 @@
+{
+  "generated": {
+    "mean_degree": 2.68,
+    "k2_moment": 18.5,
+    "giant_component_fraction": 0.853,
+    "mean_path_length": 3.4,
+    "n_nodes": 300,
+    "n_edges": 402
+  },
+  "checks": {
+    "mean_degree_ANCHOR": {
+      "generated": 2.68,
+      "status": "ANCHOR",
+      "note": "ANCHOR — kappa_dyad-set."
+    },
+    "giant_component": {
+      "generated": 0.853,
+      "target": "> 0",
+      "status": "PASS",
+      "note": "85% in giant component — healthy."
+    },
+    "mean_path_length": {
+      "generated": 3.4,
+      "target": "~3.1",
+      "status": "PASS",
+      "note": "Close to 3.1 target."
+    },
+    "clustering_coefficient": {
+      "generated": 0.155,
+      "er_floor": 0.00893,
+      "target": "0.1-0.4",
+      "status": "PASS",
+      "note": "In 0.1-0.4 range."
+    },
+    "dispersion_k2_over_k2": {
+      "generated": 2.574,
+      "poisson_baseline": 1.373,
+      "target": "> 1.373 x 1.5 = 2.06",
+      "status": "PASS",
+      "note": "Above Poisson baseline x 1.5."
+    }
+  },
+  "all_non_range_passed": true
+}
