@@ -396,11 +396,14 @@ def assign_node_sharing_intensity(
     CALIBRATION:
       - sharing_prevalence = 0.27 from NHBS any-sharing 12-mo prevalence
         (Burnett JC et al. MMWR 67(1) 2018. DOI 10.15585/mmwr.mm6701a5).
-      - Within-sharer intensity (frequency given any sharing): NHBS reports
-        proportions (every time / >half / <half) but exact breakdown is
-        not pre-loaded. Gamma(shape=0.5, scale=0.05) is a heavy-tailed
-        PLACEHOLDER: mean = 0.025 per injection per partner, variance high.
-        PENDING AC SIGN-OFF on intensity scale.
+      - Within-sharer intensity (frequency given any sharing): HANDOFF 8B RESULT:
+        The NHBS MMWR 67(1) publication does NOT contain the frequency breakdown
+        (every time / >half / <half). That data is in the NHBS 2015 public-use
+        dataset (CDC NHBS data portal), which requires direct access — not codeable
+        from published tables. Per the 8B guardrail: FLAGGED AND STOPPED.
+        Gamma(shape=0.5, scale=0.05) remains a PLACEHOLDER until AC retrieves
+        the public-use dataset or approves an alternative source.
+        PENDING AC: access CDC NHBS public-use data or approve placeholder.
 
     Node-level (not per-edge) is the structural fix: high-intensity nodes
     form edges with many venue co-visitors → triangles → clustering.

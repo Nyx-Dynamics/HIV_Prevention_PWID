@@ -32,10 +32,19 @@ HELD_OUT = frozenset({
 
 TARGET_CLASSES = {
     # ── Network benchmarks (SCORED against sourced ranges) ────────────────
-    "giant_component_fraction":   "SCORED",   # target 45–100% (empirical)
+    # 7B AMENDMENT: giant_component_fraction 45-100% RETIRED.
+    # Friedman 1997 shows largest component ~30% of 767 — not 45-100%.
+    # The correct target is largest_component_fraction (core-periphery below).
+    "giant_component_fraction":   "RETIRED",  # → replaced by core-periphery targets
     "clustering_coefficient":     "SCORED",   # target 0.1–0.4 (empirical)
     "dispersion_k2_over_k2":      "SCORED",   # target > Poisson_baseline × 1.5
     "mean_path_length":           "SCORED",   # target ~3.1
+
+    # ── Core-periphery targets (SCORED; 7B amendment; consume fields emitted by 8) ──
+    "largest_component_fraction": "SCORED",   # target 0.20–0.55 (Friedman ~30%)
+    "isolate_fraction":           "SCORED",   # target < 0.10 (< 10% degree-0)
+    "core_dispersion":            "SCORED",   # over-Poisson on 2-core
+    "core_clustering":            "SCORED",   # target 0.30–0.65 (Kwan 2019)
 
     # ── Outbreak trajectory (SCORED once outbreak_sim.json is emitted) ───
     "final_size":                 "SCORED",   # target: 82–215 cross-site range
@@ -74,6 +83,11 @@ def classify(target_key: str) -> str:
     if target_key in HELD_OUT:
         return "HELD_OUT"
     return TARGET_CLASSES.get(target_key, "UNKNOWN")
+
+
+def is_retired(target_key: str) -> bool:
+    """True if the target has been retired (replaced by a better target)."""
+    return TARGET_CLASSES.get(target_key) == "RETIRED"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,6 +137,43 @@ SCORED_TARGETS = {
             "Target ~3.1 (small-world injection-network core). "
             "Range [2.5, 4.5] is two-sided so both stale-long (≥5) and "
             "dyad-short (≤2.3) register as FAIL."
+        ),
+    },
+
+    # ── Core-periphery targets (7B amendment — consume fields emitted by 8) ──
+    "largest_component_fraction": {
+        "type": "range",
+        "range": (0.20, 0.55),
+        "source": "Friedman SR et al. Am J Public Health 87(8):1289 (1997). "
+                  "DOI 10.2105/ajph.87.8.1289 — largest component ~30% of 767 nodes. "
+                  "Lin/Boodram 2023 DOI 10.1016/j.drugpo.2023.104217 — concentrated West Side core.",
+        "note": (
+            "RETIRED the 45-100% giant_component_fraction target (was wrong). "
+            "Friedman empirical: one large ~30% + tail of smaller; this replaces the old check."
+        ),
+    },
+    "isolate_fraction": {
+        "type": "upper_bound",
+        "range": (0.0, 0.10),   # target < 10% isolated
+        "source": "Friedman 1997 (ibid.); Lin/Boodram 2023 — contact layer should "
+                  "connect most agents who move through venue geography.",
+        "note": "Target < 10% degree-0 nodes after contact-layer decoupling (Handoff 8).",
+    },
+    "core_dispersion": {
+        "type": "lower_bound_factor",
+        "factor": 1.5,   # must exceed Poisson baseline × 1.5 on 2-core nodes
+        "source": "Buchanan 2019 DOI 10.1016/j.jinf.2019.12.010; Friedman 1997 — "
+                  "2-core concentrates high-degree nodes; Poisson baseline = 1 + 1/⟨k⟩ on core.",
+        "note": "Over-Poisson dispersion on 2-core validates that hub structure is present.",
+    },
+    "core_clustering": {
+        "type": "range",
+        "range": (0.30, 0.70),   # Kwan 2019 injection-network specific
+        "source": "Kwan TH et al. PLoS One 14(5):e0216727 (2019). "
+                  "DOI 10.1371/journal.pone.0216727 — clustering 0.53–0.65 on injection networks.",
+        "note": (
+            "Measured on 2-core (core-restricted). Range [0.30, 0.70] allows for network "
+            "size/density variation; Kwan target is 0.53-0.65 in dense networks."
         ),
     },
 

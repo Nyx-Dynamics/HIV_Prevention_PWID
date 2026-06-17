@@ -310,6 +310,8 @@ def extract_network_values(artifact: Dict) -> Dict:
         checks = data.get("checks", {})
         cc_check = checks.get("clustering_coefficient", {})
         disp_check = checks.get("dispersion_k2_over_k2", {})
+        # Core-periphery fields (emitted by 8; not_emitted if older artifact)
+        cp = data.get("core_periphery", {})
         return {
             "giant_component_fraction": gen.get("giant_component_fraction", "missing_field"),
             "clustering_coefficient":   cc_check.get("generated", "missing_field"),
@@ -318,6 +320,12 @@ def extract_network_values(artifact: Dict) -> Dict:
             "mean_degree":              gen.get("mean_degree", "missing_field"),
             "er_floor":                 cc_check.get("er_floor", "missing_field"),
             "poisson_baseline":         disp_check.get("poisson_baseline", "missing_field"),
+            # Core-periphery (7B amendment targets)
+            "largest_component_fraction": cp.get("largest_component_fraction", "not_emitted"),
+            "isolate_fraction":           cp.get("isolate_fraction", "not_emitted"),
+            "core_dispersion":            cp.get("core_dispersion", "not_emitted"),
+            "core_clustering":            cp.get("core_clustering", "not_emitted"),
+            "core_mean_degree":           cp.get("core_mean_degree", "not_emitted"),
         }
 
     # --- dyad_r0_report.json schema (use first proxy) ---
@@ -565,6 +573,34 @@ def run_harness(
     report["scored"]["dispersion_k2_over_k2"] = score_target(
         "dispersion_k2_over_k2", disp_val, model_ci=(per_run_poisson,)
     )
+
+    # Core-periphery targets (7B amendment; consume new fields from Handoff 8)
+    report["scored"]["largest_component_fraction"] = score_target(
+        "largest_component_fraction",
+        net_vals.get("largest_component_fraction", "not_emitted"),
+    )
+    report["scored"]["isolate_fraction"] = score_target(
+        "isolate_fraction",
+        net_vals.get("isolate_fraction", "not_emitted"),
+    )
+    # core_dispersion: needs per-core Poisson baseline — use core_mean_degree if available
+    core_k_raw = net_vals.get("core_mean_degree", None)
+    if isinstance(core_k_raw, (int, float)) and core_k_raw > 0:
+        core_poisson = 1.0 + 1.0 / float(core_k_raw)
+    else:
+        core_poisson = per_run_poisson  # fall back to whole-network baseline
+    report["scored"]["core_dispersion"] = score_target(
+        "core_dispersion",
+        net_vals.get("core_dispersion", "not_emitted"),
+        model_ci=(core_poisson,),
+    )
+    report["scored"]["core_clustering"] = score_target(
+        "core_clustering",
+        net_vals.get("core_clustering", "not_emitted"),
+    )
+
+    # Retired target: logged in summary but not scored
+    report["summary"]["retired_targets"] = ["giant_component_fraction (45-100%) — replaced by core-periphery; see 7B amendment"]
 
     # Outbreak trajectory
     for key in ["final_size", "single_cluster_fraction",
