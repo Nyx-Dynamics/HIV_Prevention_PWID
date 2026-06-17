@@ -1,49 +1,52 @@
 {
+  "git_sha": "ca4cd83dd4146558c5dc97fbb39b71d0c9566f25",
+  "timestamp": "2026-06-17T16:50:40.975434",
+  "proxy": "ssp_concentrated_hotspot",
+  "proxy_description": "CANDIDATE C \u2014 SSP + concentrated hotspot clusters: SSP venues plus 2 tightly-clustered market/hotspot concentrations. ASSUMPTION: a small number of fixed high-activity sites dominate. Models 'shooting gallery' or known open-air market concentration. SOURCE: PLACEHOLDER \u2014 proxy only. AC must approve before use in results.",
+  "generator": "run_generator_dyads",
+  "params": {
+    "n_agents": 300,
+    "n_steps": 80,
+    "venue_return_boost": 5.0,
+    "kappa_dyad": 2.0,
+    "seed": 42
+  },
   "generated": {
-    "mean_degree": 2.7,
-    "k2_moment": 10.94,
-    "giant_component_fraction": 0.8866666666666667,
-    "mean_path_length": 5.180451127819549,
+    "mean_degree": 4.866666666666666,
+    "k2_moment": 114.75333333333333,
+    "giant_component_fraction": 0.29333333333333333,
+    "mean_path_length": 2.044932079414838,
     "n_nodes": 300,
-    "n_edges": 405
+    "n_edges": 730
   },
   "checks": {
     "mean_degree_ANCHOR": {
-      "generated": 2.7,
-      "target": "2.6 (range 0\u201314)",
+      "generated": 4.8667,
       "status": "ANCHOR",
-      "note": "ANCHOR STATISTIC \u2014 kappa_share=0.01 was set to produce \u27e8k\u27e9\u22482.6. Reporting this as PASS is circular. \u27e8k\u27e9 becomes a held-out check only after kappa_share is derived from behavioral rates independently. See params.py kappa_share and shared_fraction_per_partner."
+      "note": "ANCHOR \u2014 kappa_dyad-set; not a held-out check."
     },
     "giant_component": {
-      "generated": 0.887,
-      "target": "> 0 (empirical: 137\u2013600+ nodes in one component)",
-      "status": "PASS",
-      "note": "Buchanan 2019; Klovdahl/Potterat 1994. Not anchored by mean."
+      "generated": 0.2933,
+      "target": "45\u2013100%",
+      "status": "FAIL"
     },
     "mean_path_length": {
-      "generated": 5.18,
-      "target": "~3.1",
-      "status": "PASS",
-      "note": "Klovdahl/Potterat 1994. Not pinned by mean degree."
-    },
-    "dispersion_k2_over_k2": {
-      "generated": 1.501,
-      "target": "> 1.0 (over-dispersed; real injection networks have heavy-tailed degree)",
-      "status": "PASS",
-      "note": "HELD-OUT check. \u27e8k\u00b2\u27e9/\u27e8k\u27e9\u00b2 > 1 = over-dispersed. Rolls 2011, Buchanan 2019: empirical injection networks are over-dispersed. This is the \u03c4_c-relevant statistic \u2014 NOT pinned by anchoring \u27e8k\u27e9."
+      "generated": 2.0449,
+      "target": "~3.1 [2.5, 4.5]",
+      "status": "FAIL"
     },
     "clustering_coefficient": {
-      "generated": 0.0091,
-      "target": "> 0 (empirical networks show local clustering)",
-      "status": "PASS",
-      "note": "Rolls 2011. Not anchored by mean. Useful for structural realism."
+      "generated": 0.11633,
+      "er_floor": 0.01622,
+      "target": "0.1\u20130.4",
+      "status": "PASS"
     },
-    "k2_tail": {
-      "generated": 10.94,
-      "target": "SENSITIVITY RANGE \u2014 not a pass/fail check",
-      "status": "RANGE",
-      "note": "TAIL CAVEAT (mandatory): \u27e8k\u00b2\u27e9 is the most under-captured quantity in all available empirical datasets. \u27e8k\u00b2\u27e9 directly sets \u03c4_c. See Stage 3 sweep for \u03c4_c band."
+    "dispersion_k2_over_k2": {
+      "generated": 4.8451,
+      "poisson_baseline": 1.2055,
+      "target": ">1.205 \u00d7 1.5 = 1.808",
+      "status": "PASS"
     }
   },
-  "all_non_range_passed": true
+  "all_non_range_passed": false
 }

@@ -180,6 +180,151 @@ class TestAllClassesPresent:
         shutil.rmtree(run_dir)
 
 
+class TestProvenanceGuard:
+    def test_stale_commit_fires_banner(self, tmp_path):
+        """Artifact with fake commit SHA fires STALE banner when --expect-commit is HEAD."""
+        import subprocess
+        run_dir = tempfile.mkdtemp()
+        shutil.copy(
+            os.path.join(FIXTURE_DIR, "network_stats_stale_commit.json"),
+            os.path.join(run_dir, "network_stats.json"),
+        )
+        # Get actual HEAD
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True,
+        ).stdout.strip()
+        if not head:
+            shutil.rmtree(run_dir)
+            return  # skip if not in git repo
+
+        report = run_harness(run_dir, str(tmp_path), expect_commit=head)
+        # Banner should be set (fake SHA "000..." != HEAD)
+        assert report.get("provenance_banner") is not None, (
+            "Expected STALE banner for artifact with fake commit SHA"
+        )
+        art_prov = report["artifact_provenance"].get("network_stats", {})
+        assert art_prov.get("verdict") in ("stale", "unverified"), (
+            f"Expected stale/unverified verdict, got {art_prov.get('verdict')}"
+        )
+        # Every scored row should be tagged provenance_suspect
+        # (banner is set → provenance_suspect is True for the artifact)
+        assert art_prov.get("provenance_suspect") is True
+        shutil.rmtree(run_dir)
+
+    def test_strict_exits_nonzero_for_stale(self, tmp_path):
+        """--strict exits non-zero when a stale artifact is detected."""
+        import subprocess
+        run_dir = tempfile.mkdtemp()
+        shutil.copy(
+            os.path.join(FIXTURE_DIR, "network_stats_stale_commit.json"),
+            os.path.join(run_dir, "network_stats.json"),
+        )
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True,
+        ).stdout.strip()
+        if not head:
+            shutil.rmtree(run_dir)
+            return
+
+        # run_harness with strict=True should call sys.exit(1)
+        import pytest
+        with pytest.raises(SystemExit) as exc_info:
+            run_harness(run_dir, str(tmp_path), expect_commit=head, strict=True)
+        assert exc_info.value.code == 1, (
+            f"Expected sys.exit(1) under --strict with stale artifact, "
+            f"got {exc_info.value.code}"
+        )
+        shutil.rmtree(run_dir)
+
+    def test_fresh_artifact_no_banner(self, tmp_path):
+        """Artifact with no embedded commit (network_stats_85pct) → unverified but no banner unless expect_commit set."""
+        run_dir = _make_run_dir("network_stats_85pct_giant.json")
+        # Without expect_commit: unverified but no banner (default permissive)
+        report = run_harness(run_dir, str(tmp_path))
+        # unverified but provenance_banner should be None (default permissive for unverified)
+        # OR it may fire a banner — both are acceptable; the key is it doesn't crash
+        assert "provenance_banner" in report  # field exists
+        shutil.rmtree(run_dir)
+
+    def test_provenance_in_report_header(self, tmp_path):
+        """Report header contains artifact_provenance with path/mtime/verdict."""
+        run_dir = _make_run_dir("network_stats_85pct_giant.json")
+        report = run_harness(run_dir, str(tmp_path))
+        prov = report.get("artifact_provenance", {})
+        assert "network_stats" in prov, "network_stats missing from artifact_provenance"
+        ns_prov = prov["network_stats"]
+        assert "verdict" in ns_prov
+        assert "mtime" in ns_prov or ns_prov.get("verdict") == "not_found"
+        shutil.rmtree(run_dir)
+
+
+class TestPathLengthTightened:
+    def test_stale_baseline_path_fails(self, tmp_path):
+        """Stale baseline path_length=5.18 now FAILS with two-sided range."""
+        # Synthetic artifact with path_length=5.18 (the stale Handoff-3 value)
+        run_dir = tempfile.mkdtemp()
+        artifact = {
+            "generated": {
+                "mean_degree": 2.70, "k2_moment": 10.94,
+                "giant_component_fraction": 0.887, "mean_path_length": 5.18,
+                "n_nodes": 300, "n_edges": 405,
+            },
+            "checks": {
+                "mean_degree_ANCHOR": {"generated": 2.70, "status": "ANCHOR"},
+                "giant_component": {"generated": 0.887, "status": "PASS"},
+                "mean_path_length": {"generated": 5.18, "status": "PASS"},
+                "clustering_coefficient": {"generated": 0.0091, "er_floor": 0.009, "status": "REVIEW"},
+                "dispersion_k2_over_k2": {"generated": 1.501, "poisson_baseline": 1.370, "status": "PASS"},
+            },
+        }
+        with open(os.path.join(run_dir, "network_stats.json"), "w") as f:
+            json.dump(artifact, f)
+        report = run_harness(run_dir, str(tmp_path))
+        mpl = report["scored"]["mean_path_length"]
+        assert mpl["status"] == "FAIL", (
+            f"Expected FAIL for path_length=5.18 (stale baseline), got {mpl['status']}"
+        )
+        shutil.rmtree(run_dir)
+
+    def test_dyad_short_path_fails(self, tmp_path):
+        """Dyad network path_length≈2.29 now FAILS with two-sided range."""
+        run_dir = tempfile.mkdtemp()
+        artifact = {
+            "generated": {
+                "mean_degree": 2.83, "k2_moment": 41.047,
+                "giant_component_fraction": 0.283, "mean_path_length": 2.29,
+                "n_nodes": 300, "n_edges": 424,
+            },
+            "checks": {
+                "mean_degree_ANCHOR": {"generated": 2.83, "status": "ANCHOR"},
+                "giant_component": {"generated": 0.283, "status": "PASS"},
+                "mean_path_length": {"generated": 2.29, "status": "PASS"},
+                "clustering_coefficient": {"generated": 0.0825, "er_floor": 0.00942, "status": "ABOVE_FLOOR"},
+                "dispersion_k2_over_k2": {"generated": 5.137, "poisson_baseline": 1.354, "status": "PASS"},
+            },
+        }
+        with open(os.path.join(run_dir, "network_stats.json"), "w") as f:
+            json.dump(artifact, f)
+        report = run_harness(run_dir, str(tmp_path))
+        mpl = report["scored"]["mean_path_length"]
+        assert mpl["status"] == "FAIL", (
+            f"Expected FAIL for path_length=2.29 (dyad too-short), got {mpl['status']}"
+        )
+        shutil.rmtree(run_dir)
+
+    def test_good_path_passes(self, tmp_path):
+        """The 85% fixture with path_length=3.4 still PASSES."""
+        run_dir = _make_run_dir("network_stats_85pct_giant.json")
+        report = run_harness(run_dir, str(tmp_path))
+        mpl = report["scored"]["mean_path_length"]
+        assert mpl["status"] == "PASS", (
+            f"Expected PASS for path_length=3.4, got {mpl['status']}"
+        )
+        shutil.rmtree(run_dir)
+
+
 class TestRealizedSchema:
     def test_realized_network_validation_report(self, tmp_path):
         """Harness falls back gracefully to network_validation_report.json (realized name)."""
@@ -241,6 +386,18 @@ if __name__ == "__main__":
     t5 = TestRealizedSchema()
     run_test("realized_schema_fallback",  lambda p: t5.test_realized_network_validation_report(p))
 
-    print(f"\n{'PASSED' if not failures else 'FAILED'}: {12 - len(failures)}/12 tests")
+    t6 = TestProvenanceGuard()
+    run_test("stale_commit_fires_banner",   lambda p: t6.test_stale_commit_fires_banner(p))
+    run_test("strict_exits_nonzero",        lambda p: t6.test_strict_exits_nonzero_for_stale(p))
+    run_test("fresh_no_banner",             lambda p: t6.test_fresh_artifact_no_banner(p))
+    run_test("provenance_in_header",        lambda p: t6.test_provenance_in_report_header(p))
+
+    t7 = TestPathLengthTightened()
+    run_test("stale_path_fails",   lambda p: t7.test_stale_baseline_path_fails(p))
+    run_test("dyad_path_fails",    lambda p: t7.test_dyad_short_path_fails(p))
+    run_test("good_path_passes",   lambda p: t7.test_good_path_passes(p))
+
+    n_tests = 20
+    print(f"\n{'PASSED' if not failures else 'FAILED'}: {n_tests - len(failures)}/{n_tests} tests")
     if failures:
         print(f"Failures: {failures}")

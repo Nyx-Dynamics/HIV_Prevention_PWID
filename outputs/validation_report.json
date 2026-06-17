@@ -1,12 +1,32 @@
 {
   "run_dir": "/Users/acdstudpro/air/HIV_Prevention_PWID/outputs",
-  "timestamp": "2026-06-17T12:56:30.908386",
+  "timestamp": "2026-06-17T16:50:45.613955",
+  "head_commit": "ca4cd83dd4146558c5dc97fbb39b71d0c9566f25",
+  "expect_commit": null,
+  "provenance_banner": null,
+  "artifact_provenance": {
+    "network_stats": {
+      "path": "outputs/network_validation_report.json",
+      "mtime": "2026-06-17T16:50:40.976893",
+      "age_hours": 0.0,
+      "artifact_commit": "ca4cd83dd4146558c5dc97fbb39b71d0c9566f25",
+      "head_commit": "ca4cd83dd4146558c5dc97fbb39b71d0c9566f25",
+      "expect_commit": null,
+      "verdict": "fresh",
+      "provenance_suspect": false
+    },
+    "outbreak_sim": {
+      "path": "outputs/outbreak_sim.json",
+      "verdict": "not_found",
+      "provenance_suspect": false
+    }
+  },
   "schema_discovery": {
     "network_stats": {
       "source_file": "network_validation_report.json",
       "spec_name": "network_stats.json",
       "realized": true,
-      "schema_note": "Spec name not found; using realized name 'network_validation_report.json'. Top keys: ['generated', 'checks', 'all_non_range_passed']"
+      "schema_note": "Spec name not found; using realized name 'network_validation_report.json'. Top keys: ['git_sha', 'timestamp', 'proxy', 'proxy_description', 'generator', 'params', 'generated', 'checks', 'all_non_range_passed']"
     },
     "outbreak_sim": {
       "source_file": null,
@@ -17,8 +37,8 @@
   },
   "scored": {
     "giant_component_fraction": {
-      "status": "PASS",
-      "model_value": 0.8866666666666667,
+      "status": "FAIL",
+      "model_value": 0.29333333333333333,
       "model_ci": null,
       "target_range": [
         0.45,
@@ -26,12 +46,12 @@
       ],
       "target_source": "Buchanan R et al. J Infect 80:225 (2019). DOI 10.1016/j.jinf.2019.12.010 (137/595 in giant, ~23\u2013100%); Klovdahl/Potterat 1994. Minimum ~45% as operationally relevant connected component.",
       "ci_overlaps_target": null,
-      "median_in_range": true,
+      "median_in_range": false,
       "note": "Current dyad model: ~29% \u2014 fails this check; Handoff 7A connectivity fix expected to raise this."
     },
     "clustering_coefficient": {
-      "status": "FAIL",
-      "model_value": 0.0091,
+      "status": "PASS",
+      "model_value": 0.11633,
       "model_ci": null,
       "target_range": [
         0.1,
@@ -39,36 +59,36 @@
       ],
       "target_source": "Rolls DA et al. J Theor Biol 297:73 (2011). DOI 10.1016/j.jtbi.2011.12.008; Buchanan 2019.",
       "ci_overlaps_target": null,
-      "median_in_range": false,
+      "median_in_range": true,
       "note": "ABOVE_FLOOR (~0.08) currently; Proxy C first to reach PASS."
     },
     "mean_path_length": {
-      "status": "PASS",
-      "model_value": 5.180451127819549,
+      "status": "FAIL",
+      "model_value": 2.044932079414838,
       "model_ci": null,
       "target_range": [
-        2.0,
-        6.0
+        2.5,
+        4.5
       ],
       "target_source": "Klovdahl AS, Potterat JJ et al. Soc Sci Med 38:79 (1994). DOI 10.1016/0277-9536(94)90302-6",
       "ci_overlaps_target": null,
-      "median_in_range": true,
-      "note": "Target ~3.1; range allows sparse first-pass networks."
+      "median_in_range": false,
+      "note": "Target ~3.1 (small-world injection-network core). Range [2.5, 4.5] is two-sided so both stale-long (\u22655) and dyad-short (\u22642.3) register as FAIL."
     },
     "dispersion_k2_over_k2": {
-      "status": "FAIL",
-      "model_value": 1.501,
+      "status": "PASS",
+      "model_value": 4.8451,
       "model_ci": [
-        1.38
+        1.2054794520547945
       ],
       "target_range": [
-        2.07,
+        1.8082191780821917,
         "\u221e"
       ],
       "target_source": "Buchanan 2019 \u2014 max degree 14 vs mean 2.6 implies heavy tail substantially above Poisson (1 + 1/\u27e8k\u27e9).",
       "ci_overlaps_target": null,
-      "median_in_range": false,
-      "note": "Poisson baseline = 1 + 1/\u27e8k\u27e9; target = baseline \u00d7 1.5."
+      "median_in_range": true,
+      "note": "Poisson baseline = 1 + 1/\u27e8k\u27e9 computed from the SAME RUN's \u27e8k\u27e9 (not hardcoded) so the target moves correctly when 7A reconnects isolates. Target = baseline \u00d7 1.5."
     },
     "final_size": {
       "status": "NOT_EMITTED",

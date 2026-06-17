@@ -105,15 +105,25 @@ SCORED_TARGETS = {
         "factor": 1.5,       # must exceed Poisson baseline × 1.5
         "source": "Buchanan 2019 — max degree 14 vs mean 2.6 implies heavy tail "
                   "substantially above Poisson (1 + 1/⟨k⟩).",
-        "note": "Poisson baseline = 1 + 1/⟨k⟩; target = baseline × 1.5.",
+        "note": (
+            "Poisson baseline = 1 + 1/⟨k⟩ computed from the SAME RUN's ⟨k⟩ "
+            "(not hardcoded) so the target moves correctly when 7A reconnects isolates. "
+            "Target = baseline × 1.5."
+        ),
     },
     "mean_path_length": {
         "type": "range",
-        "range": (2.0, 6.0),  # generous; ideally ~3.1
+        # Two-sided range: stale baseline 5.18 and dyad net 2.0–2.3 both FAIL;
+        # healthy injection networks (Klovdahl ~3.1) PASS.
+        "range": (2.5, 4.5),
         "ideal": 3.1,
         "source": "Klovdahl AS, Potterat JJ et al. Soc Sci Med 38:79 (1994). "
                   "DOI 10.1016/0277-9536(94)90302-6",
-        "note": "Target ~3.1; range allows sparse first-pass networks.",
+        "note": (
+            "Target ~3.1 (small-world injection-network core). "
+            "Range [2.5, 4.5] is two-sided so both stale-long (≥5) and "
+            "dyad-short (≤2.3) register as FAIL."
+        ),
     },
 
     # ── Outbreak trajectory ───────────────────────────────────────────────

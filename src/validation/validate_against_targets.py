@@ -29,9 +29,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
+import time
 from datetime import datetime
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Resolve package path (supports both -m invocation and direct script)
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -47,6 +49,133 @@ from validation.targets_io import (
 
 # Import target dicts from params.py — read-only, no modification
 from mobility.params import OUTBREAK_VALIDATION_TARGETS, SENTINEL_LADDER
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROVENANCE GUARD (v2)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _git_head_sha() -> Optional[str]:
+    """Return current HEAD commit SHA; None if not in a git repo or git unavailable."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, cwd=_ROOT,
+        )
+        return result.stdout.strip() if result.returncode == 0 else None
+    except (FileNotFoundError, OSError):
+        return None
+
+
+def _short(sha: Optional[str]) -> str:
+    return sha[:8] if sha and len(sha) >= 8 else (sha or "unknown")
+
+
+def read_artifact_provenance(
+    filepath: str,
+    expect_commit: Optional[str] = None,
+    max_age_hours: Optional[float] = None,
+) -> Dict:
+    """
+    Read provenance metadata for a single artifact file.
+
+    Returns a dict with: path, mtime, age_hours, artifact_commit,
+    head_commit, verdict, provenance_suspect.
+
+    verdict is one of: "fresh" | "stale" | "unverified"
+      - fresh: artifact commit matches HEAD (or no expect_commit and within max_age)
+      - stale: artifact commit doesn't match HEAD, or max_age exceeded
+      - unverified: no commit embedded and no max_age constraint → can't verify
+    """
+    if not os.path.exists(filepath):
+        return {
+            "path": filepath,
+            "mtime": None,
+            "age_hours": None,
+            "artifact_commit": None,
+            "head_commit": _git_head_sha(),
+            "verdict": "not_found",
+            "provenance_suspect": True,
+        }
+
+    stat = os.stat(filepath)
+    mtime = stat.st_mtime
+    age_hours = (time.time() - mtime) / 3600
+    mtime_str = datetime.fromtimestamp(mtime).isoformat()
+
+    # Try to find a commit SHA embedded in the artifact JSON
+    data = _load_json(filepath)
+    artifact_commit = None
+    if data:
+        artifact_commit = (
+            data.get("git_sha")
+            or data.get("commit")
+            or data.get("run_sha")
+            or (data.get("run_manifest") or {}).get("git_sha")
+        )
+
+    head_sha = _git_head_sha()
+
+    # Determine verdict
+    stale = False
+    if artifact_commit and head_sha:
+        if artifact_commit == head_sha:
+            verdict = "fresh"
+        else:
+            verdict = "stale"
+            stale = True
+    elif expect_commit:
+        # No embedded commit but caller expects a specific one — can't verify
+        verdict = "unverified"
+        stale = True  # treat conservatively
+    elif max_age_hours and age_hours > max_age_hours:
+        verdict = "stale"
+        stale = True
+    else:
+        verdict = "unverified"
+        # unverified but not flagged as stale unless explicitly required
+
+    # explicit expect_commit mismatch (artifact has embedded commit that differs)
+    if expect_commit and artifact_commit and artifact_commit != expect_commit:
+        verdict = "stale"
+        stale = True
+
+    return {
+        "path": filepath,
+        "mtime": mtime_str,
+        "age_hours": round(age_hours, 2),
+        "artifact_commit": artifact_commit,
+        "head_commit": head_sha,
+        "expect_commit": expect_commit,
+        "verdict": verdict,
+        "provenance_suspect": stale,
+    }
+
+
+def build_provenance_banner(provenance_records: List[Dict]) -> Optional[str]:
+    """
+    Return a STALE/UNVERIFIED-PROVENANCE banner string if any artifact is suspect.
+    Returns None if all are fresh.
+    """
+    suspect = [p for p in provenance_records if p.get("provenance_suspect")]
+    if not suspect:
+        return None
+
+    lines = [
+        "⚠ STALE / UNVERIFIED-PROVENANCE",
+        "  One or more artifacts predate HEAD or have no embedded commit SHA.",
+        "  Scores may reflect an outdated network — re-run the generator before",
+        "  treating this report as current.",
+        "  Suspect artifacts:",
+    ]
+    for p in suspect:
+        lines.append(
+            f"    {os.path.basename(p['path'])}: verdict={p['verdict']}  "
+            f"mtime={p['mtime']}  "
+            f"artifact_commit={_short(p.get('artifact_commit'))}  "
+            f"head={_short(p.get('head_commit'))}"
+        )
+    return "\n".join(lines)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -337,7 +466,13 @@ def score_target(
 # MAIN HARNESS
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_harness(run_dir: str, output_dir: Optional[str] = None) -> Dict:
+def run_harness(
+    run_dir: str,
+    output_dir: Optional[str] = None,
+    expect_commit: Optional[str] = None,
+    max_age_hours: Optional[float] = None,
+    strict: bool = False,
+) -> Dict:
     """
     Build the full validation report for a given run directory.
 
@@ -345,6 +480,9 @@ def run_harness(run_dir: str, output_dir: Optional[str] = None) -> Dict:
     ----------
     run_dir : directory containing the run's emitted JSON artifacts
     output_dir : where to write validation_report.json / .md (default: run_dir)
+    expect_commit : if set, artifacts must have this commit SHA embedded
+    max_age_hours : if set, artifacts older than this are flagged stale
+    strict : if True, exit non-zero when any artifact is stale/unverified
 
     Returns the report dict.
     """
@@ -355,6 +493,10 @@ def run_harness(run_dir: str, output_dir: Optional[str] = None) -> Dict:
     report: Dict[str, Any] = {
         "run_dir": os.path.abspath(run_dir),
         "timestamp": datetime.now().isoformat(),
+        "head_commit": _git_head_sha(),
+        "expect_commit": expect_commit,
+        "provenance_banner": None,
+        "artifact_provenance": {},
         "schema_discovery": {},
         "scored": {},
         "held_out": {},
@@ -365,6 +507,30 @@ def run_harness(run_dir: str, output_dir: Optional[str] = None) -> Dict:
 
     # ── 1. Discover files ─────────────────────────────────────────────────
     artifacts = discover_files(run_dir)
+
+    # ── 1b. Provenance guard ──────────────────────────────────────────────
+    prov_records = []
+    for artifact_key, art in artifacts.items():
+        if art["source_file"]:
+            fpath = os.path.join(run_dir, art["source_file"])
+            prov = read_artifact_provenance(fpath, expect_commit, max_age_hours)
+        else:
+            prov = {
+                "path": os.path.join(run_dir, art["spec_name"]),
+                "verdict": "not_found",
+                "provenance_suspect": False,  # not_found ≠ stale
+            }
+        report["artifact_provenance"][artifact_key] = prov
+        prov_records.append(prov)
+
+    banner = build_provenance_banner(prov_records)
+    report["provenance_banner"] = banner
+    if banner:
+        print(banner)
+        if strict:
+            print("\n--strict: exiting non-zero due to stale/unverified provenance.")
+            sys.exit(1)
+
     report["schema_discovery"] = {
         k: {
             "source_file": v["source_file"],
@@ -387,13 +553,17 @@ def run_harness(run_dir: str, output_dir: Optional[str] = None) -> Dict:
         val = net_vals.get(key, "missing_field")
         report["scored"][key] = score_target(key, val)
 
-    # Dispersion needs poisson_baseline from context
+    # Dispersion — per-run Poisson baseline from the SAME RUN's ⟨k⟩ (v2 fix)
     disp_val = net_vals.get("dispersion_k2_over_k2", "missing_field")
-    pb = net_vals.get("poisson_baseline", 1.38)
-    if isinstance(pb, str):
-        pb = 1.38
+    mean_k_raw = net_vals.get("mean_degree", None)
+    if isinstance(mean_k_raw, (int, float)) and mean_k_raw > 0:
+        per_run_poisson = 1.0 + 1.0 / float(mean_k_raw)
+    else:
+        # Embedded poisson_baseline from the checks dict (validate_network.py)
+        pb_raw = net_vals.get("poisson_baseline", None)
+        per_run_poisson = float(pb_raw) if isinstance(pb_raw, (int, float)) else 1.38
     report["scored"]["dispersion_k2_over_k2"] = score_target(
-        "dispersion_k2_over_k2", disp_val, model_ci=(float(pb),)
+        "dispersion_k2_over_k2", disp_val, model_ci=(per_run_poisson,)
     )
 
     # Outbreak trajectory
@@ -473,6 +643,40 @@ def _render_markdown(report: Dict) -> str:
         "# Validation Report",
         f"Run dir: `{report['run_dir']}`",
         f"Timestamp: {report['timestamp']}",
+        f"HEAD commit: `{_short(report.get('head_commit'))}`",
+        "",
+    ]
+
+    # Provenance banner — always at top, prominent if stale
+    banner = report.get("provenance_banner")
+    if banner:
+        lines += [
+            "---",
+            f"**⚠ STALE/UNVERIFIED-PROVENANCE**",
+            "",
+            "```",
+            banner,
+            "```",
+            "",
+            "---",
+        ]
+
+    # Artifact provenance table
+    lines += [
+        "## Artifact Provenance",
+        "| Artifact | File | mtime | artifact_commit | head_commit | verdict |",
+        "|---|---|---|---|---|---|",
+    ]
+    for k, p in report.get("artifact_provenance", {}).items():
+        fname = os.path.basename(p.get("path", "—"))
+        mtime = (p.get("mtime") or "—")[:19]
+        ac = _short(p.get("artifact_commit"))
+        hc = _short(p.get("head_commit"))
+        v = p.get("verdict", "—")
+        flag = " ⚠" if p.get("provenance_suspect") else ""
+        lines.append(f"| {k} | {fname} | {mtime} | `{ac}` | `{hc}` | **{v}{flag}** |")
+
+    lines += [
         "",
         "## Schema Discovery",
         "| Artifact | Source file | Status |",
@@ -548,9 +752,21 @@ def main():
     parser.add_argument("--output", default=None,
                         help="Output directory for validation_report.json/.md "
                              "(default: same as --run)")
+    parser.add_argument("--expect-commit", default=None, dest="expect_commit",
+                        help="If given, artifacts must embed this commit SHA; "
+                             "mismatches trigger STALE banner")
+    parser.add_argument("--max-age", type=float, default=None, dest="max_age_hours",
+                        help="Maximum artifact age in hours before STALE is flagged")
+    parser.add_argument("--strict", action="store_true",
+                        help="Exit non-zero when any artifact is stale/unverified")
     args = parser.parse_args()
 
-    report = run_harness(args.run, args.output)
+    report = run_harness(
+        args.run, args.output,
+        expect_commit=args.expect_commit,
+        max_age_hours=args.max_age_hours,
+        strict=args.strict,
+    )
     s = report["summary"]
     print(f"\nValidation complete.")
     print(f"  SCORED:     {s['scored_pass']} pass / {s['scored_fail']} fail / "

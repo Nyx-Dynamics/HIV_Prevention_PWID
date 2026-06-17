@@ -1,6 +1,13 @@
 # Validation Report
 Run dir: `/Users/acdstudpro/air/HIV_Prevention_PWID/outputs`
-Timestamp: 2026-06-17T12:56:30.908386
+Timestamp: 2026-06-17T16:50:45.613955
+HEAD commit: `ca4cd83d`
+
+## Artifact Provenance
+| Artifact | File | mtime | artifact_commit | head_commit | verdict |
+|---|---|---|---|---|---|
+| network_stats | network_validation_report.json | 2026-06-17T16:50:40 | `ca4cd83d` | `ca4cd83d` | **fresh** |
+| outbreak_sim | outbreak_sim.json | — | `unknown` | `unknown` | **not_found** |
 
 ## Schema Discovery
 | Artifact | Source file | Status |
@@ -11,10 +18,10 @@ Timestamp: 2026-06-17T12:56:30.908386
 ## SCORED Targets
 | Target | Model value | Target range | Status | CI overlaps | Median in range |
 |---|---|---|---|---|---|
-| giant_component_fraction | 0.8866666666666667 | (0.45, 1.0) | **PASS** | None | True |
-| clustering_coefficient | 0.0091 | (0.1, 0.4) | **FAIL** | None | False |
-| mean_path_length | 5.180451127819549 | (2.0, 6.0) | **PASS** | None | True |
-| dispersion_k2_over_k2 | 1.501 | (2.07, '∞') | **FAIL** | None | False |
+| giant_component_fraction | 0.29333333333333333 | (0.45, 1.0) | **FAIL** | None | False |
+| clustering_coefficient | 0.11633 | (0.1, 0.4) | **PASS** | None | True |
+| mean_path_length | 2.044932079414838 | (2.5, 4.5) | **FAIL** | None | False |
+| dispersion_k2_over_k2 | 4.8451 | (1.8082191780821917, '∞') | **PASS** | None | True |
 | final_size | not_emitted | — | **NOT_EMITTED** | None | None |
 | single_cluster_fraction | not_emitted | — | **NOT_EMITTED** | None | None |
 | degree_risk_gradient | not_emitted | — | **NOT_EMITTED** | None | None |
