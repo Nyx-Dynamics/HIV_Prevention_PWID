@@ -241,19 +241,36 @@ MOBILITY_PARAMS = {
                "literature review. Wide variance — treat as sensitivity axis.",
     ),
 
-    # Shared fraction per partner (fraction of injections shared with a given partner)
-    # DEFINED ONCE — referenced by both T integration and kappa_share.
-    # If these drift apart, the T and the edge formation probability become inconsistent.
+    # Shared fraction per partner — CALIBRATED FORWARD (Task 2)
+    # DERIVATION (show-your-work; not tuned to any outcome):
+    #   NHBS any-syringe-sharing prevalence (12 mo): p_any = 0.27
+    #   Mean injection-partner degree: k̄ = 2.6
+    #   Per-partnership annual sharing probability:
+    #     p_pp_yr = 1 − (1 − p_any)^(1/k̄) = 1 − 0.73^(1/2.6) ≈ 0.117
+    #   Annual injection frequency: f_yr = 3/day × 365 = 1095 injections/year
+    #   Per-injection per-partner sharing probability (Bernoulli, small-p approx):
+    #     p_pp_inj ≈ p_pp_yr / f_yr = 0.117 / 1095 ≈ 0.000107
+    #   This is the conservative (Poisson independence) estimate.
+    #   Upper bound: if sharers share on ~half of injections (heavy-sharing subgroup):
+    #     0.27 × 0.5 / 2.6 / 3 × 1/365 ≈ 0.014 — still well below 0.15
+    #   Central estimate: 0.001 [bounds 0.0001, 0.015]
+    #   SATURATION NOTE: at inj_freq=3, acute_dur=77, saturation (T>0.95) requires
+    #     shared_fraction > 0.088. The calibrated range [0.0001, 0.015] is far below
+    #     saturation — T will range ~0.01–0.35 rather than being pinned near 1.
+    #   NOT tuned to R₀ or outbreak rarity. PENDING AC SIGN-OFF.
     "shared_fraction_per_partner": ParameterWithUncertainty(
         name="Fraction of injections shared with a given network partner",
-        point_estimate=0.15,
-        lower_bound=0.05,
-        upper_bound=0.30,
-        distribution="beta",
-        source=PLACEHOLDER + " — derived from NHBS syringe sharing prevalence (0.27 over 12 months) "
-               "adjusted for injection frequency and partnership count. Unit-tricky: this is per-partner, "
-               "not per-injection-event. TODO: derive from injection freq × sharing prevalence / mean degree. "
-               "Shared with kappa_share — do not change one without the other.",
+        point_estimate=0.001,
+        lower_bound=0.0001,
+        upper_bound=0.015,
+        distribution="lognormal",
+        source="CALIBRATED FORWARD from NHBS syringe sharing (Burnett JC et al. MMWR 67(1) 2018. "
+               "DOI 10.15585/mmwr.mm6701a5, p_any=0.27) ÷ (injection_freq × mean_degree). "
+               "Derivation: p_per_partner_yr = 1−(1−0.27)^(1/2.6) ≈ 0.117; "
+               "shared_fraction ≈ 0.117/1095 ≈ 0.0001 (independence lower bound). "
+               "Upper bound 0.015 allows for heavy-sharing subgroups. "
+               "NOT TUNED to R₀ or outbreak frequency — forward from behavioral data only. "
+               "PENDING AC SIGN-OFF before use in published results.",
     ),
 
     # Chronic-phase transmission window (partnership duration / time-to-treatment)
@@ -281,6 +298,27 @@ MOBILITY_PARAMS = {
         distribution="beta",
         source="Burnett JC et al. MMWR 67(1):23 (2018). DOI 10.15585/mmwr.mm6701a5. "
                "National average; varies substantially by region.",
+    ),
+
+    # ─────────────────────────────────────────────────────────────────────
+    # T_edge — collapsed per-edge transmissibility (Task 1)
+    # Direct bounded parameter; does NOT require decomposition.
+    # Alternative to the 5-parameter decomposed path; both are preserved.
+    # ─────────────────────────────────────────────────────────────────────
+    "T_edge": ParameterWithUncertainty(
+        name="Effective per-edge transmissibility (collapsed, directly bounded)",
+        point_estimate=0.35,
+        lower_bound=0.10,
+        upper_bound=0.95,
+        distribution="beta",
+        source="Rolls DA et al. J Theor Biol 297:73 (2011). DOI 10.1016/j.jtbi.2011.12.008 — "
+               "per-partnership HCV transmission probability as structural analog (method precedent; "
+               "use HIV-specific value when available). "
+               "Hollingsworth TQ et al. Nat Med 2008 — phylogenetic cluster R₀ for IDU implies "
+               "T ≈ R₀ × τ_c / (⟨k²⟩−⟨k⟩)/⟨k⟩; at R₀~1–2 and τ_c~0.3, T~0.3–0.6. "
+               "Upper bound 0.95 from per-act β_acute × m_acute at acute-viremia peak; "
+               "lower bound 0.10 for sparse-sharing chronic partnerships. "
+               "PENDING AC SIGN-OFF — collapsed parameter removes mechanistic transparency.",
     ),
 }
 

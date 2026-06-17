@@ -32,6 +32,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from mobility.network_generator import run_generator, NetworkStats
 from mobility.params import MOBILITY_PARAMS, BETA_CAP
+import copy as _copy
 
 RNG = np.random.default_rng(42)
 
@@ -133,6 +134,80 @@ def compute_per_edge_T(
         )
 
     return T
+
+
+def saturation_diagnostic(params: dict = None) -> Dict:
+    """
+    Task 1: Report the shared_fraction at which T crosses 0.95 (saturation).
+
+    At point estimates for β_chronic, acute_multiplier, acute_duration,
+    injection_freq, and chronic_window, computes the crossover fraction where
+    T exceeds 0.95 — i.e., the partnership is essentially certain to transmit.
+    Reports whether the current shared_fraction is past that point.
+
+    Returns a dict with crossover_shared_fraction, current_shared_fraction,
+    current_T_point, and is_saturated flag.
+    """
+    if params is None:
+        params = MOBILITY_PARAMS
+
+    beta_c = params["beta_chronic_per_shared_injection"].point_estimate
+    mult = params["acute_multiplier"].point_estimate
+    acute_dur = params["acute_duration_days"].point_estimate
+    inj_freq = params["injection_freq_per_day"].point_estimate
+    chronic_win = params["chronic_window_days"].point_estimate
+    current_sf = params["shared_fraction_per_partner"].point_estimate
+
+    beta_acute = min(beta_c * mult, BETA_CAP)
+
+    # Find crossover via binary search: T(sf) = 0.95
+    def T_at_sf(sf):
+        m_a = inj_freq * sf * acute_dur
+        m_c = inj_freq * sf * chronic_win
+        return 1.0 - (1 - beta_acute) ** m_a * (1 - beta_c) ** m_c
+
+    # Binary search in [0, 1]
+    lo, hi = 1e-6, 1.0
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        if T_at_sf(mid) < 0.95:
+            lo = mid
+        else:
+            hi = mid
+    crossover = (lo + hi) / 2
+
+    current_T = T_at_sf(current_sf)
+
+    return {
+        "crossover_shared_fraction": float(crossover),
+        "current_shared_fraction": float(current_sf),
+        "current_T_point_estimate": float(current_T),
+        "is_saturated": bool(current_sf >= crossover),
+        "saturation_note": (
+            f"T saturates (>0.95) at shared_fraction ≥ {crossover:.4f}. "
+            f"Current value {current_sf:.4f} is {'PAST' if current_sf >= crossover else 'BELOW'} "
+            f"the saturation point (T={current_T:.4f}). "
+            "Default placeholder 0.15 was past saturation; calibrated 0.001 is well below it."
+        ),
+    }
+
+
+def compute_T_edge_distribution(
+    params: dict = None,
+    n_samples: int = 5000,
+    rng: np.random.Generator = None,
+) -> np.ndarray:
+    """
+    Task 1: Sample T_edge from the collapsed, directly-bounded parameter.
+
+    Returns T_samples from MOBILITY_PARAMS["T_edge"] distribution.
+    This is the identifiable alternative to the 5-parameter decomposed path.
+    """
+    if params is None:
+        params = MOBILITY_PARAMS
+    if rng is None:
+        rng = np.random.default_rng(42)
+    return params["T_edge"].sample(n_samples)
 
 
 def r0_on_network(T: float, degree_seq: List[int]) -> float:
@@ -316,8 +391,13 @@ def run_threshold_analysis(
     else:
         print(f"    τ_c   = ∞  (degenerate degree sequence; ⟨k²⟩ ≈ ⟨k⟩)")
 
-    # ── 2. Per-edge T distribution ──────────────────────────────────────────
-    print("\n2. Computing per-edge transmissibility T (duration-integrated, acute-weighted)...")
+    # ── 2a. Saturation diagnostic ────────────────────────────────────────────
+    print("\n2a. Saturation diagnostic (Task 1)...")
+    sat = saturation_diagnostic(MOBILITY_PARAMS)
+    print(f"    {sat['saturation_note']}")
+
+    # ── 2b. Decomposed T distribution ───────────────────────────────────────
+    print("\n2b. Decomposed T (duration-integrated, acute-weighted)...")
     T_samples = compute_per_edge_T(params=MOBILITY_PARAMS, n_samples=n_T_samples, rng=rng)
 
     T_summary = {
@@ -329,16 +409,25 @@ def run_threshold_analysis(
         "T_p95": float(np.percentile(T_samples, 95)),
     }
 
-    print(f"    T median = {T_summary['T_median']:.4f}")
-    print(f"    T [5th, 95th] = [{T_summary['T_p5']:.4f}, {T_summary['T_p95']:.4f}]")
+    print(f"    T_decomposed median = {T_summary['T_median']:.4f}")
+    print(f"    T_decomposed [5th, 95th] = [{T_summary['T_p5']:.4f}, {T_summary['T_p95']:.4f}]")
 
-    # Sanity check: T should straddle values that make R₀ straddle 1
-    # (from the handoff: "T lands roughly 0.5–0.9 with acute weighting")
     if T_summary['T_p95'] < 0.05:
         print("  ⚠ SANITY GUARD: T_p95 < 0.05 — possible per-act β error. Stop and recheck.")
 
-    # ── 3. R₀ distribution ──────────────────────────────────────────────────
-    print("\n3. Computing R₀ = T / τ_c distribution...")
+    # ── 2c. Collapsed T_edge ─────────────────────────────────────────────────
+    print("\n2c. Collapsed T_edge (directly bounded, identifiable)...")
+    T_edge_samples = compute_T_edge_distribution(params=MOBILITY_PARAMS, n_samples=n_T_samples, rng=rng)
+    T_edge_summary = {
+        "T_edge_median": float(np.median(T_edge_samples)),
+        "T_edge_p5": float(np.percentile(T_edge_samples, 5)),
+        "T_edge_p95": float(np.percentile(T_edge_samples, 95)),
+    }
+    print(f"    T_edge median = {T_edge_summary['T_edge_median']:.4f}")
+    print(f"    T_edge [5th, 95th] = [{T_edge_summary['T_edge_p5']:.4f}, {T_edge_summary['T_edge_p95']:.4f}]")
+
+    # ── 3. R₀ distribution (both paths) ─────────────────────────────────────
+    print("\n3. Computing R₀ = T / τ_c distribution (both paths)...")
 
     # Propagate τ_c uncertainty via the sweep (ρ, r_g)
     # For R₀ credible interval, sample τ_c from the sweep range as a uniform proxy
@@ -352,15 +441,20 @@ def run_threshold_analysis(
     else:
         tau_c_samples = np.full(n_T_samples, tau_c_point)
 
+    # Decomposed path
     r0_samples, p_r0_gt1, r0_summary = compute_r0_distribution(T_samples, tau_c_samples)
 
-    print(f"    R₀ median = {r0_summary['median']:.3f}")
-    print(f"    R₀ [5th, 95th pct] = [{r0_summary['p5']:.3f}, {r0_summary['p95']:.3f}]")
-    print(f"    P(R₀ > 1) = {p_r0_gt1:.3f}")
-    print(f"    Credible interval straddles R₀=1: {r0_summary['straddles_1']}")
+    print(f"    [decomposed] R₀ median = {r0_summary['median']:.3f}  "
+          f"[5–95th: {r0_summary['p5']:.3f}–{r0_summary['p95']:.3f}]  "
+          f"P(R₀>1)={p_r0_gt1:.3f}  straddles={r0_summary['straddles_1']}")
 
-    if not r0_summary['straddles_1']:
-        print("  NOTE: interval does not straddle 1 — check parameter ranges and kappa_share.")
+    # Collapsed T_edge path
+    r0_edge_samples, p_r0_edge_gt1, r0_edge_summary = compute_r0_distribution(
+        T_edge_samples, tau_c_samples
+    )
+    print(f"    [T_edge]     R₀ median = {r0_edge_summary['median']:.3f}  "
+          f"[5–95th: {r0_edge_summary['p5']:.3f}–{r0_edge_summary['p95']:.3f}]  "
+          f"P(R₀>1)={p_r0_edge_gt1:.3f}  straddles={r0_edge_summary['straddles_1']}")
 
     # ── 4. Dimension note (replaces the retired κ comparison) ───────────────
     print("\n" + "-" * 72)
@@ -384,6 +478,7 @@ def run_threshold_analysis(
             "k2_moment": stats.k2_moment,
             "k2_is_sensitivity_range": True,
         },
+        "saturation_diagnostic": sat,
         "tau_c": {
             "point_estimate": tau_c_point if np.isfinite(tau_c_point) else None,
             "sweep_min": tc_min,
@@ -392,12 +487,17 @@ def run_threshold_analysis(
             "note": "tau_c is a per-edge transmissibility threshold (T units). "
                     "NOT comparable to kappa=0.35 (a density variable).",
         },
-        "T_per_edge": T_summary,
-        "r0": {
+        "T_decomposed": T_summary,
+        "T_edge": T_edge_summary,
+        "r0_decomposed": {
             **r0_summary,
-            "formula": "R0 = T / tau_c = T * (k2 - k) / k",
+            "formula": "R0 = T_decomposed / tau_c",
             "T_units": "per-edge (duration-integrated, acute-weighted)",
-            "note": "R0 straddles 1 = near-criticality thesis; not comfortable supercriticality.",
+        },
+        "r0_T_edge": {
+            **r0_edge_summary,
+            "formula": "R0 = T_edge / tau_c",
+            "T_units": "per-edge (collapsed, directly bounded)",
         },
         "dimension_note": (
             "kappa=0.35 (density threshold) and tau_c (transmissibility threshold) "
@@ -418,13 +518,19 @@ def run_threshold_analysis(
     print("\n" + "=" * 72)
     print("  SUMMARY")
     print("=" * 72)
-    print(f"  τ_c (point)          = {tau_c_point:.4f}  [sweep: {tc_min:.4f}–{tc_max:.4f}]")
-    print(f"  T median (per-edge)  = {T_summary['T_median']:.4f}  "
-          f"[5–95th pct: {T_summary['T_p5']:.4f}–{T_summary['T_p95']:.4f}]")
-    print(f"  R₀ median            = {r0_summary['median']:.3f}  "
-          f"[5–95th pct: {r0_summary['p5']:.3f}–{r0_summary['p95']:.3f}]")
-    print(f"  P(R₀ > 1)           = {p_r0_gt1:.3f}")
-    print(f"  Straddles R₀=1      = {r0_summary['straddles_1']}")
+    print(f"  τ_c (point)                  = {tau_c_point:.4f}  [sweep: {tc_min:.4f}–{tc_max:.4f}]")
+    print(f"  Saturation crossover         = sf ≥ {sat['crossover_shared_fraction']:.4f}  "
+          f"(current sf={sat['current_shared_fraction']:.5f}, {'SATURATED' if sat['is_saturated'] else 'below'})")
+    print(f"  T_decomposed median          = {T_summary['T_median']:.4f}  "
+          f"[5–95th: {T_summary['T_p5']:.4f}–{T_summary['T_p95']:.4f}]")
+    print(f"  T_edge median (collapsed)    = {T_edge_summary['T_edge_median']:.4f}  "
+          f"[5–95th: {T_edge_summary['T_edge_p5']:.4f}–{T_edge_summary['T_edge_p95']:.4f}]")
+    print(f"  R₀ (decomposed T)  median    = {r0_summary['median']:.3f}  "
+          f"[{r0_summary['p5']:.3f}–{r0_summary['p95']:.3f}]  P(>1)={p_r0_gt1:.3f}  "
+          f"straddles={r0_summary['straddles_1']}")
+    print(f"  R₀ (T_edge collapsed) median = {r0_edge_summary['median']:.3f}  "
+          f"[{r0_edge_summary['p5']:.3f}–{r0_edge_summary['p95']:.3f}]  P(>1)={p_r0_edge_gt1:.3f}  "
+          f"straddles={r0_edge_summary['straddles_1']}")
 
     return report
 
