@@ -224,3 +224,73 @@ yet wired together — that is a separate human-reviewed step.
    all available empirical datasets. Any published τ_c value must be presented as a range
    driven by the tail uncertainty, not a point estimate. AC should review the sensitivity
    band produced by Stage 3 and set conservative / liberal bounds for the manuscript.
+
+5. **NHBS receptive-sharing frequency breakdown:** The module has the any-sharing
+   prevalence (27%) but needs the frequency distribution (every time / >half / <half)
+   to set within-sharer intensity in the dyad model. This is likely in the NHBS MMWR
+   67(1) supplementary tables. **Highest priority for next sourcing pass.**
+
+6. **injection_frequency by drug class:** Stimulant (meth/cocaine) injection frequency
+   differs from opioid. Strathdee 1997 and Des Jarlais 2020 document the direction;
+   specific per-day counts by drug class are needed for the staged T model.
+
+7. **`intensity_scale` in `assign_node_sharing_intensity()`:** Currently
+   `Gamma(shape=0.5, scale=0.05)` — PLACEHOLDER. Will be retired once the staged-β
+   model (Hollingsworth 2008 acute ×26, late ×7) is wired into `compute_per_edge_T`.
+   See `params.py` entries `acute_multiplier`, `late_stage_multiplier`.
+
+8. **Giant component gap:** Current dyad model produces only 29% giant-component
+   fraction (vs 90%+ empirical). Cause: 71% of nodes have zero sharing intensity.
+   Two options for Handoff 7: (a) add rare-sharing tier for non-zero-intensity nodes
+   at low probability, (b) make kappa_dyad produce edges even for low-intensity pairs.
+
+---
+
+## T_dyad Staging — Sourcing (feeds Handoff 7 implementation)
+
+Staged per-injection β: **T = 1 − (1−β_stage)^m** per stage, where
+**m = injection_freq × sharing_fraction × window_days**.
+
+| Stage | Multiplier vs β_chronic | Window | Source |
+|---|---|---|---|
+| Acute | ×26 | ~90 days | Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501 |
+| Chronic/asymptomatic | ×1 (baseline) | partnership duration − acute − late | (baseline) |
+| Late-stage | ×7 | ~270 days (19–10 mo pre-death) | Hollingsworth 2008 (ibid.) |
+
+The acute ×26 window (~3 months) is the non-circular takeoff form: explosiveness
+emerges from viremia staging rather than from a phenomenological cliff. This is what
+validates against Scott County trajectory (18.6/100 py explosive incidence) forward,
+not backward.
+
+## Sentinel Ladder — Sourcing
+
+Four pathogens ordered by effective R₀ threshold on one contact-intensity axis.
+HIV is held out. Each rung provides an independent ordered constraint.
+
+| Rung | Pathogen | Validation target | Source |
+|---|---|---|---|
+| 1 | Rectal GC | Subsequent HIV 4.1/100 py | Katz DA et al. Sex Transm Dis 43(2):91 (2016). DOI 10.1097/OLQ.0000000000000423 |
+| 2 | Early syphilis | Subsequent HIV 2.8/100 py | Katz 2016 (ibid.) |
+| 3 | **HIV** | **HELD OUT — forward prediction** | — |
+| 4 | Sexual HCV | Incidence 1–4/100 py (HIV+ MSM) | Chaillon 2019 DOI 10.1093/ofid/ofz160; Wandeler 2012 DOI 10.1093/cid/cis694; Jansen 2015 DOI 10.1371/journal.pone.0142515 |
+
+Composite STI cofactor: rectal STI → incident HIV aHR 2.7 [1.2–6.4], PAF 14.6%
+(Kelley 2015 DOI 10.1089/AID.2015.0013). ONE cofactor on bridge nodes; GC + syphilis
+are indicators, not independent transmission coefficients.
+
+**Do NOT let the 4.1/100 py incidence figures enter as transmission coefficients.**
+They are validation targets for the model's output, not inputs.
+
+## Outbreak Validation Panel — Sourcing
+
+Validate on trajectory (size / cluster / incidence / doubling), not a published R₀.
+
+| Target | Value | Source |
+|---|---|---|
+| Final size (Scott Co.) | 215 | Peters PJ et al. N Engl J Med 373:2431 (2015). DOI 10.1056/NEJMoa1515195 |
+| Final size (Cabell Co.) | 82 | McClung RP et al. Am J Prev Med 61(1):50 (2021). DOI 10.1016/j.amepre.2021.05.039 |
+| Final size (NE Mass.) | 129 | Alpren C et al. Am J Public Health 110(1):37 (2020). DOI 10.2105/AJPH.2019.305366 |
+| Cluster dominance | 93–99% in one cluster | Peters 2015; McClung 2021 |
+| Degree→risk gradient | aRR 1.9 per syringe-sharing partner named | Peters 2015 |
+| Explosive incidence | 18.6/100 py [11.1–26.0] | Strathdee SA et al. AIDS 11(8) (1997). DOI 10.1097/00002030-199708000-00001 |
+| SIR removal rate | 0.024 /diagnosed/day | Gonsalves GS & Crawford FW. Lancet HIV 5(6):e297 (2018). DOI 10.1016/S2352-3018(18)30176-0 |

@@ -206,39 +206,76 @@ MOBILITY_PARAMS = {
     ),
 
     # Acute-phase multiplier on per-act β
-    # Acute viremia elevates β by ~8–26×; IDU outbreaks are acute-phase driven
+    # Hollingsworth 2008: ×26 vs asymptomatic; duration ~3 months (90 days).
+    # NOTE: ratio derived from sexual transmission data; transfers by mechanism.
+    # Range lower bound 8 preserves uncertainty from secondary sources.
     "acute_multiplier": ParameterWithUncertainty(
         name="Acute-phase transmissibility multiplier on β_chronic",
-        point_estimate=15.0,
+        point_estimate=26.0,
         lower_bound=8.0,
         upper_bound=26.0,
         distribution="lognormal",
-        source="Corner 2 acute kinetics; Hollingsworth TQ et al. Nat Med 2008; "
-               "Wawer MJ et al. J Infect Dis 2005; Pinkerton SD. AIDS 2007. "
-               "Acute viremia elevation factor.",
+        source="Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501 — "
+               "×26 vs asymptomatic; sexual data, ratio transfers to injection route. "
+               "Lower bound from secondary sources (Wawer MJ et al. J Infect Dis 2005; "
+               "Pinkerton SD. AIDS 2007). Point estimate updated to Hollingsworth primary value.",
     ),
 
-    # Acute-phase duration (Fiebig staging)
+    # Acute-phase duration (Hollingsworth 2008: ~3 months)
+    # Updated from prior 77 d (Fiebig staging only); Hollingsworth gives ~90 d window.
     "acute_duration_days": ParameterWithUncertainty(
         name="Acute HIV infection duration (days)",
-        point_estimate=77.0,
-        lower_bound=49.0,
-        upper_bound=112.0,
+        point_estimate=90.0,
+        lower_bound=60.0,
+        upper_bound=120.0,
         distribution="normal",
-        source="Corner 2 / Fiebig staging; Hollingsworth TQ et al. Nat Med 2008. "
-               "~7–16 weeks.",
+        source="Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501 — "
+               "acute phase ~3 months; ~90 d window for elevated viremia/transmissibility. "
+               "Fiebig staging consistent with 60–120 d range.",
+    ),
+
+    # Late-stage multiplier on β_chronic (NEW — Hollingsworth 2008)
+    # ×7 vs asymptomatic, concentrated 19–10 months pre-death.
+    # Staged T model: T = 1-(1-β_acute)^m_acute × (1-β_late)^m_late × (1-β_chronic)^m_chronic
+    # NOT YET IMPLEMENTED in compute_per_edge_T — placeholder for next build pass.
+    "late_stage_multiplier": ParameterWithUncertainty(
+        name="Late-stage HIV transmissibility multiplier on β_chronic",
+        point_estimate=7.0,
+        lower_bound=3.0,
+        upper_bound=12.0,
+        distribution="lognormal",
+        source="Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501 — "
+               "late-stage ×7 vs asymptomatic; window concentrated 19–10 months pre-death. "
+               "NOT YET WIRED into staged T model — next build pass.",
+    ),
+
+    # Late-stage duration window (19–10 months pre-death = ~270 days)
+    "late_stage_duration_days": ParameterWithUncertainty(
+        name="Late-stage HIV infection window for elevated transmissibility (days)",
+        point_estimate=270.0,
+        lower_bound=180.0,
+        upper_bound=365.0,
+        distribution="normal",
+        source="Hollingsworth TQ et al. Nat Med 14:1096 (2008). DOI 10.1086/590501 — "
+               "window 19–10 months pre-death ≈ 270 days. NOT YET WIRED.",
     ),
 
     # Injection frequency (acts per day)
-    # Wide variance — flag for sensitivity
+    # Drug-type dependent: stimulants (meth/cocaine) → more frequent injection.
+    # Strathdee 1997 — cocaine → frequent injection; Des Jarlais 2020 — short-acting drugs.
+    # NEEDS numeric freq by drug class for staged model. Current range is aggregate.
     "injection_freq_per_day": ParameterWithUncertainty(
         name="Injection frequency (injections per day per PWID)",
         point_estimate=3.0,
         lower_bound=1.0,
         upper_bound=6.0,
         distribution="lognormal",
-        source="Burnett JC et al. MMWR 67(1) (2018). DOI 10.15585/mmwr.mm6701a5; "
-               "literature review. Wide variance — treat as sensitivity axis.",
+        source="Burnett JC et al. MMWR 67(1) (2018). DOI 10.15585/mmwr.mm6701a5 (aggregate). "
+               "Strathdee SA et al. AIDS 11(8) (1997). DOI 10.1097/00002030-199708000-00001 "
+               "(cocaine → frequent injection). "
+               "Des Jarlais DC et al. Lancet HIV 7(7) (2020). DOI 10.1016/S2352-3018(20)30082-5 "
+               "(short-acting drugs, injection pattern). "
+               "NEEDS drug-class stratification (stimulant vs opioid) for next build pass.",
     ),
 
     # Shared fraction per partner — CALIBRATED FORWARD (Task 2)
@@ -353,5 +390,146 @@ VALIDATION_TARGETS = {
         "source": "Multiple RDS surveys (Buchanan, Young, Klovdahl).",
         "note": "TAIL CAVEAT: high-degree tail is most under-captured in all RDS datasets. "
                 "k² and hence τ_c must be treated as a sensitivity range, never a point estimate.",
+    },
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OUTBREAK VALIDATION PANEL
+# Validate simulated outbreak on TRAJECTORY (size / cluster / incidence /
+# doubling), NOT on a published R₀ — avoids circularity.
+# HIV outbreak frequency is HELD OUT as a forward prediction; not fitted.
+# ─────────────────────────────────────────────────────────────────────────────
+
+OUTBREAK_VALIDATION_TARGETS = {
+    "final_size": {
+        "scott_county_in": 215,
+        "cabell_county_wv": 82,
+        "ne_massachusetts": 129,
+        "source": (
+            "Peters PJ et al. N Engl J Med 373:2431 (2015). DOI 10.1056/NEJMoa1515195 "
+            "(Scott Co.; 215 confirmed cases). "
+            "McClung RP et al. Am J Prev Med 61(1):50 (2021). DOI 10.1016/j.amepre.2021.05.039 "
+            "(Cabell Co.; 82). "
+            "Alpren C et al. Am J Public Health 110(1):37 (2020). DOI 10.2105/AJPH.2019.305366 "
+            "(NE Mass.; 129)."
+        ),
+        "use": "final-size plausibility check; range <100 to >1000 cross-site",
+        "note": "Des Jarlais DC et al. Lancet HIV 2020 DOI 10.1016/S2352-3018(20)30082-5 — "
+                "outbreak size range <100 to >1000.",
+    },
+    "cluster_dominance": {
+        "scott_county_pct": 98.7,
+        "cabell_county_pct": 93.0,
+        "source": "Peters 2015 (ibid.); McClung 2021 (ibid.)",
+        "use": "single-seed → giant-component check. "
+               "Argues against 29% giant-component artifact — empirical outbreaks "
+               "show 93-99% in one molecular cluster.",
+    },
+    "degree_risk_gradient": {
+        "arr_per_syringe_partner_named": 1.9,
+        "source": "Peters PJ et al. N Engl J Med 373:2431 (2015). DOI 10.1056/NEJMoa1515195",
+        "use": "validates degree→risk shape in the generated network",
+    },
+    "explosive_hiv_incidence_per_100py": {
+        "value": 18.6,
+        "ci_lower": 11.1,
+        "ci_upper": 26.0,
+        "source": "Strathdee SA et al. AIDS 11(8) (1997). DOI 10.1097/00002030-199708000-00001",
+        "use": "incidence check during explosive-phase simulation",
+    },
+    "hcv_prevalence_injection_dominated": {
+        "range_pct": (88, 92),
+        "source": "Peters 2015 (ibid.); Strathdee 1997 (ibid.)",
+        "use": (
+            "route-stratified sharing-intensity anchor. "
+            "ROUTE CAVEAT: use ONLY in injection-dominated nodes. "
+            "In bridge (HIV+/chemsex MSM) HCV is sexually transmitted — using "
+            "whole-network HCV as injection intensity is route-misattribution."
+        ),
+    },
+    "sir_removal_rate_per_diagnosed_per_day": {
+        "value": 0.024,
+        "source": "Gonsalves GS & Crawford FW. Lancet HIV 5(6):e297 (2018). "
+                  "DOI 10.1016/S2352-3018(18)30176-0",
+        "use": "SIR removal term (diagnosis→treatment suppression)",
+        "note": "Gonsalves & Crawford model transmission rate + case-finding; "
+                "no clean R₀ — validate on trajectory, not a published R₀.",
+    },
+    "structural_drivers": {
+        "cabell_unstable_housing_pct": 80,
+        "source": "McClung 2021 (ibid.); Des Jarlais 2020 (ibid.)",
+        "use": "structural concentration / hotspot weighting in venue layer",
+    },
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SENTINEL LADDER
+# Four pathogens on ONE contact-intensity axis.
+# Rectal GC → early syphilis → HIV → sexual HCV (ordered by effective R₀ /
+# threshold; lower rung = lower threshold = lights up first).
+# HIV stays HELD OUT. Each rung is a non-circular ordered constraint.
+# ─────────────────────────────────────────────────────────────────────────────
+
+SENTINEL_LADDER = {
+    "rectal_gc": {
+        "rung": 1,
+        "subsequent_hiv_incidence_per_100py": 4.1,
+        "source": "Katz DA et al. Sex Transm Dis 43(2):91 (2016). "
+                  "DOI 10.1097/OLQ.0000000000000423",
+        "role": "Fastest detector; site-specific to receptive anal → cleanest "
+                "behavioral marker of bridge node.",
+    },
+    "early_syphilis": {
+        "rung": 2,
+        "subsequent_hiv_incidence_per_100py": 2.8,
+        "source": "Katz DA et al. Sex Transm Dis 43(2):91 (2016). "
+                  "DOI 10.1097/OLQ.0000000000000423",
+        "role": "Detector + ulcerative cofactor.",
+    },
+    "hiv": {
+        "rung": 3,
+        "held_out": True,
+        "role": "HELD-OUT forward prediction. Not fitted. Not validated against outcome.",
+    },
+    "sexual_hcv": {
+        "rung": 4,
+        "incidence_per_100py_range": (1.0, 4.09),
+        "source": (
+            "Chaillon A et al. Open Forum Infect Dis 6(9):ofz160 (2019). "
+            "DOI 10.1093/ofid/ofz160 (San Diego 1.13→3.01). "
+            "Wandeler G et al. Clin Infect Dis 55(6):821 (2012). "
+            "DOI 10.1093/cid/cis694 (Swiss 0.23→4.09). "
+            "Jansen K et al. PLoS One 10(10):e0142515 (2015). "
+            "DOI 10.1371/journal.pone.0142515 (Ger 1.54)."
+        ),
+        "role": "High-water mark: sexual sustainment ≈ pool already supercritical for HIV. "
+                "Falsification: HCV sexual sustainment should track contact INTENSITY, "
+                "not HIV serostatus per se.",
+    },
+    "composite_sti_cofactor": {
+        "ahr": 2.7,
+        "ci_lower": 1.2,
+        "ci_upper": 6.4,
+        "paf_pct": 14.6,
+        "source": "Kelley CF et al. AIDS Res Hum Retroviruses 31(10):1009 (2015). "
+                  "DOI 10.1089/AID.2015.0013 (rectal STI → incident HIV, propensity-weighted). "
+                  "David D et al. Infect Dis Model 5:721 (2020). "
+                  "DOI 10.1016/j.idm.2020.10.008 (HIV–syphilis coupling model). "
+                  "Wandeler 2012: syphilis predicts HCV seroconversion aHR 2.11.",
+        "role": "ONE inflammatory cofactor on bridge nodes — composite, not per-pathogen. "
+                "Rectal GC + syphilis are INDICATORS of that state; "
+                "4.1/100py and 2.8/100py are VALIDATION TARGETS, not transmission coefficients.",
+        "note": "DO NOT split per-pathogen — collinear, would double-count. "
+                "Coupling precedent: David 2020 HIV-syphilis reproduction-number model.",
+    },
+    "methamphetamine_sexualized_use_pct": {
+        "value": 48.0,
+        "source": "Palaniswami PP & Fierer DS. Open Forum Infect Dis 5(10):ofy238 (2018). "
+                  "DOI 10.1093/ofid/ofy238",
+        "role": "48% sexualized meth use in sexually-acquired-HCV cohort. "
+                "Drug type → injection_frequency → m. Stimulant use is the link "
+                "between injection model and bridge; sets upper range of injection_freq.",
     },
 }
