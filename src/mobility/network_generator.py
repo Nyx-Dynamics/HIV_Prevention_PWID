@@ -378,6 +378,58 @@ def colocation_counter(
     return counter
 
 
+def colocation_counter_capped(
+    trajectories: List[Trajectory],
+    contact_cap: int,
+    rng: np.random.Generator,
+    space_bin: float = 0.5,
+    time_bin: int = 5,
+) -> Dict[Tuple[int, int], int]:
+    """
+    Per-event contact cap: within each venue-time bin of m co-present agents,
+    each agent samples min(contact_cap, m-1) partners without replacement.
+    A pair's count is incremented at most once per bin (distinct events only).
+    Edge exists in the contact layer if count >= min_colocs.
+
+    Replaces the full-clique colocation_counter in run_generator_core_periphery.
+    The original colocation_counter (full clique) is retained for the dyads path.
+
+    Mechanistic rationale: a PWID shares at a venue with a small number of
+    co-present partners, not with every person in the space simultaneously.
+    Degree then emerges from mobility: high-traversal agents attend more events
+    (more draws → higher degree → the core).
+    """
+    bin_map: Dict[Tuple[int, int, int], List[int]] = {}
+    for traj in trajectories:
+        for x, y, step in traj.visits:
+            sx = int(np.floor(x / space_bin))
+            sy = int(np.floor(y / space_bin))
+            tb = step // time_bin
+            key = (sx, sy, tb)
+            if key not in bin_map:
+                bin_map[key] = []
+            bin_map[key].append(traj.agent_id)
+
+    counter: Dict[Tuple[int, int], int] = {}
+    for agents_in_bin in bin_map.values():
+        unique = list(set(agents_in_bin))
+        m = len(unique)
+        if m < 2:
+            continue
+        sampled_pairs: set = set()
+        for agent in unique:
+            others = [a for a in unique if a != agent]
+            n_sample = min(contact_cap, len(others))
+            chosen = rng.choice(others, size=n_sample, replace=False)
+            for partner in chosen:
+                pair = (min(int(agent), int(partner)), max(int(agent), int(partner)))
+                sampled_pairs.add(pair)
+        for pair in sampled_pairs:
+            counter[pair] = counter.get(pair, 0) + 1
+
+    return counter
+
+
 def assign_node_sharing_intensity(
     n_agents: int,
     sharing_prevalence: float,
@@ -909,22 +961,26 @@ def run_generator_core_periphery(
     kappa_dyad: float = 2.0,
     space_bin: float = 0.5,
     time_bin: int = 5,
-    min_colocs: int = 2,
+    min_colocs: int = 4,
+    contact_cap: int = 2,
     venues: Optional[List[Venue]] = None,
     venue_return_boost: float = 5.0,
     seed: int = 42,
 ) -> Tuple[nx.Graph, NetworkStats, List[Agent], np.ndarray, Dict, Dict]:
     """
-    Core-periphery pipeline (Handoff 8).
+    Core-periphery pipeline (Handoff 8 / H8-fix).
 
     KEY DIFFERENCE from run_generator_dyads():
-      - Contact layer (topology): edges for ALL agents with >= min_colocs
-        co-locations, regardless of sharing intensity.
+      - Contact layer (topology): per-event capped sampler (contact_cap partners
+        per agent per venue-time bin, accumulated over >= min_colocs distinct bins).
+        Replaces the prior full-clique conversion that produced <k>=254.7.
       - Transmission layer (T weights): per-edge T from form_dyads(),
         stored as edge attribute 'T' on the contact graph.
       - Venue weights heavy-tailed (Gamma(0.3, 3.0)) so 1-2 venues dominate.
 
-    Fixes 29%/71% isolate artifact: non-sharers now get contact edges.
+    Calibration: contact_cap=2, min_colocs=4 → emergent <k>≈3.0 (target ~2.6,
+    Buchanan empirical mean; range 0-14).  Scale calibrated; shape held out.
+    Non-circularity: degree distribution is a prediction, not an assumption.
 
     Returns
     -------
@@ -968,10 +1024,15 @@ def run_generator_core_periphery(
         venue_return_boost=venue_return_boost,
     )
 
-    # Step 3a: co-location counts
-    coloc_counts = colocation_counter(trajectories, space_bin=space_bin, time_bin=time_bin)
+    # Step 3a: co-location counts — capped per-event sampler (H8-fix)
+    # Each agent samples ≤ contact_cap partners per venue-time bin; pair count
+    # is incremented at most once per bin (distinct events). Replaces full-clique.
+    coloc_counts = colocation_counter_capped(
+        trajectories, contact_cap=contact_cap, rng=rng,
+        space_bin=space_bin, time_bin=time_bin,
+    )
 
-    # Step 3b: contact edges -- ALL co-locating pairs (no sharing-intensity gate)
+    # Step 3b: contact edges — pairs with >= min_colocs distinct shared events
     contact_edges = build_contact_edges(coloc_counts, min_colocs=min_colocs)
 
     # Step 3c: node-level sharing intensities (for T weights, not topology)
