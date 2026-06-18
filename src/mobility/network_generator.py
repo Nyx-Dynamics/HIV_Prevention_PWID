@@ -683,3 +683,318 @@ def _synthetic_venue_layer(rg_scale_km: float, rng: np.random.Generator) -> List
                             relevance=1.0, venue_type="drug_market_placeholder"))
 
     return venues
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HANDOFF 8 — Core-periphery via emergent heterogeneity
+#
+# The functions below decouple the contact layer (topology) from the
+# sharing-intensity layer (T weights).  In the dyad pipeline the sharing gate
+# created 29% giant-component / 71% isolates: only sharers had edges.  The fix
+# is to build edges for ALL agents who repeatedly co-locate (contact layer),
+# while keeping per-edge T from node-level sharing intensity (transmission
+# layer).
+#
+# References embedded inline per-function.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def assign_venue_weights_heavy_tailed(
+    n_venues: int,
+    rng: np.random.Generator,
+    shape: float = 0.3,
+    scale: float = 3.0,
+) -> np.ndarray:
+    """
+    Draw per-venue relevance weights from Gamma(shape=0.3, scale=3.0).
+
+    This produces a heavily right-skewed distribution where most venues
+    have low weight (0.1-1.0) and 1-2 venues get weight 5-15x, reproducing
+    the "West Side concentration" pattern in PWID venue use.
+
+    Sources
+    -------
+    Friedman SR et al. Am J Public Health 87(8):1289 (1997).
+      DOI 10.2105/ajph.87.8.1289 -- 2-core structure; West Side concentration.
+    Lin Q & Boodram B. Int J Drug Policy (2023).
+      DOI 10.1016/j.drugpo.2023.104217 -- transient group, West Side concentration.
+    """
+    return rng.gamma(shape=shape, scale=scale, size=n_venues)
+
+
+def build_contact_edges(
+    coloc_counts: Dict[Tuple, int],
+    min_colocs: int = 2,
+) -> List[Tuple[int, int]]:
+    """
+    Build contact-layer edges for ALL agent pairs with >= min_colocs co-locations.
+
+    DECOUPLING FIX: No sharing-intensity gate.  Every pair of agents who
+    repeatedly co-locate forms a contact edge regardless of sharer status.
+    T-weight is applied separately in form_dyads() (transmission layer).
+
+    Why this fixes 29% giant-component / 71% isolates
+    --------------------------------------------------
+    form_dyads() skips pairs where either node has zero sharing intensity.
+    Since 73% of PWID are non-sharers (1-0.27=0.73), most co-locating pairs
+    never got edges -> isolates.  This function includes all co-locating pairs.
+    """
+    edges: List[Tuple[int, int]] = []
+    for (a, b), count in coloc_counts.items():
+        if count >= min_colocs:
+            edges.append((min(a, b), max(a, b)))
+    return edges
+
+
+def compute_core_periphery_stats(G: nx.Graph) -> Dict:
+    """
+    Compute 2-core and component-structure statistics for core-periphery grading.
+
+    Uses nx.k_core(G, k=2) for the 2-core.
+
+    Returns
+    -------
+    dict with keys: two_core_size, two_core_fraction, two_core_density,
+    component_sizes (sorted desc), n_components, largest_component_fraction,
+    isolate_fraction, isolate_count, core_dispersion, core_clustering,
+    core_mean_degree.
+
+    Validation targets (Handoff 8)
+    --------------------------------
+    isolate_fraction < 0.10
+    largest_component_fraction ~ 0.25-0.55  (Friedman 1997: ~30% of 767)
+    two_core_fraction > 0.10
+    core_dispersion > Poisson baseline
+    core_clustering 0.1-0.65  (Kwan 2019: 0.53-0.65)
+
+    Sources
+    -------
+    Friedman SR et al. Am J Public Health 87(8):1289 (1997).
+      DOI 10.2105/ajph.87.8.1289 -- largest component ~30% of 767 PWID.
+    Kwan CK. PLoS ONE 14(5):e0216727 (2019).
+      DOI 10.1371/journal.pone.0216727 -- clustering 0.53-0.65 in PWID networks.
+    """
+    n = G.number_of_nodes()
+    if n == 0:
+        return {
+            "two_core_size": 0, "two_core_fraction": 0.0, "two_core_density": 0.0,
+            "component_sizes": [], "n_components": 0,
+            "largest_component_fraction": 0.0,
+            "isolate_fraction": 0.0, "isolate_count": 0,
+            "core_dispersion": 0.0, "core_clustering": 0.0, "core_mean_degree": 0.0,
+        }
+
+    # 2-core: iteratively remove nodes with degree < 2
+    core = nx.k_core(G, k=2)
+    two_core_size = core.number_of_nodes()
+    two_core_fraction = two_core_size / n
+
+    if two_core_size > 1:
+        two_core_density = nx.density(core)
+        core_degrees = np.array([d for _, d in core.degree()], dtype=float)
+        k_mean = float(np.mean(core_degrees))
+        k2_mean = float(np.mean(core_degrees ** 2))
+        core_dispersion = k2_mean / (k_mean ** 2) if k_mean > 0 else 0.0
+        core_clustering = float(nx.average_clustering(core))
+        core_mean_degree = k_mean
+    else:
+        two_core_density = 0.0
+        core_dispersion = 0.0
+        core_clustering = 0.0
+        core_mean_degree = 0.0
+
+    # Component structure (whole graph)
+    components = sorted(nx.connected_components(G), key=len, reverse=True)
+    component_sizes = [len(c) for c in components]
+    n_components = len(component_sizes)
+    largest_component_fraction = component_sizes[0] / n if component_sizes else 0.0
+
+    # Isolates (degree == 0)
+    isolate_count = sum(1 for _, d in G.degree() if d == 0)
+    isolate_fraction = isolate_count / n
+
+    return {
+        "two_core_size": two_core_size,
+        "two_core_fraction": round(two_core_fraction, 4),
+        "two_core_density": round(two_core_density, 4),
+        "component_sizes": component_sizes,
+        "n_components": n_components,
+        "largest_component_fraction": round(largest_component_fraction, 4),
+        "isolate_fraction": round(isolate_fraction, 4),
+        "isolate_count": isolate_count,
+        "core_dispersion": round(core_dispersion, 4),
+        "core_clustering": round(core_clustering, 4),
+        "core_mean_degree": round(core_mean_degree, 4),
+    }
+
+
+def _synthetic_venue_layer_heavy_tail(
+    rg_scale_km: float,
+    rng: np.random.Generator,
+) -> List[Venue]:
+    """
+    Venue layer with heavy-tailed relevance weights (Handoff 8).
+
+    Places 12 venues: 8 SSP-type (gridded) + 4 other (concentrated in hotspot
+    areas).  Relevance weights from Gamma(0.3, 3.0): 1-2 venues dominate
+    (weight 5-15x), most get 0.1-1.0.
+
+    Sources
+    -------
+    Friedman SR et al. Am J Public Health 87(8):1289 (1997).
+      DOI 10.2105/ajph.87.8.1289 -- West Side concentration.
+    Lin Q & Boodram B. Int J Drug Policy (2023).
+      DOI 10.1016/j.drugpo.2023.104217 -- transient group / hotspot concentration.
+    """
+    venues: List[Venue] = []
+
+    # 8 SSP-type venues: gridded across activity space for spatial coverage
+    n_ssp = 8
+    n_side = int(np.ceil(np.sqrt(n_ssp)))  # 3x3 grid, use first 8
+    coords = np.linspace(-rg_scale_km * 0.8, rg_scale_km * 0.8, n_side)
+    ssp_weights = assign_venue_weights_heavy_tailed(n_ssp, rng)
+    idx = 0
+    for xi in coords:
+        for yi in coords:
+            if idx >= n_ssp:
+                break
+            jx = rng.uniform(-rg_scale_km * 0.1, rg_scale_km * 0.1)
+            jy = rng.uniform(-rg_scale_km * 0.1, rg_scale_km * 0.1)
+            venues.append(Venue(
+                venue_id=idx,
+                x=float(xi + jx),
+                y=float(yi + jy),
+                relevance=float(ssp_weights[idx]),
+                venue_type="ssp",
+            ))
+            idx += 1
+
+    # 4 "other" venues concentrated in 1-2 hotspot areas.
+    # PLACEHOLDER -- hotspot locations are synthetic.
+    # Sources: Friedman 1997 (West Side), Lin/Boodram 2023 (transient group).
+    other_weights = assign_venue_weights_heavy_tailed(4, rng)
+    hotspot_centers = [
+        (rg_scale_km * 0.15, rg_scale_km * 0.05),   # near center
+        (-rg_scale_km * 0.55, rg_scale_km * 0.45),  # peripheral
+    ]
+    scatter = rg_scale_km * 0.05  # tight cluster (~50m if rg=1km)
+    vid = n_ssp
+    for ci, (cx, cy) in enumerate(hotspot_centers):
+        for sub in range(2):
+            x = cx + rng.normal(0, scatter)
+            y = cy + rng.normal(0, scatter)
+            venues.append(Venue(
+                venue_id=vid,
+                x=float(x),
+                y=float(y),
+                relevance=float(other_weights[ci * 2 + sub]),
+                venue_type="drug_market_hotspot_PLACEHOLDER",
+            ))
+            vid += 1
+
+    return venues
+
+
+def run_generator_core_periphery(
+    n_agents: int = 300,
+    n_steps: int = 80,
+    rg_scale_km: float = 2.4,
+    rg_growth_exponent: float = 1.65,
+    seed_hiv_prevalence: float = 0.07,
+    epr_rho: float = 0.60,
+    epr_gamma: float = 0.21,
+    jump_length_exponent: float = 0.60,
+    sharing_prevalence: float = 0.27,
+    intensity_shape: float = 0.5,
+    intensity_scale: float = 0.05,
+    kappa_dyad: float = 2.0,
+    space_bin: float = 0.5,
+    time_bin: int = 5,
+    min_colocs: int = 2,
+    venues: Optional[List[Venue]] = None,
+    venue_return_boost: float = 5.0,
+    seed: int = 42,
+) -> Tuple[nx.Graph, NetworkStats, List[Agent], np.ndarray, Dict, Dict]:
+    """
+    Core-periphery pipeline (Handoff 8).
+
+    KEY DIFFERENCE from run_generator_dyads():
+      - Contact layer (topology): edges for ALL agents with >= min_colocs
+        co-locations, regardless of sharing intensity.
+      - Transmission layer (T weights): per-edge T from form_dyads(),
+        stored as edge attribute 'T' on the contact graph.
+      - Venue weights heavy-tailed (Gamma(0.3, 3.0)) so 1-2 venues dominate.
+
+    Fixes 29%/71% isolate artifact: non-sharers now get contact edges.
+
+    Returns
+    -------
+    (G, stats, agents, node_intensities, edge_intensity_dict, core_periphery_stats)
+
+    Sources
+    -------
+    Friedman SR et al. Am J Public Health 87(8):1289 (1997).
+      DOI 10.2105/ajph.87.8.1289 -- 2-core, largest component ~30% of 767.
+    Lin Q & Boodram B. Int J Drug Policy (2023).
+      DOI 10.1016/j.drugpo.2023.104217 -- West Side / transient group concentration.
+    Kwan CK. PLoS ONE 14(5):e0216727 (2019).
+      DOI 10.1371/journal.pone.0216727 -- clustering 0.53-0.65 in PWID networks.
+    Gonzalez, Hidalgo & Barabasi. Nature 453:779 (2008).
+      DOI 10.1038/nature06958 -- heavy-tailed r_g (cited in params.py).
+    """
+    rng = np.random.default_rng(seed)
+
+    # Step 1: agents
+    agents = sample_traversement_potential(
+        n=n_agents,
+        rg_scale_km=rg_scale_km,
+        rg_growth_exponent=rg_growth_exponent,
+        seed_hiv_prevalence=seed_hiv_prevalence,
+        rng=rng,
+    )
+
+    # Step 2: heavy-tailed venue layer (if not provided)
+    if venues is None:
+        venues = _synthetic_venue_layer_heavy_tail(rg_scale_km, rng)
+
+    # Step 2b: EPR walks (same engine as run_generator_dyads)
+    trajectories = generate_walks(
+        agents=agents,
+        venues=venues,
+        n_steps=n_steps,
+        epr_rho=epr_rho,
+        epr_gamma=epr_gamma,
+        jump_length_exponent=jump_length_exponent,
+        rng=rng,
+        venue_return_boost=venue_return_boost,
+    )
+
+    # Step 3a: co-location counts
+    coloc_counts = colocation_counter(trajectories, space_bin=space_bin, time_bin=time_bin)
+
+    # Step 3b: contact edges -- ALL co-locating pairs (no sharing-intensity gate)
+    contact_edges = build_contact_edges(coloc_counts, min_colocs=min_colocs)
+
+    # Step 3c: node-level sharing intensities (for T weights, not topology)
+    node_intensities = assign_node_sharing_intensity(
+        n_agents=n_agents,
+        sharing_prevalence=sharing_prevalence,
+        rng=rng,
+        shape=intensity_shape,
+        scale=intensity_scale,
+    )
+
+    # Step 3d: T-weighted sharing dyads (subset; used as edge attribute 'T')
+    _, edge_intensities = form_dyads(coloc_counts, node_intensities, kappa_dyad, rng)
+
+    # Step 4: build contact graph from ALL contact edges (topology layer)
+    G, stats = build_contact_graph(contact_edges, n_agents=n_agents)
+
+    # Attach T weights to sharing-dyad edges as graph edge attribute
+    for (a, b), t_val in edge_intensities.items():
+        if G.has_edge(a, b):
+            G[a][b]['T'] = float(t_val)
+
+    # Step 5: core-periphery metrics
+    cp_stats = compute_core_periphery_stats(G)
+
+    return G, stats, agents, node_intensities, edge_intensities, cp_stats
