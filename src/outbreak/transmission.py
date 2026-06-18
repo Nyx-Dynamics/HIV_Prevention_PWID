@@ -314,6 +314,7 @@ def run_temporal_with_gamma(
     removed_set: set = set()
     removed_while_S: set = set()
     removed_while_I: set = set()
+    removed_bin_by_agent: dict = {}   # agent_id -> t_bin when removed (for person-time)
 
     for t_bin in range(max_t_bin + 1):
 
@@ -325,6 +326,7 @@ def run_temporal_with_gamma(
                     continue
                 if p_rm[agent] > 0.0 and draws[agent] < p_rm[agent]:
                     removed_set.add(agent)
+                    removed_bin_by_agent[agent] = t_bin
                     if agent in infection_bin:
                         removed_while_I.add(agent)
                     else:
@@ -384,7 +386,9 @@ def run_temporal_with_gamma(
                     new_by_bin[t_bin] += 1
 
     base = _metrics(infection_bin, new_by_bin, n_agents, time_bin_days, outbreak_threshold)
-    base["removed_while_S"] = len(removed_while_S)
-    base["removed_while_I"] = len(removed_while_I)
-    base["total_removed"]   = len(removed_set)
+    base["removed_while_S"]      = len(removed_while_S)
+    base["removed_while_I"]      = len(removed_while_I)
+    base["total_removed"]        = len(removed_set)
+    base["infection_bin_raw"]    = dict(infection_bin)       # {agent_id: t_bin}
+    base["removed_bin_by_agent"] = dict(removed_bin_by_agent)  # {agent_id: t_bin}
     return base
