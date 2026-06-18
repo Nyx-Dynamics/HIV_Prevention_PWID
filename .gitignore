@@ -8,3 +8,10 @@ build/
 .env
 *.tif
 *.eps
+outputs/
+data/csv_xlsx/
+baseline_csv_xlsx/
+data/figures/
+data/reproducibility_log.txt
+*.log
+.idea/
