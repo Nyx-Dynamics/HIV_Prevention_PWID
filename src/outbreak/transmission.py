@@ -242,3 +242,149 @@ def run_static(
                 new_by_bin[t_bin] += 1
 
     return _metrics(infection_bin, new_by_bin, n_agents, time_bin_days, outbreak_threshold)
+
+
+# ── Temporal model with γ removal (Handoff 10 — desaturation ladder) ─────────
+
+def run_temporal_with_gamma(
+    event_stream,
+    n_agents: int,
+    seed_agent: int,
+    contact_cap: int,
+    beta_syringe: float,
+    beta_env: float,
+    gamma_array,                      # np.ndarray, per-agent γ/day; zeros → Arm 0
+    relocation_fraction: float,       # = 0 for all H10 runs (switch for future)
+    acute_dur_bins: int,
+    late_start_bins: int,
+    acute_mult: float,
+    late_mult: float,
+    rng_transmission,                 # acquisition draws ONLY
+    rng_removal,                      # removal draws ONLY — never crossed
+    time_bin_days: int = 5,
+    outbreak_threshold: int = 10,
+) -> dict:
+    """
+    SI outbreak with terminal agent removal (γ structural-censoring).
+
+    RNG ARCHITECTURE (§3, Handoff 10):
+      rng_transmission — all acquisition/transmission draws.
+      rng_removal      — removal draws ONLY; never touched by rng_transmission.
+      Arm 0 (γ=0): rng_removal is NEVER drawn from → transmission draws are
+      byte-for-byte identical to Arms 1/2 on the same SeedSequence root.
+      Verify: Arm 0 final_size == event-stream baseline (299/300) on each seed.
+
+    Removal mechanics:
+      At the start of each time-bin, each non-removed agent is tested for
+      removal: p = 1 − exp(−γ_i × time_bin_days), drawn from rng_removal.
+      Removal is terminal and serostatus-blind (affects S and I equally).
+      Removed agents are excluded from all subsequent events.
+
+    relocation_fraction: 0 for all H10 runs.  Switch exposes the parameter
+    for future displacement/bridge modelling without re-architecting.
+
+    Additional returned metrics:
+      removed_while_S  — susceptibles removed before infection (pool dilution)
+      removed_while_I  — infected removed (source extinction)
+      total_removed    — total removals
+    """
+    import numpy as _np
+    from collections import defaultdict as _dd
+
+    if relocation_fraction != 0.0:
+        raise NotImplementedError("relocation_fraction > 0 is reserved for future builds.")
+
+    gamma_arr = _np.asarray(gamma_array, dtype=float)
+    any_removal = bool(_np.any(gamma_arr > 0))
+    p_rm = _np.array([
+        float(1.0 - _np.exp(-g * time_bin_days)) if g > 0 else 0.0
+        for g in gamma_arr
+    ])
+
+    # Build time-bin indexed event lookup
+    events_by_t: dict = _dd(list)
+    max_t_bin = 0
+    for t_bin, cell, agents in event_stream:
+        events_by_t[t_bin].append((cell, agents))
+        if t_bin > max_t_bin:
+            max_t_bin = t_bin
+
+    infection_bin: dict = {seed_agent: 0}
+    new_by_bin: dict = _dd(int)
+    removed_set: set = set()
+    removed_while_S: set = set()
+    removed_while_I: set = set()
+
+    for t_bin in range(max_t_bin + 1):
+
+        # ── Removal phase (rng_removal only; Arm 0 skips entirely) ────────────
+        if any_removal:
+            draws = rng_removal.random(n_agents)
+            for agent in range(n_agents):
+                if agent in removed_set:
+                    continue
+                if p_rm[agent] > 0.0 and draws[agent] < p_rm[agent]:
+                    removed_set.add(agent)
+                    if agent in infection_bin:
+                        removed_while_I.add(agent)
+                    else:
+                        removed_while_S.add(agent)
+
+        # ── Transmission phase (rng_transmission only) ────────────────────────
+        for _cell, agents in events_by_t[t_bin]:
+            active = [a for a in agents if a not in removed_set]
+            m = len(active)
+            if m < 2:
+                continue
+
+            infected_here = [(a, infection_bin[a]) for a in active if a in infection_bin]
+            if not infected_here:
+                continue
+            susceptibles = [a for a in active if a not in infection_bin]
+            if not susceptibles:
+                continue
+
+            src_b1 = []
+            src_b2 = []
+            for src, t_inf in infected_here:
+                t_since = t_bin - t_inf
+                src_b1.append(
+                    (src, _stage_beta(beta_syringe, t_since, acute_dur_bins,
+                                      late_start_bins, acute_mult, late_mult))
+                )
+                if beta_env > 0:
+                    src_b2.append(
+                        (src, _stage_beta(beta_env, t_since, acute_dur_bins,
+                                          late_start_bins, acute_mult, late_mult))
+                    )
+
+            new_this_bin = []
+            for susc in susceptibles:
+                others = [a for a in active if a != susc]
+                n_sample = min(contact_cap, len(others))
+                sampled_set = set(int(x) for x in
+                                  rng_transmission.choice(others, size=n_sample, replace=False))
+
+                log_surv = 0.0
+                for src, b in src_b1:
+                    if src in sampled_set and b > 0.0:
+                        log_surv += _np.log1p(-b)
+                for src, b in src_b2:
+                    if b > 0.0:
+                        log_surv += _np.log1p(-b)
+
+                if log_surv < 0.0:
+                    p_acq = -_np.expm1(log_surv)
+                    if rng_transmission.random() < p_acq:
+                        new_this_bin.append(susc)
+
+            for a in new_this_bin:
+                if a not in infection_bin and a not in removed_set:
+                    infection_bin[a] = t_bin
+                    new_by_bin[t_bin] += 1
+
+    base = _metrics(infection_bin, new_by_bin, n_agents, time_bin_days, outbreak_threshold)
+    base["removed_while_S"] = len(removed_while_S)
+    base["removed_while_I"] = len(removed_while_I)
+    base["total_removed"]   = len(removed_set)
+    return base
