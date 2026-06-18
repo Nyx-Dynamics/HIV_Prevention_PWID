@@ -40,10 +40,19 @@ PROXY_DESCRIPTIONS = {
         "No drug market proxy. Represents minimum venue-anchoring assumption."
     ),
     "ssp_diffuse_market": (
-        "CANDIDATE B — SSP + diffuse market field: SSP venues plus synthetic "
-        "drug market venues spread across the activity space at moderate density. "
-        "ASSUMPTION: markets are distributed (no single hotspot). "
-        "SOURCE: PLACEHOLDER — proxy only. AC must approve before use in results."
+        "CANDIDATE B — SSP + diffuse market field: 8 SSP venues (relevance=2.0) "
+        "plus 6 drug-market venues (relevance=1.2) scattered uniformly across "
+        "±rg_scale_km. Total 14 venues; no single venue dominates. "
+        "GEOMETRY ANCHOR: Clipman & Solomon (New Delhi, 2,512 PWID) found "
+        "venue-level HCV risk concentrated at particular injecting sites with "
+        "risk decaying ~17%/degree-of-separation (DOI 10.1111/jvh.13960). "
+        "Multiple venues at moderate weight represents that multi-site structure "
+        "without the single-hotspot concentration of Candidate C. "
+        "Zelenev & Altice (Hartford, 1,574 PWID) degree-corrected block model "
+        "implies community structure driven by venue-level clustering — "
+        "distributed venues allow that structure to emerge (DOI 10.1016/S1473-3099(17)30676-X). "
+        "SOURCE: Synthetic venue locations; provenance-anchored geometry. "
+        "AC must approve before use in primary results."
     ),
     "ssp_concentrated_hotspot": (
         "CANDIDATE C — SSP + concentrated hotspot clusters: SSP venues plus "
